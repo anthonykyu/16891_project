@@ -1,0 +1,10 @@
+
+<launch>
+
+	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>
+	
+
+	  <!--  **************** Visualisation ****************  -->
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find steer_bot_viz)/rviz/steer_bot_planning.rviz"/> -->
+
+</launch>

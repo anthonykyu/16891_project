@@ -1,0 +1,1 @@
+#include "mamp_planning/vertex.hpp"
