@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "steer_bot_planning_node");
+  ros::init(argc, argv, "mamp_planning_node");
   ROS_INFO("Heyyy");
   CBSMP planner_;
   ros::spin();
