@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mamp_planning/custom_priority_queue.hpp"
+#include "mamp_planning/open_list.hpp"
 #include "mamp_planning/vertex.hpp"
 #include "mamp_planning/edge.hpp"
 #include "mamp_planning/prm.hpp"

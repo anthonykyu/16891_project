@@ -145,7 +145,7 @@ add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/astar.cpp
                                     src/cbs_mp.cpp
                                     src/ct_node.cpp
-                                    src/custom_priority_queue.cpp
+                                    src/open_list.cpp
                                     src/dstar_lite.cpp
                                     src/edge.cpp
                                     src/pbs_dstar_mp.cpp
