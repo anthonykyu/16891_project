@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <memory>
+#include <tuple>
+#include <limits>
 #include "mamp_planning/agent.hpp"
 #include "mamp_planning/edge.hpp"
 
@@ -14,18 +16,22 @@ public:
     double const &getG();
     double const &getH();
     double const &getV();
-    int const &getId();
+    double getF();
+    unsigned int const &getId();
+    std::shared_ptr<Vertex> getParent();
+    std::vector<double> const &getJointPos();
+    std::vector<std::shared_ptr<Edge>> const &getEdges();
+    // function to compare g and v values, -1 underconsistent, 0 consistent, 1 overconsistent
+    int checkConsistency();
+
     void changeValidity(bool validity);
     void setId(unsigned int id);
     void setG(double g);
     void setH(double h);
     void setV(double v);
-    std::shared_ptr<Vertex> getParent();
     void setParent(std::shared_ptr<Vertex> parent);
-    void addEdge(std::shared_ptr<Edge>);
+    void addEdge(std::shared_ptr<Edge> edge);
     std::tuple<double, unsigned int> getComparisonTuple();
-    // function to compare g and v values, -1 underconsistent, 0 consistent, 1 overconsistent
-    int checkConsistency();
 
 private:
     double g_;
