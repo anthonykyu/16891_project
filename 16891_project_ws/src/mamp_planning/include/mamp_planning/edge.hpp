@@ -3,6 +3,7 @@
 #include <array>
 #include <memory>
 #include <unordered_map>
+#include <cmath>
 #include "mamp_planning/vertex.hpp"
 #include "mamp_planning/agent.hpp"
 
@@ -14,6 +15,7 @@ public:
     bool const& isValid();
     void changeValidity(bool validity);
     std::shared_ptr<Vertex> getOpposingVertex(std::shared_ptr<Vertex> v);
+    double const &getCost();
 
 private:
     double cost_;
