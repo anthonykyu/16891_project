@@ -41,6 +41,11 @@ unsigned int const &Vertex::getId()
   return id_;
 }
 
+unsigned int const &Vertex::getComponentId()
+{
+  return component_id_;
+}
+
 std::vector<double> const &Vertex::getJointPos()
 {
   return joint_pos_;
@@ -89,6 +94,16 @@ void Vertex::setParent(std::shared_ptr<Vertex> parent)
 void Vertex::addEdge(std::shared_ptr<Edge> edge)
 {
   edges_.push_back(edge);
+}
+
+void Vertex::setJointPos(std::vector<double> joint_pos)
+{
+  joint_pos_ = joint_pos;
+}
+
+void Vertex::setComponentId(unsigned int component_id)
+{
+  component_id_ = component_id;
 }
 
 std::tuple<double, unsigned int> Vertex::getComparisonTuple()

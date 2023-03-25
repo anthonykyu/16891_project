@@ -18,6 +18,7 @@ public:
     double const &getV();
     double getF();
     unsigned int const &getId();
+    unsigned int const &getComponentId();
     std::shared_ptr<Vertex> getParent();
     std::vector<double> const &getJointPos();
     std::vector<std::shared_ptr<Edge>> const &getEdges();
@@ -31,6 +32,8 @@ public:
     void setV(double v);
     void setParent(std::shared_ptr<Vertex> parent);
     void addEdge(std::shared_ptr<Edge> edge);
+    void setJointPos(std::vector<double> joint_pos);
+    void setComponentId(unsigned int component_id);
     std::tuple<double, unsigned int> getComparisonTuple();
 
 private:
@@ -39,6 +42,7 @@ private:
     double v_;
     bool valid_;
     unsigned int id_;
+    unsigned int component_id_;
     std::vector<double> joint_pos_;
     std::shared_ptr<Vertex> parent_vertex_;
     std::vector<std::shared_ptr<Edge>> edges_;
