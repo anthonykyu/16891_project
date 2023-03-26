@@ -3,6 +3,7 @@
 PRM::PRM()
 {
   radius_ = 0.5;
+  num_samples_ = 15000;
 }
 
 bool PRM::PRMCheckCollision(vector<double> joint_pos)
@@ -33,7 +34,7 @@ void PRM::PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> g
     double distance = PRMGetDistance(q_new, q_near);
     if (distance <= radius)
     {
-      neighborhood_.push_back(q_near);
+      q_new->setNeighborhood(q_near->getNeighborhood());
     }
   }
 }
@@ -46,6 +47,7 @@ shared_ptr<Vertex> PRM::PRMGetRandomVertex(int dof)
     {
       q_rand_pos[i] = (double)rand() / (double)RAND_MAX;
     }
+    return q_rand;
 }
 
 shared_ptr<Vertex> PRM::PRMGetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
@@ -107,7 +109,7 @@ bool PRM::PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
     for (int i = 0; i < num_steps; ++i)
     {
         // creat a double vector with the same size as the joint position
-        auto unit_vector = q1->getJointPos();
+        vector<double> unit_vector;
         for (int j = 0; j < q1->getJointPos().size(); ++j)
         {
             unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
@@ -118,4 +120,67 @@ bool PRM::PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
         }
     }
     return false;
+}
+
+void PRM::PRMGetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes)
+{
+    shared_ptr<Vertex> q = q_goal;
+    while (q->getId() != q_start->getId())
+    {
+        PRMpath_.push_back(q);
+        q = q->getParent();
+    }
+    PRMpath_.push_back(q_start);
+}
+
+void PRM::BuildPRM()
+{
+    int component = 0;
+    for (int i = 0; i < num_samples_; i++)
+    {
+        shared_ptr<Vertex> q_rand = PRMGetRandomVertex(dof_);
+        if (PRMCheckCollision(q_rand->getJointPos()))
+        {
+            continue;
+        }
+
+        q_rand->setId(PRMgraph_.size());
+        PRMgraph_.push_back(q_rand);
+        PRMGetNeighbors(q_rand, PRMgraph_, radius_);
+
+        // if the neighborhood is empty, then the new vertex is a new component
+        if (q_rand->getNeighborhood().empty())
+        {
+            q_rand->setComponentId(component);
+            component++;
+            continue;
+        }
+        
+        // if the neighborhood is not empty, then the new vertex is in the same component as its nearest neighbor
+        for(int j = 0; j < q_rand->getNeighborhood().size(); j++)
+        {
+                shared_ptr<Vertex> q_near = q_rand->getNeighborhood()[j];
+                if(q_rand->getComponentId() != q_near->getComponentId())
+                {
+                    // merge two components
+                    if (PRMConnect(q_rand, q_near))
+                    {
+                        q_rand->setComponentId(q_near->getComponentId());
+                        shared_ptr<Edge> edge = make_shared<Edge>(q_rand, q_near);
+                        q_rand->addEdge(edge);
+                        q_near->addEdge(edge);
+                        for (int k = 0; k < PRMgraph_.size(); ++k)
+                        {
+                                PRMgraph_[k]->setComponentId(q_rand->getComponentId());    
+                        }
+                    }
+                    else
+                    {
+                        q_rand->setComponentId(component);
+                        component++;
+                    } 
+            }
+        }
+        
+    }
 }

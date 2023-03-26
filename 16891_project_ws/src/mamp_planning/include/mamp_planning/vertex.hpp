@@ -21,6 +21,7 @@ public:
     unsigned int const &getComponentId();
     std::shared_ptr<Vertex> getParent();
     std::vector<double> const &getJointPos();
+    std::vector<std::shared_ptr<Vertex>> const &getNeighborhood();
     std::vector<std::shared_ptr<Edge>> const &getEdges();
     // function to compare g and v values, -1 underconsistent, 0 consistent, 1 overconsistent
     int checkConsistency();
@@ -34,6 +35,7 @@ public:
     void addEdge(std::shared_ptr<Edge> edge);
     void setJointPos(std::vector<double> joint_pos);
     void setComponentId(unsigned int component_id);
+    void setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood);
     std::tuple<double, unsigned int> getComparisonTuple();
 
 private:
@@ -46,6 +48,7 @@ private:
     std::vector<double> joint_pos_;
     std::shared_ptr<Vertex> parent_vertex_;
     std::vector<std::shared_ptr<Edge>> edges_;
+    std::vector<std::shared_ptr<Vertex>> neighborhood_;
 };
 
 struct CompareVertex

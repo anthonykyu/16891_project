@@ -56,6 +56,11 @@ std::vector<std::shared_ptr<Edge>> const &Vertex::getEdges()
   return edges_;
 }
 
+std::vector<std::shared_ptr<Vertex>> const &Vertex::getNeighborhood()
+{
+  return neighborhood_;
+}
+
 void Vertex::changeValidity(bool validity)
 {
   valid_ = validity;
@@ -104,6 +109,11 @@ void Vertex::setJointPos(std::vector<double> joint_pos)
 void Vertex::setComponentId(unsigned int component_id)
 {
   component_id_ = component_id;
+}
+
+void Vertex::setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood)
+{
+  neighborhood_ = neighborhood;
 }
 
 std::tuple<double, unsigned int> Vertex::getComparisonTuple()

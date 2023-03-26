@@ -21,7 +21,8 @@ private:
     
     double radius_;
     double epsilon_;
-    vector<shared_ptr<Vertex>> neighborhood_;
+    int num_samples_;
+    int dof_;
     bool PRMCheckCollision(vector<double> joint_pos);
     double PRMGetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
     void PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> graph, double radius);
