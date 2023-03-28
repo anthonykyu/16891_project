@@ -6,12 +6,12 @@ PRM::PRM()
   num_samples_ = 15000;
 }
 
-bool PRM::PRMCheckCollision(vector<double> joint_pos)
+bool PRM::CheckCollision(vector<double> joint_pos)
 {
     return false;
 }
 
-double PRM::PRMGetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
+double PRM::GetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
 {
   double distance = 0;
   for (int i = 0; i < v1->getJointPos().size(); ++i)
@@ -22,7 +22,7 @@ double PRM::PRMGetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
   return sqrt(distance);
 }
 
-void PRM::PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> graph, double radius)
+void PRM::GetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> graph, double radius)
 {
   for (int i = 0; i < graph.size(); ++i)
   {
@@ -31,7 +31,7 @@ void PRM::PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> g
       continue;
     }
     shared_ptr<Vertex> q_near = graph[i];
-    double distance = PRMGetDistance(q_new, q_near);
+    double distance = GetDistance(q_new, q_near);
     if (distance <= radius)
     {
       q_new->setNeighborhood(q_near->getNeighborhood());
@@ -39,7 +39,7 @@ void PRM::PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> g
   }
 }
 
-shared_ptr<Vertex> PRM::PRMGetRandomVertex(int dof)
+shared_ptr<Vertex> PRM::GetRandomVertex(int dof)
 {
     shared_ptr<Vertex> q_rand;
     auto q_rand_pos = q_rand->getJointPos();
@@ -50,11 +50,11 @@ shared_ptr<Vertex> PRM::PRMGetRandomVertex(int dof)
     return q_rand;
 }
 
-shared_ptr<Vertex> PRM::PRMGetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
+shared_ptr<Vertex> PRM::GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
 {
     // create a new vertex
     shared_ptr<Vertex> q_new = make_shared<Vertex>(q_new->getJointPos(), q_new->getId());
-    double distance = PRMGetDistance(q_near, q);
+    double distance = GetDistance(q_near, q);
     int num_steps = (int)(distance / r);
 
     if (num_steps < 2)
@@ -75,7 +75,7 @@ shared_ptr<Vertex> PRM::PRMGetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Ver
 
 }
 
-shared_ptr<Vertex> PRM::PRMGetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
+shared_ptr<Vertex> PRM::GetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
 {
     double min_distance = 1000000;
     shared_ptr<Vertex> q_near;
@@ -86,7 +86,7 @@ shared_ptr<Vertex> PRM::PRMGetNearestVertex(shared_ptr<Vertex> q, vector<shared_
             continue;
         }
 
-        double distance = PRMGetDistance(q, nodes[i]);
+        double distance = GetDistance(q, nodes[i]);
         if (distance < min_distance)
         {
             min_distance = distance;
@@ -96,9 +96,9 @@ shared_ptr<Vertex> PRM::PRMGetNearestVertex(shared_ptr<Vertex> q, vector<shared_
     return q_near;
 }
 
-bool PRM::PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
+bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
 {
-    double distance = PRMGetDistance(q1, q2);
+    double distance = GetDistance(q1, q2);
     int num_steps = (int)(distance / epsilon_);
     if (num_steps < 2)
     {
@@ -114,7 +114,7 @@ bool PRM::PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
         {
             unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
         }
-        if (!PRMCheckCollision(unit_vector))
+        if (!CheckCollision(unit_vector))
         {
             return false;
         }
@@ -122,7 +122,7 @@ bool PRM::PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
     return false;
 }
 
-void PRM::PRMGetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes)
+void PRM::GetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes)
 {
     shared_ptr<Vertex> q = q_goal;
     while (q->getId() != q_start->getId())
@@ -138,15 +138,15 @@ void PRM::BuildPRM()
     int component = 0;
     for (int i = 0; i < num_samples_; i++)
     {
-        shared_ptr<Vertex> q_rand = PRMGetRandomVertex(dof_);
-        if (PRMCheckCollision(q_rand->getJointPos()))
+        shared_ptr<Vertex> q_rand = GetRandomVertex(dof_);
+        if (CheckCollision(q_rand->getJointPos()))
         {
             continue;
         }
 
         q_rand->setId(PRMgraph_.size());
         PRMgraph_.push_back(q_rand);
-        PRMGetNeighbors(q_rand, PRMgraph_, radius_);
+        GetNeighbors(q_rand, PRMgraph_, radius_);
 
         // if the neighborhood is empty, then the new vertex is a new component
         if (q_rand->getNeighborhood().empty())
@@ -163,7 +163,7 @@ void PRM::BuildPRM()
                 if(q_rand->getComponentId() != q_near->getComponentId())
                 {
                     // merge two components
-                    if (PRMConnect(q_rand, q_near))
+                    if (Connect(q_rand, q_near))
                     {
                         q_rand->setComponentId(q_near->getComponentId());
                         shared_ptr<Edge> edge = make_shared<Edge>(q_rand, q_near);

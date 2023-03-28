@@ -23,14 +23,14 @@ private:
     double epsilon_;
     int num_samples_;
     int dof_;
-    bool PRMCheckCollision(vector<double> joint_pos);
-    double PRMGetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
-    void PRMGetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> graph, double radius);
-    shared_ptr<Vertex> PRMGetRandomVertex(int dof);
-    shared_ptr<Vertex> PRMGetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r);
-    shared_ptr<Vertex> PRMGetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id);
-    bool PRMConnect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2);
-    void PRMGetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes);
+    bool CheckCollision(vector<double> joint_pos);
+    double GetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
+    void GetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> graph, double radius);
+    shared_ptr<Vertex> GetRandomVertex(int dof);
+    shared_ptr<Vertex> GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r);
+    shared_ptr<Vertex> GetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id);
+    bool Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2);
+    void GetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes);
     void BuildPRM();
 
 
