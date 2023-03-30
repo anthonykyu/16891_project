@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   moveit_msgs
+  kdl_parser
+  urdf
   moveit_core
   moveit_ros_planning
   moveit_ros_planning_interface
@@ -19,7 +21,10 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(orocos_kdl REQUIRED
+urdf_model REQUIRED
+Eigen 3 3.3 REQUIRED
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -108,12 +113,12 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
+ INCLUDE_DIRS include ${Eigen3_INCLUDE_DIRS}
 #  LIBRARIES mamp_planning
- CATKIN_DEPENDS roscpp rospy std_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs kdl_parser urdf eigen
  moveit_core
  moveit_ros_planning_interface
-#  DEPENDS system_lib
+ DEPENDS orocos_kdl urdf_model
 )
 
 ###########
@@ -141,6 +146,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(${PROJECT_NAME}_node src/main.cpp
+                                    src/vertex.cpp
                                     src/agent.cpp
                                     src/astar.cpp
                                     src/cbs_mp.cpp
@@ -151,7 +157,6 @@ add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/pbs_dstar_mp.cpp
                                     src/pbs_node.cpp
                                     src/prm.cpp
-                                    src/vertex.cpp
                                     )
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})

@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <cmath>
 #include "mamp_planning/vertex.hpp"
-#include "mamp_planning/agent.hpp"
 
 class Vertex;
 class Edge
@@ -20,5 +19,7 @@ public:
 private:
     double cost_;
     bool valid_;
+    double traversal_time_;
+    
     std::unordered_map<unsigned int, std::shared_ptr<Vertex>> vertices_;
 };

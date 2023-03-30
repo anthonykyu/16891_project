@@ -1,9 +1,9 @@
 #pragma once
 
-#include "mamp_planning/agent.hpp"
+// #include "mamp_planning/agent.hpp"
 #include "mamp_planning/vertex.hpp"
 #include "mamp_planning/edge.hpp"
-#include "mamp_planning/astar.hpp"
+// #include "mamp_planning/astar.hpp"
 
 using namespace std;
 class PRM
@@ -13,7 +13,7 @@ public:
     PRM();
     vector<shared_ptr<Vertex>> PRMgraph_;
     vector<shared_ptr<Vertex>> PRMpath_;
-    vector<shared_ptr<Vertex>> Astarpath_;
+    // vector<shared_ptr<Vertex>> Astarpath_;
 
 
 

@@ -4,7 +4,6 @@
 #include <memory>
 #include <tuple>
 #include <limits>
-#include "mamp_planning/agent.hpp"
 #include "mamp_planning/edge.hpp"
 
 class Edge;
