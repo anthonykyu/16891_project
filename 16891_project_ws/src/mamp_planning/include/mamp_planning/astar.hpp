@@ -8,7 +8,7 @@ class AStar
 public:
     shared_ptr<Vertex> start_;
     shared_ptr<Vertex> goal_;
-    shared_ptr<Agent> agent_;
+    // shared_ptr<Agent> agent_;
     std::vector<constraint> constraints_;
     vector<shared_ptr<Vertex>> Astarpath_;
     AStar();
