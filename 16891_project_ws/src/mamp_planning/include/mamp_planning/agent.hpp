@@ -5,7 +5,7 @@
 #include <urdf_model/model.h>
 #include <urdf/model.h>
 
-#include "mamp_planning/vertex.hpp"
+#include "mamp_planning/astar.hpp"
 #include "mamp_planning/prm.hpp"
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/planning_scene/planning_scene.h>

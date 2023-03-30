@@ -3,8 +3,8 @@
 #pragma once
 
 #include "ros/ros.h"
-#include "mamp_planning/prm.hpp"
-#include "mamp_planning/astar.hpp"
+#include "mamp_planning/agent.hpp"
+#include "mamp_planning/ct_node.hpp"
 
 #define PLANNER_RATE 10
 

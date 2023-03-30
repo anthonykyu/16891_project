@@ -1,9 +1,6 @@
 #pragma once
 
-// #include "mamp_planning/agent.hpp"
-#include "mamp_planning/vertex.hpp"
-#include "mamp_planning/edge.hpp"
-// #include "mamp_planning/astar.hpp"
+#include "mamp_planning/mamp_helper.hpp"
 
 using namespace std;
 class PRM
