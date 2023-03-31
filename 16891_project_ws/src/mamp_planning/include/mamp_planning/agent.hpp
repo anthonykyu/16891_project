@@ -19,7 +19,12 @@ public:
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();
     unsigned int const &getID();
     std::shared_ptr<PRM> &getPRM();
-    std::vector<double> getJointVelLimit();
+    std::vector<double> const &getJointVelLimit();
+    std::vector<double> const &getUpperJointLimit();
+    std::vector<double> const &getLowerJointLimit();
+    std::vector<double> const &getStart();
+    std::vector<double> const &getGoal();
+
 
 private:
     unsigned int id_;
@@ -27,9 +32,14 @@ private:
     std::vector<double> upper_joint_limit_;
     std::vector<double> lower_joint_limit_;
     std::vector<double> joint_vel_limit_;
+    std::vector<double> start_;
+    std::vector<double> goal_;
     std::shared_ptr<PRM> prm_;
+    std::shared_ptr<AStar> astar_;
+    std::vector<std::shared_ptr<Vertex>> prm_path_;
+    std::vector<std::shared_ptr<Vertex>> discretized_path_;
+    double path_cost_;
 
-    std::vector<Vertex> path_;
     std::shared_ptr<robot_model_loader::RobotModelLoader> robot_model_loader_;
     std::shared_ptr<moveit::core::RobotModelPtr> kinematic_model_;
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;

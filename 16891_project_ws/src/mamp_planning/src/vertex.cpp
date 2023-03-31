@@ -136,3 +136,13 @@ int Vertex::checkConsistency()
     return -1;
   }
 }
+
+void Vertex::setPRMEdge(std::shared_ptr<Edge> edge)
+{
+  prm_edge_ = edge;
+}
+
+std::shared_ptr<Edge> const &Vertex::getPRMEdge()
+{
+  return prm_edge_;
+}
