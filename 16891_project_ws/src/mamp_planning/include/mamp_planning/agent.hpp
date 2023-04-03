@@ -28,6 +28,7 @@ public:
 
 private:
     unsigned int id_;
+    string planning_group_;
     urdf::Model urdf_model_;
     std::vector<double> upper_joint_limit_;
     std::vector<double> lower_joint_limit_;

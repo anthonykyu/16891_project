@@ -87,4 +87,11 @@ class MAMP_Helper
     // inserted into the Agent's path.
     return std::vector<std::shared_ptr<Vertex>>();
   }
+
+  static std::vector<Constraint> resolveCollision(Collision &collision)
+  {
+    // This function turns a collision into a pair of constraints to be
+    // separated into two nodes of a CT for CBS.
+    return std::vector<Constraint>();
+  }
 };
