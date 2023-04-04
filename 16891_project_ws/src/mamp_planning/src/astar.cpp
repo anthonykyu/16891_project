@@ -1,5 +1,10 @@
 #include "mamp_planning/astar.hpp"
 
+AStar::AStar(std::shared_ptr<PRM> &prm)
+{
+
+}
+
 // AStar::AStar(shared_ptr<Vertex> start, shared_ptr<Vertex> goal, shared_ptr<Agent> agent, std::vector<Constraint> constraints)
 // {
 //     start_ = start;

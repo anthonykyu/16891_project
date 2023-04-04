@@ -6,17 +6,17 @@
 class AStar
 {
 public:
-    shared_ptr<Vertex> start_;
-    shared_ptr<Vertex> goal_;
-    // shared_ptr<Agent> agent_;
+    std::shared_ptr<Vertex> start_;
+    std::shared_ptr<Vertex> goal_;
+    // std::shared_ptr<Agent> agent_;
     std::vector<Constraint> constraints_;
-    vector<shared_ptr<Vertex>> Astarpath_;
-    AStar();
-    // AStar(shared_ptr<Vertex> start, shared_ptr<Vertex> goal, shared_ptr<Agent> agent, std::vector<Constraint> constraints);
+    std::vector<std::shared_ptr<Vertex>> Astarpath_;
+    AStar(std::shared_ptr<PRM> &prm);
+    // AStar(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<Agent> agent, std::vector<Constraint> constraints);
 // 
     // void GetPath();
-    // double GetEucDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2);
-    // void backtrack(vector<shared_ptr<Vertex>> PRMgraph);
+    // double GetEucDistance(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2);
+    // void backtrack(vector<std::shared_ptr<Vertex>> PRMgraph);
 
 private:
 

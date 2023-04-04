@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <memory>
+#include <limits>
+#include <algorithm>
 #include <urdf_model/model.h>
 #include <urdf/model.h>
 
@@ -14,29 +16,33 @@
 class Agent
 {
 public:
-    Agent(unsigned int id, std::shared_ptr<planning_scene::PlanningScene>& planning_scene);
+    Agent(const std::string &robot_description, const std::string &collision_robot_description,
+        const std::string &base_frame, const std::string &tip_frame, unsigned int id, std::string &planning_group,
+        double &timestep, std::vector<double> start, std::vector<double> goal);
 
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();
     unsigned int const &getID();
+    std::string const &getPlanningGroup();
     std::shared_ptr<PRM> &getPRM();
     std::vector<double> const &getJointVelLimit();
     std::vector<double> const &getUpperJointLimit();
     std::vector<double> const &getLowerJointLimit();
-    std::vector<double> const &getStart();
-    std::vector<double> const &getGoal();
+    std::shared_ptr<Vertex> const &getStart();
+    std::shared_ptr<Vertex> const &getGoal();
 
 
 private:
     unsigned int id_;
-    string planning_group_;
+    std::string planning_group_;
     urdf::Model urdf_model_;
     std::vector<double> upper_joint_limit_;
     std::vector<double> lower_joint_limit_;
     std::vector<double> joint_vel_limit_;
-    std::vector<double> start_;
-    std::vector<double> goal_;
+    std::shared_ptr<Vertex> start_;
+    std::shared_ptr<Vertex> goal_;
     std::shared_ptr<PRM> prm_;
     std::shared_ptr<AStar> astar_;
+    double timestep_;
     std::vector<std::shared_ptr<Vertex>> prm_path_;
     std::vector<std::shared_ptr<Vertex>> discretized_path_;
     double path_cost_;
@@ -49,5 +55,5 @@ private:
     // std::shared_ptr<moveit::core::RobotState> current_state_;
     collision_detection::AllowedCollisionMatrix acm_; // allowed collision matrix
 
-    bool compute_joint_limits();
+    bool compute_joint_limits(const std::string& base_frame, const std::string& tip_frame);
 };
