@@ -18,7 +18,7 @@
       <origin rpy="0 0 0" xyz="${-length/2} ${-length/2} 0"/>
     </joint>
 
-    
+
 
     <!-- Setup the first wall -->
     <link name="wall_right" type="fixed">
@@ -28,6 +28,13 @@
         </geometry>
         <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${length} ${width} ${height}"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+      </collision>
     </link>
 
     <joint name="world_to_right" type="fixed">
@@ -44,6 +51,13 @@
         </geometry>
         <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${length} ${width} ${height}"/>
+        </geometry>
+        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+      </collision>
     </link>
 
     <joint name="right_to_front" type="fixed">
@@ -60,6 +74,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${length} ${width} ${height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+      </collision>
     </link>
 
     <joint name="front_to_left" type="fixed">
@@ -77,6 +98,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${length} ${width} ${height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+      </collision>
     </link>
 
     <joint name="left_to_back" type="fixed">
@@ -99,6 +127,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_1" type="fixed">
@@ -116,6 +151,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_2" type="fixed">
@@ -132,6 +174,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_3" type="fixed">
@@ -148,6 +197,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_4" type="fixed">
@@ -165,6 +221,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_5" type="fixed">
@@ -181,6 +244,13 @@
         </geometry>
         <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_shelf_6" type="fixed">
@@ -207,13 +277,15 @@
           <geometry>
             <box size="${pp_length} ${pp_width} ${pp_height}"/>
           </geometry>
-          <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
-          <!-- <material> -->
-            <!-- <color rgba="0.2 0.2 0.2 1"/> -->
-          <!-- </material> -->
-          <!-- <color rgba="1 1 1 1"/> -->
           <material name="pickup_shelf_color"/>
+          <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
         </visual>
+        <collision>
+          <geometry>
+            <box size="${pp_length} ${pp_width} ${pp_height}"/>
+          </geometry>
+          <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
+        </collision>
       </link>
 
       <joint name="world_to_pickup_point_${number}" type="fixed">
@@ -244,9 +316,15 @@
         <geometry>
           <box size="${pp_length} 2 ${pp_height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
         <!-- <material name="pickup_shelf_color"/> -->
+        <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
       </visual>
+      <collision>
+        <geometry>
+          <box size="${pp_length} 2 ${pp_height}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
+      </collision>
     </link>
 
     <joint name="world_to_dropoff_point" type="fixed">

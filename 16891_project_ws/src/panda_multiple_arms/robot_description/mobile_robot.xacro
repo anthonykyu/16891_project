@@ -31,9 +31,16 @@
         <geometry>
           <cylinder length="${height}" radius="${dims}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="0 0 ${height/2}"/>
         <material name="${color}"/>
+        <origin rpy = "0 0 0" xyz="0 0 ${height/2}"/>
       </visual>
+
+      <collision>
+        <geometry>
+          <cylinder length="${height}" radius="${dims}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${height/2}"/>
+      </collision>
     </link>
   </xacro:macro>
 

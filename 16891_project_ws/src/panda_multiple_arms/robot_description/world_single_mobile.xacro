@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_just_mobile">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_single_mobile">
 
   <xacro:include filename="$(find panda_multiple_arms)/robot_description/walls.xacro" />
   <xacro:include filename="$(find panda_multiple_arms)/robot_description/mobile_robot.xacro" />
