@@ -6,6 +6,7 @@
     <xacro:property name="length" value="10.0" /> 
     <xacro:property name="width" value="0.1" /> 
     <xacro:property name="height" value="1" /> 
+    <xacro:property name="margin" value="0.01" />
 
 
     <link name="world_center"/>
@@ -26,14 +27,14 @@
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy="0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </visual>
 
       <collision>
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy="0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </collision>
     </link>
 
@@ -49,14 +50,14 @@
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy="0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </visual>
 
       <collision>
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy="0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy="0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </collision>
     </link>
 
@@ -72,14 +73,14 @@
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy = "0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </visual>
 
       <collision>
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy = "0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </collision>
     </link>
 
@@ -96,14 +97,14 @@
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy = "0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </visual>
 
       <collision>
         <geometry>
           <box size="${length} ${width} ${height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="${length/2} 0 0"/>
+        <origin rpy = "0 0 0" xyz="${length/2} ${-width/2 - margin} 0"/>
       </collision>
     </link>
 
@@ -295,42 +296,46 @@
       </joint>      
     </xacro:macro>
 
-    <xacro:pickup_point number="1" loc_x="${length/4}" loc_y="0"/>
-    <xacro:pickup_point number="2" loc_x="${2*length/4}" loc_y="0"/>
-    <xacro:pickup_point number="3" loc_x="${3*length/4}" loc_y="0"/>
+    <xacro:pickup_point number="1" loc_x="${length/4}" loc_y="${pp_width/2}"/>
+    <xacro:pickup_point number="2" loc_x="${2*length/4}" loc_y="${pp_width/2}"/>
+    <xacro:pickup_point number="3" loc_x="${3*length/4}" loc_y="${pp_width/2}"/>
 
-    <xacro:pickup_point number="4" loc_x="0" loc_y="${length/4}"/>
-    <xacro:pickup_point number="5" loc_x="0" loc_y="${2*length/4}"/>
-    <xacro:pickup_point number="6" loc_x="0" loc_y="${3*length/4}"/>
+    <xacro:pickup_point number="4" loc_x="${pp_length/2}" loc_y="${length/4}"/>
+    <xacro:pickup_point number="5" loc_x="${pp_length/2}" loc_y="${2*length/4}"/>
+    <xacro:pickup_point number="6" loc_x="${pp_length/2}" loc_y="${3*length/4}"/>
 
-    <xacro:pickup_point number="7" loc_x="${length/4}" loc_y="${length}"/>
-    <xacro:pickup_point number="8" loc_x="${2*length/4}" loc_y="${length}"/>
-    <xacro:pickup_point number="9" loc_x="${3*length/4}" loc_y="${length}"/>
+    <xacro:pickup_point number="7" loc_x="${length/4}" loc_y="${length-pp_width/2}"/>
+    <xacro:pickup_point number="8" loc_x="${2*length/4}" loc_y="${length-pp_width/2}"/>
+    <xacro:pickup_point number="9" loc_x="${3*length/4}" loc_y="${length-pp_width/2}"/>
 
     <!-- ############# -->
     <!-- Dropoff point -->
     <!-- ############# -->
 
+    <xacro:property name="dp_length" value = "${pp_length}"/>
+    <xacro:property name="dp_width" value = "2"/>
+    <xacro:property name="dp_height" value = "${pp_height}"/>
+
     <link name="dropoff_point">
       <visual>
         <geometry>
-          <box size="${pp_length} 2 ${pp_height}"/>
+          <box size="${dp_length} ${dp_width} ${dp_height}"/>
         </geometry>
         <!-- <material name="pickup_shelf_color"/> -->
-        <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
+        <origin rpy = "0 0 0" xyz="0 0 ${dp_height/2}"/>
       </visual>
       <collision>
         <geometry>
-          <box size="${pp_length} 2 ${pp_height}"/>
+          <box size="${dp_length} ${dp_width} ${dp_height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="0 0 ${pp_height/2}"/>
+        <origin rpy = "0 0 0" xyz="0 0 ${dp_height/2}"/>
       </collision>
     </link>
 
     <joint name="world_to_dropoff_point" type="fixed">
       <parent link="world"/>
       <child link="dropoff_point"/>
-      <origin rpy="0 0 0" xyz="${length} ${length/2} 0"/>
+      <origin rpy="0 0 0" xyz="${length - dp_length/2} ${length/2} 0"/>
     </joint>
 
 

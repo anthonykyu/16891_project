@@ -1,6 +1,9 @@
 
 <launch>
-
+	<param name="robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile.urdf" />
+	<param name="environment_description" command=" cat $(find panda_multiple_arms)/robot_description/walls_test.urdf" />
+	<param name="mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/mobile_test.urdf" />
+	<param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile.urdf" />
 	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>
 	
 

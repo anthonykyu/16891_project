@@ -34,13 +34,13 @@
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </visual>
     <collision>
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </collision>
   </link>
   <joint name="world_to_right" type="fixed">
@@ -54,13 +54,13 @@
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </visual>
     <collision>
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </collision>
   </link>
   <joint name="right_to_front" type="fixed">
@@ -74,13 +74,13 @@
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </visual>
     <collision>
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </collision>
   </link>
   <joint name="front_to_left" type="fixed">
@@ -94,13 +94,13 @@
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </visual>
     <collision>
       <geometry>
         <box size="10.0 0.1 1"/>
       </geometry>
-      <origin rpy="0 0 0" xyz="5.0 0 0"/>
+      <origin rpy="0 0 0" xyz="5.0 -0.060000000000000005 0"/>
     </collision>
   </link>
   <joint name="left_to_back" type="fixed">
@@ -249,7 +249,7 @@
   <joint name="world_to_pickup_point_1" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_1"/>
-    <origin rpy="0 0 0" xyz="2.5 0 0"/>
+    <origin rpy="0 0 0" xyz="2.5 0.25 0"/>
   </joint>
   <link name="pickup_point_2">
     <visual>
@@ -269,7 +269,7 @@
   <joint name="world_to_pickup_point_2" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_2"/>
-    <origin rpy="0 0 0" xyz="5.0 0 0"/>
+    <origin rpy="0 0 0" xyz="5.0 0.25 0"/>
   </joint>
   <link name="pickup_point_3">
     <visual>
@@ -289,7 +289,7 @@
   <joint name="world_to_pickup_point_3" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_3"/>
-    <origin rpy="0 0 0" xyz="7.5 0 0"/>
+    <origin rpy="0 0 0" xyz="7.5 0.25 0"/>
   </joint>
   <link name="pickup_point_4">
     <visual>
@@ -309,7 +309,7 @@
   <joint name="world_to_pickup_point_4" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_4"/>
-    <origin rpy="0 0 0" xyz="0 2.5 0"/>
+    <origin rpy="0 0 0" xyz="0.25 2.5 0"/>
   </joint>
   <link name="pickup_point_5">
     <visual>
@@ -329,7 +329,7 @@
   <joint name="world_to_pickup_point_5" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_5"/>
-    <origin rpy="0 0 0" xyz="0 5.0 0"/>
+    <origin rpy="0 0 0" xyz="0.25 5.0 0"/>
   </joint>
   <link name="pickup_point_6">
     <visual>
@@ -349,7 +349,7 @@
   <joint name="world_to_pickup_point_6" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_6"/>
-    <origin rpy="0 0 0" xyz="0 7.5 0"/>
+    <origin rpy="0 0 0" xyz="0.25 7.5 0"/>
   </joint>
   <link name="pickup_point_7">
     <visual>
@@ -369,7 +369,7 @@
   <joint name="world_to_pickup_point_7" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_7"/>
-    <origin rpy="0 0 0" xyz="2.5 10.0 0"/>
+    <origin rpy="0 0 0" xyz="2.5 9.75 0"/>
   </joint>
   <link name="pickup_point_8">
     <visual>
@@ -389,7 +389,7 @@
   <joint name="world_to_pickup_point_8" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_8"/>
-    <origin rpy="0 0 0" xyz="5.0 10.0 0"/>
+    <origin rpy="0 0 0" xyz="5.0 9.75 0"/>
   </joint>
   <link name="pickup_point_9">
     <visual>
@@ -409,7 +409,7 @@
   <joint name="world_to_pickup_point_9" type="fixed">
     <parent link="world"/>
     <child link="pickup_point_9"/>
-    <origin rpy="0 0 0" xyz="7.5 10.0 0"/>
+    <origin rpy="0 0 0" xyz="7.5 9.75 0"/>
   </joint>
   <!-- ############# -->
   <!-- Dropoff point -->
@@ -432,7 +432,7 @@
   <joint name="world_to_dropoff_point" type="fixed">
     <parent link="world"/>
     <child link="dropoff_point"/>
-    <origin rpy="0 0 0" xyz="10.0 5.0 0"/>
+    <origin rpy="0 0 0" xyz="9.75 5.0 0"/>
   </joint>
   <link default="mobile_bot_unnamed" name="mobile_1">
     <visual>
