@@ -1,1 +1,56 @@
 #include "mamp_planning/ct_node.hpp"
+
+CTNode::CTNode(unsigned int id, std::vector<std::shared_ptr<Agent>> agents)
+{
+  cost_ = 0;
+  id_ = id;
+  agents_ = agents;
+}
+
+CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
+{
+  id_ = id;
+  cost_ = 0;
+  constraints_ = n->getConstraints();
+  paths_ = n->getPaths();
+  for (int i = 0; i < n->getAgents().size(); ++i)
+  {
+    agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
+  }
+}
+
+void CTNode::addConstraint(Constraint c)
+{
+  constraints_.push_back(c);
+}
+
+Collision &CTNode::getNextCollision()
+{
+  if (collisions_.size() > 0)
+    return collisions_[0];
+}
+
+void CTNode::computeCost()
+{
+  cost_ = MAMP_Helper::getSumOfCosts(paths_);
+}
+
+std::vector<Constraint> const &CTNode::getConstraints()
+{
+  return constraints_;
+}
+
+std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> const &CTNode::getPaths()
+{
+  return paths_;
+}
+
+std::vector<std::shared_ptr<Agent>> &CTNode::getAgents()
+{
+  return agents_;
+}
+
+std::tuple<double, unsigned int> CTNode::getComparisonTuple()
+{
+  return std::make_tuple(cost_, id_);
+}

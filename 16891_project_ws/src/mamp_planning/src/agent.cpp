@@ -29,6 +29,28 @@ Agent::Agent(const std::string &robot_description, const std::string &collision_
   astar_ = std::make_shared<AStar>(prm_);
 }
 
+Agent::Agent(std::shared_ptr<Agent> &a)
+{
+  id_ = a->getID();
+  planning_group_ = a->getPlanningGroup();
+  urdf_model_ = a->getURDF();
+  upper_joint_limit_ = a->getUpperJointLimit();
+  lower_joint_limit_ = a->getLowerJointLimit();
+  joint_vel_limit_ = a->getJointVelLimit();
+  start_ = a->getStart();
+  goal_ = a->getGoal();
+  prm_ = a->getPRM();
+  timestep_ = a->getTimestep();
+  prm_path_ = a->getPRMPath();
+  discretized_path_ = a->getDiscreitzedPath();
+  path_cost_ = a->getPathCost();
+  robot_model_loader_ = a->getRobotModelLoader();
+  kinematic_model_ = a->getKinematicModel();
+  planning_scene_ = a->getPlanningScene();
+  acm_ = a->getACM();
+  astar_ = std::make_shared<AStar>(a->getAStar());
+}
+
 std::shared_ptr<planning_scene::PlanningScene> const &Agent::getPlanningScene()
 {
   return planning_scene_;
@@ -72,6 +94,51 @@ std::shared_ptr<Vertex> const &Agent::getStart()
 std::shared_ptr<Vertex> const &Agent::getGoal()
 {
   return goal_;
+}
+
+urdf::Model const &Agent::getURDF()
+{
+  return urdf_model_;
+}
+
+double const &Agent::getTimestep()
+{
+  return timestep_;
+}
+
+std::shared_ptr<AStar> &Agent::getAStar()
+{
+  return astar_;
+}
+
+std::vector<std::shared_ptr<Vertex>> Agent::getPRMPath()
+{
+  return prm_path_;
+}
+
+std::vector<std::shared_ptr<Vertex>> Agent::getDiscreitzedPath()
+{
+  return discretized_path_;
+}
+
+double Agent::getPathCost()
+{
+  return path_cost_;
+}
+
+std::shared_ptr<robot_model_loader::RobotModelLoader> const &Agent::getRobotModelLoader()
+{
+  return robot_model_loader_;
+}
+
+std::shared_ptr<moveit::core::RobotModelPtr> const &Agent::getKinematicModel()
+{
+  return kinematic_model_;
+}
+
+collision_detection::AllowedCollisionMatrix const &Agent::getACM()
+{
+  return acm_;
 }
 
 bool Agent::compute_joint_limits(const std::string &base_frame, const std::string &tip_frame)

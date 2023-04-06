@@ -94,4 +94,16 @@ class MAMP_Helper
     // separated into two nodes of a CT for CBS.
     return std::vector<Constraint>();
   }
+
+  static double getSumOfCosts(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths)
+  {
+    // This function adds up costs to get the sum of costs
+    return 0.0;
+  }
+
+  static std::unordered_map<std::shared_ptr<Edge>, Constraint> getConstraintsForAgent(std::vector<Constraint> constraints, unsigned int agent)
+  {
+    std::unordered_map<std::shared_ptr<Edge>, Constraint> m;
+    return m;
+  }
 };

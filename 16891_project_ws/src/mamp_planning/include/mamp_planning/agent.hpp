@@ -19,6 +19,7 @@ public:
     Agent(const std::string &robot_description, const std::string &collision_robot_description,
         const std::string &base_frame, const std::string &tip_frame, unsigned int id, std::string &planning_group,
         double &timestep, std::vector<double> start, std::vector<double> goal);
+    Agent(std::shared_ptr<Agent> &a);
 
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();
     unsigned int const &getID();
@@ -29,6 +30,15 @@ public:
     std::vector<double> const &getLowerJointLimit();
     std::shared_ptr<Vertex> const &getStart();
     std::shared_ptr<Vertex> const &getGoal();
+    urdf::Model const &getURDF();
+    double const &getTimestep();
+    std::shared_ptr<AStar> &getAStar();
+    std::vector<std::shared_ptr<Vertex>> getPRMPath();
+    std::vector<std::shared_ptr<Vertex>> getDiscreitzedPath();
+    double getPathCost();
+    std::shared_ptr<robot_model_loader::RobotModelLoader> const &getRobotModelLoader();
+    std::shared_ptr<moveit::core::RobotModelPtr> const &getKinematicModel();
+    collision_detection::AllowedCollisionMatrix const &getACM();
 
 
 private:
