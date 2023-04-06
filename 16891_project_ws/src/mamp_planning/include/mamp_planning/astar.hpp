@@ -12,7 +12,7 @@ public:
     std::vector<Constraint> constraints_;
     std::vector<std::shared_ptr<Vertex>> Astarpath_;
     AStar(std::shared_ptr<PRM> &prm);
-    AStar(std::shared_ptr<AStar> &astar);
+    // AStar(std::shared_ptr<AStar> &astar);
     // AStar(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<Agent> agent, std::vector<Constraint> constraints);
 // 
     // void GetPath();

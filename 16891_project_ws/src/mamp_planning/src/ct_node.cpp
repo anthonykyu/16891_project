@@ -13,10 +13,11 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   cost_ = 0;
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
-  for (int i = 0; i < n->getAgents().size(); ++i)
-  {
-    agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
-  }
+  agents_ = n->getAgents();
+  // for (int i = 0; i < n->getAgents().size(); ++i)
+  // {
+  //   agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
+  // }
 }
 
 void CTNode::addConstraint(Constraint c)
@@ -35,17 +36,17 @@ void CTNode::computeCost()
   cost_ = MAMP_Helper::getSumOfCosts(paths_);
 }
 
-std::vector<Constraint> const &CTNode::getConstraints()
+std::vector<Constraint> CTNode::getConstraints()
 {
   return constraints_;
 }
 
-std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> const &CTNode::getPaths()
+std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> CTNode::getPaths()
 {
   return paths_;
 }
 
-std::vector<std::shared_ptr<Agent>> &CTNode::getAgents()
+std::vector<std::shared_ptr<Agent>> CTNode::getAgents()
 {
   return agents_;
 }
@@ -53,4 +54,19 @@ std::vector<std::shared_ptr<Agent>> &CTNode::getAgents()
 std::tuple<double, unsigned int> CTNode::getComparisonTuple()
 {
   return std::make_tuple(cost_, id_);
+}
+
+void CTNode::detectCollisions()
+{
+  collisions_ = MAMP_Helper::detectAgentAgentCollisions(paths_);
+}
+
+size_t CTNode::numCollisions()
+{
+  return collisions_.size();
+}
+
+unsigned int CTNode::getId()
+{
+  return id_;
 }

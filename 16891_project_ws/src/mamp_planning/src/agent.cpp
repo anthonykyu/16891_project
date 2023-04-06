@@ -48,7 +48,7 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   kinematic_model_ = a->getKinematicModel();
   planning_scene_ = a->getPlanningScene();
   acm_ = a->getACM();
-  astar_ = std::make_shared<AStar>(a->getAStar());
+  astar_ = a->getAStar();
 }
 
 std::shared_ptr<planning_scene::PlanningScene> const &Agent::getPlanningScene()

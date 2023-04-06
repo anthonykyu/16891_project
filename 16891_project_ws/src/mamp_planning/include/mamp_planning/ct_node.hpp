@@ -15,10 +15,13 @@ public:
     void addConstraint(Constraint c);
     Collision &getNextCollision();
     void computeCost();
-    std::vector<Constraint> const &getConstraints();
-    std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> const &getPaths();
-    std::vector<std::shared_ptr<Agent>> &getAgents();
+    std::vector<Constraint> getConstraints();
+    std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> getPaths();
+    std::vector<std::shared_ptr<Agent>> getAgents();
     std::tuple<double, unsigned int> getComparisonTuple();
+    void detectCollisions();
+    size_t numCollisions();
+    unsigned int getId();
 
 
 

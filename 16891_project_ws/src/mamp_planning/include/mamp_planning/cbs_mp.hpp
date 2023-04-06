@@ -16,13 +16,15 @@ class CBSMP
 
     private:
     void timerCallback(const ros::TimerEvent&);
+    bool shouldResample(unsigned int N);
 
     ros::NodeHandle n_;
     ros::Timer timer_;
 
     bool initialized_;
-    unsigned int sampling_iter_;
-    OpenList<std::shared_ptr<CTNode>, CompareCTNode> open_list_;
+    unsigned int S_;
+    std::vector<std::shared_ptr<Agent>> agents_;
+    OpenList<CTNode, CompareCTNode> open_list_;
 
 };
 

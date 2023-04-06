@@ -5,10 +5,10 @@ AStar::AStar(std::shared_ptr<PRM> &prm)
 
 }
 
-AStar::AStar(std::shared_ptr<AStar> &astar)
-{
+// AStar::AStar(std::shared_ptr<AStar> &astar)
+// {
 
-}
+// }
 
 // AStar::AStar(shared_ptr<Vertex> start, shared_ptr<Vertex> goal, shared_ptr<Agent> agent, std::vector<Constraint> constraints)
 // {
