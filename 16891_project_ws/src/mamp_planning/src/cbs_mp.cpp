@@ -22,12 +22,12 @@ CBSMP::CBSMP()
 void CBSMP::timerCallback(const ros::TimerEvent &)
 {
   ROS_INFO("In Timer!");
-  unsigned int id = 0;
+  unsigned int node_id = 0;
   unsigned int N = 0;
-  std::shared_ptr<CTNode> root = std::make_shared<CTNode>(++id, agents_);
+  std::shared_ptr<CTNode> root = std::make_shared<CTNode>(++node_id, agents_);
   root->detectCollisions();
   root->computeCost();
-  open_list_.insert(root);
+  open_list_.insert(root->getComparisonTuple(), root);
   while (open_list_.size() > 0)
   {
     if (shouldResample(N))
@@ -43,13 +43,13 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
     }
     Collision c = node->getNextCollision();
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
-    std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++id, node);
-    std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++id, node);
+    std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++node_id, node);
+    std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++node_id, node);
     n1->addConstraint(constraints[0]);
     n2->addConstraint(constraints[1]);
     // TODO: Get n1 and n2 to recompute paths for specific agents affected
-    open_list_.insert(n1);
-    open_list_.insert(n2);
+    open_list_.insert(n1->getComparisonTuple(), n1);
+    open_list_.insert(n2->getComparisonTuple(), n2);
     N += 2;
   }
   // No solution!!!
@@ -60,3 +60,5 @@ bool CBSMP::shouldResample(unsigned int N)
   // TODO:
   return false;
 }
+
+

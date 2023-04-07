@@ -17,13 +17,12 @@ class Agent
 {
 public:
     Agent(const std::string &robot_description, const std::string &collision_robot_description,
-        const std::string &base_frame, const std::string &tip_frame, unsigned int id, std::string &planning_group,
+        const std::string &base_frame, const std::string &tip_frame, std::string &id,
         double &timestep, std::vector<double> start, std::vector<double> goal);
     Agent(std::shared_ptr<Agent> &a);
 
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();
-    unsigned int const &getID();
-    std::string const &getPlanningGroup();
+    std::string const &getID();
     std::shared_ptr<PRM> &getPRM();
     std::vector<double> const &getJointVelLimit();
     std::vector<double> const &getUpperJointLimit();
@@ -34,16 +33,15 @@ public:
     double const &getTimestep();
     std::shared_ptr<AStar> &getAStar();
     std::vector<std::shared_ptr<Vertex>> getPRMPath();
-    std::vector<std::shared_ptr<Vertex>> getDiscreitzedPath();
-    double getPathCost();
+    std::vector<std::shared_ptr<Vertex>> getDiscretizedPath();
+    // double getPathCost();
     std::shared_ptr<robot_model_loader::RobotModelLoader> const &getRobotModelLoader();
     std::shared_ptr<moveit::core::RobotModelPtr> const &getKinematicModel();
-    collision_detection::AllowedCollisionMatrix const &getACM();
+    // collision_detection::AllowedCollisionMatrix const &getACM();
 
 
 private:
-    unsigned int id_;
-    std::string planning_group_;
+    std::string id_;
     urdf::Model urdf_model_;
     std::vector<double> upper_joint_limit_;
     std::vector<double> lower_joint_limit_;
@@ -55,7 +53,7 @@ private:
     double timestep_;
     std::vector<std::shared_ptr<Vertex>> prm_path_;
     std::vector<std::shared_ptr<Vertex>> discretized_path_;
-    double path_cost_;
+    // double path_cost_;
 
     std::shared_ptr<robot_model_loader::RobotModelLoader> robot_model_loader_;
     std::shared_ptr<moveit::core::RobotModelPtr> kinematic_model_;
@@ -63,7 +61,7 @@ private:
     // collision_detection::CollisionRequest collision_request_;
     // collision_detection::CollisionResult collision_result_;
     // std::shared_ptr<moveit::core::RobotState> current_state_;
-    collision_detection::AllowedCollisionMatrix acm_; // allowed collision matrix
+    // collision_detection::AllowedCollisionMatrix acm_; // allowed collision matrix
 
     bool compute_joint_limits(const std::string& base_frame, const std::string& tip_frame);
 };

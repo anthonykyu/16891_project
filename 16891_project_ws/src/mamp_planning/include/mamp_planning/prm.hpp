@@ -7,7 +7,7 @@ class PRM
 {
 public:
     //INFO: I am assuming that the start and goal vertices for each agent comes from the agent class
-    PRM(std::string planning_group, std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
+    PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
         std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal);
     std::vector<std::shared_ptr<Vertex>> PRMgraph_;

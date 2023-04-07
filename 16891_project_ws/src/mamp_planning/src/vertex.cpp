@@ -2,12 +2,13 @@
 
 Vertex::Vertex(std::vector<double> joint_pos, unsigned int id)
 {
-  setG(std::numeric_limits<double>::infinity());
-  setH(std::numeric_limits<double>::infinity());
-  setV(std::numeric_limits<double>::infinity());
+  // setG(std::numeric_limits<double>::infinity());
+  // setH(std::numeric_limits<double>::infinity());
+  // setV(std::numeric_limits<double>::infinity());
   joint_pos_ = joint_pos;
   id_ = id;
   parent_vertex_ = nullptr;
+  prm_edge_ = nullptr;
   valid_ = true;
 }
 
@@ -16,25 +17,25 @@ bool const &Vertex::isValid()
   return valid_;
 }
 
-double const &Vertex::getG()
-{
-  return g_;
-}
+// double const &Vertex::getG()
+// {
+//   return g_;
+// }
 
-double const &Vertex::getH()
-{
-  return h_;
-}
+// double const &Vertex::getH()
+// {
+//   return h_;
+// }
 
-double const &Vertex::getV()
-{
-  return v_;
-}
+// double const &Vertex::getV()
+// {
+//   return v_;
+// }
 
-double Vertex::getF()
-{
-  return g_ + h_;
-}
+// double Vertex::getF()
+// {
+//   return g_ + h_;
+// }
 
 unsigned int const &Vertex::getId()
 {
@@ -51,7 +52,7 @@ std::vector<double> const &Vertex::getJointPos()
   return joint_pos_;
 }
 
-std::vector<std::shared_ptr<Edge>> const &Vertex::getEdges()
+std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> const &Vertex::getEdges()
 {
   return edges_;
 }
@@ -71,20 +72,20 @@ void Vertex::setId(unsigned int id)
   id_ = id;
 }
 
-void Vertex::setG(double g)
-{
-  g_ = g;
-}
+// void Vertex::setG(double g)
+// {
+//   g_ = g;
+// }
 
-void Vertex::setH(double h)
-{
-  h_ = h;
-}
+// void Vertex::setH(double h)
+// {
+//   h_ = h;
+// }
 
-void Vertex::setV(double v)
-{
-  v_ = v;
-}
+// void Vertex::setV(double v)
+// {
+//   v_ = v;
+// }
 
 std::shared_ptr<Vertex> Vertex::getParent()
 {
@@ -96,9 +97,9 @@ void Vertex::setParent(std::shared_ptr<Vertex> parent)
   parent_vertex_ = parent;
 }
 
-void Vertex::addEdge(std::shared_ptr<Edge> edge)
+void Vertex::addEdge(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge)
 {
-  edges_.push_back(edge);
+  edges_.insert({vertex, edge});
 }
 
 void Vertex::setJointPos(std::vector<double> joint_pos)
@@ -116,26 +117,26 @@ void Vertex::setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood)
   neighborhood_ = neighborhood;
 }
 
-std::tuple<double, unsigned int> Vertex::getComparisonTuple()
-{
-  return std::make_tuple(getF(), getId());
-}
+// std::tuple<double, unsigned int> Vertex::getComparisonTuple()
+// {
+//   return std::make_tuple(getF(), getId());
+// }
 
-int Vertex::checkConsistency()
-{
-  if (g_ == v_)
-  {
-    return 0;
-  }
-  else if (g_ < v_)
-  {
-    return 1;
-  }
-  else
-  {
-    return -1;
-  }
-}
+// int Vertex::checkConsistency()
+// {
+//   if (g_ == v_)
+//   {
+//     return 0;
+//   }
+//   else if (g_ < v_)
+//   {
+//     return 1;
+//   }
+//   else
+//   {
+//     return -1;
+//   }
+// }
 
 void Vertex::setPRMEdge(std::shared_ptr<Edge> edge)
 {

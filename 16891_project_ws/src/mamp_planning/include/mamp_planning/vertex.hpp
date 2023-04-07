@@ -4,6 +4,7 @@
 #include <memory>
 #include <tuple>
 #include <limits>
+#include <unordered_map>
 #include "mamp_planning/edge.hpp"
 
 class Edge;
@@ -12,54 +13,54 @@ class Vertex
 public:
     Vertex(std::vector<double> joint_pos, unsigned int id);
     bool const &isValid();
-    double const &getG();
-    double const &getH();
-    double const &getV();
-    double getF();
+    // double const &getG();
+    // double const &getH();
+    // double const &getV();
+    // double getF();
     unsigned int const &getId();
     unsigned int const &getComponentId();
     std::shared_ptr<Vertex> getParent();
     std::vector<double> const &getJointPos();
     std::vector<std::shared_ptr<Vertex>> const &getNeighborhood();
-    std::vector<std::shared_ptr<Edge>> const &getEdges();
+    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> const &getEdges();
     std::shared_ptr<Edge> const &getPRMEdge();
     // function to compare g and v values, -1 underconsistent, 0 consistent, 1 overconsistent
-    int checkConsistency();
+    // int checkConsistency();
 
     void changeValidity(bool validity);
     void setId(unsigned int id);
-    void setG(double g);
-    void setH(double h);
-    void setV(double v);
+    // void setG(double g);
+    // void setH(double h);
+    // void setV(double v);
     void setParent(std::shared_ptr<Vertex> parent);
     void setPRMEdge(std::shared_ptr<Edge> edge);
-    void addEdge(std::shared_ptr<Edge> edge);
+    void addEdge(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge);
     void setJointPos(std::vector<double> joint_pos);
     void setComponentId(unsigned int component_id);
     void setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood);
-    std::tuple<double, unsigned int> getComparisonTuple();
+    // std::tuple<double, unsigned int> getComparisonTuple();
 
 private:
-    double g_;
-    double h_;
-    double v_;
+    // double g_;
+    // double h_;
+    // double v_;
     bool valid_;
     unsigned int id_;
     unsigned int component_id_;
     std::vector<double> joint_pos_;
     std::shared_ptr<Vertex> parent_vertex_;
     std::shared_ptr<Edge> prm_edge_;
-    std::vector<std::shared_ptr<Edge>> edges_;
+    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> edges_;
     std::vector<std::shared_ptr<Vertex>> neighborhood_;
 };
 
-struct CompareVertex
-{
-    bool operator()(const std::shared_ptr<Vertex> &a, const std::shared_ptr<Vertex> &b) const
-    {
-        return a->getComparisonTuple() < b->getComparisonTuple();
-    }
-};
+// struct CompareVertex
+// {
+//     bool operator()(const std::shared_ptr<Vertex> &a, const std::shared_ptr<Vertex> &b) const
+//     {
+//         return a->getComparisonTuple() < b->getComparisonTuple();
+//     }
+// };
 
 // Credit for array hasher function below is from: https://stackoverflow.com/questions/42701688/using-an-unordered-map-with-arrays-as-keys
 // struct ArrayHasher

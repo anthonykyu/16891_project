@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
+#include <cstring>
 #include "mamp_planning/edge.hpp"
 
 #include <moveit/robot_model_loader/robot_model_loader.h>
@@ -12,15 +13,15 @@
 
 struct Constraint
 {
-  unsigned int agent_id;
+  std::string agent_id;
   std::shared_ptr<Edge> joint_pos_edge;
   double time_step;
 };
 
 struct Collision
 {
-  unsigned int agent_id1;
-  unsigned int agent_id2;
+  std::string agent_id1;
+  std::string agent_id2;
   std::shared_ptr<Edge> location1;
   std::shared_ptr<Edge> location2;
   double timestep;
@@ -32,7 +33,7 @@ class MAMP_Helper
   public:
   // This function is used in the CT node to detect agent-agent collisions
   // The input is an unordered map, with the key being the agent id, and the value is the agent discretized path
-  static std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths)
+  static std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths)
   {
     // Use the global planning scene to step each agent (planning group) 
     // through their respective path (given input). At each timestep,
@@ -92,18 +93,52 @@ class MAMP_Helper
   {
     // This function turns a collision into a pair of constraints to be
     // separated into two nodes of a CT for CBS.
-    return std::vector<Constraint>();
+    Constraint c1;
+    Constraint c2;
+    c1.agent_id = collision.agent_id1;
+    c1.joint_pos_edge = collision.location1;
+    c1.time_step = collision.timestep;
+    c2.agent_id = collision.agent_id2;
+    c2.joint_pos_edge = collision.location2;
+    c2.time_step = collision.timestep;
+    std::vector<Constraint> constraints;
+    constraints.push_back(c1);
+    constraints.push_back(c2);
+    return constraints;
   }
 
-  static double getSumOfCosts(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths)
+  static double getSumOfCosts(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths)
   {
     // This function adds up costs to get the sum of costs
-    return 0.0;
+    double cost = 0;
+    for (auto p : paths)
+    {
+      std::shared_ptr<Vertex> v = p.second[0];
+      int i = 1;
+      while (i < p.second.size())
+      {
+        auto it = v->getEdges().find(p.second[i]);
+        if (it != v->getEdges().end())
+        {
+          cost += it->second->getCost();
+          v = it->first;
+        }
+        ++i;
+      }
+    }
+    return cost;
   }
 
-  static std::unordered_map<std::shared_ptr<Edge>, Constraint> getConstraintsForAgent(std::vector<Constraint> constraints, unsigned int agent)
+  static std::unordered_map<std::shared_ptr<Edge>, Constraint> getConstraintsForAgent(std::vector<Constraint> constraints, std::string agent)
   {
     std::unordered_map<std::shared_ptr<Edge>, Constraint> m;
+    for (int i = 0; i < constraints.size(); ++i)
+    {
+      if (strcmp(constraints[i].agent_id.c_str(), agent.c_str()) == 0)
+      {
+        m.insert({constraints[i].joint_pos_edge, constraints[i]});
+      }
+    }
     return m;
   }
 };

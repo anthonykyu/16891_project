@@ -2,6 +2,7 @@
 
 #include "mamp_planning/open_list.hpp"
 #include "mamp_planning/prm.hpp"
+#include <unordered_map>
 
 class AStar
 {
@@ -21,4 +22,8 @@ public:
 
 private:
 
+    OpenList<std::tuple<double, unsigned int, double>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int, double>>> open_list_;
+    std::unordered_map<std::tuple<unsigned int, double>, double, hash_tuple::hash<std::tuple<unsigned int, double>>> g_;
+    std::unordered_map<unsigned int, double> h_;
+    std::unordered_map<std::tuple<unsigned int, double>, double, hash_tuple::hash<std::tuple<unsigned int, double>>> v_;
 };

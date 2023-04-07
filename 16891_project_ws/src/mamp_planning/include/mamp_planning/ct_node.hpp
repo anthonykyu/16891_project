@@ -16,7 +16,7 @@ public:
     Collision &getNextCollision();
     void computeCost();
     std::vector<Constraint> getConstraints();
-    std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> getPaths();
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> getPaths();
     std::vector<std::shared_ptr<Agent>> getAgents();
     std::tuple<double, unsigned int> getComparisonTuple();
     void detectCollisions();
@@ -29,7 +29,7 @@ private:
     double cost_;
     unsigned int id_;
     std::vector<std::shared_ptr<Agent>> agents_;
-    std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> paths_;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> paths_;
     std::vector<Collision> collisions_;
     std::vector<Constraint> constraints_;
 

@@ -1,7 +1,7 @@
 #include "mamp_planning/agent.hpp"
 
 Agent::Agent(const std::string &robot_description, const std::string &collision_robot_description,
-             const std::string &base_frame, const std::string &tip_frame, unsigned int id, std::string &planning_group,
+             const std::string &base_frame, const std::string &tip_frame, std::string &id,
              double &timestep, std::vector<double> start, std::vector<double> goal)
 {
   if (!urdf_model_.initString(robot_description))
@@ -13,17 +13,16 @@ Agent::Agent(const std::string &robot_description, const std::string &collision_
     ROS_ERROR("Could not initialize joint limits");
   }
   id_ = id;
-  planning_group_ = planning_group;
 
   robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(collision_robot_description);
   kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
   planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 
   timestep_ = timestep;
-  path_cost_ = std::numeric_limits<double>::infinity();
+  // path_cost_ = std::numeric_limits<double>::infinity();
   start_ = std::make_shared<Vertex>(start, 0);
   goal_ = std::make_shared<Vertex>(goal, 0);
-  prm_ = std::make_shared<PRM>(planning_group_, planning_scene_, timestep_,
+  prm_ = std::make_shared<PRM>(planning_scene_, timestep_,
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
                                start_, goal_);
   astar_ = std::make_shared<AStar>(prm_);
@@ -32,7 +31,6 @@ Agent::Agent(const std::string &robot_description, const std::string &collision_
 Agent::Agent(std::shared_ptr<Agent> &a)
 {
   id_ = a->getID();
-  planning_group_ = a->getPlanningGroup();
   urdf_model_ = a->getURDF();
   upper_joint_limit_ = a->getUpperJointLimit();
   lower_joint_limit_ = a->getLowerJointLimit();
@@ -42,12 +40,12 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   prm_ = a->getPRM();
   timestep_ = a->getTimestep();
   prm_path_ = a->getPRMPath();
-  discretized_path_ = a->getDiscreitzedPath();
-  path_cost_ = a->getPathCost();
+  discretized_path_ = a->getDiscretizedPath();
+  // path_cost_ = a->getPathCost();
   robot_model_loader_ = a->getRobotModelLoader();
   kinematic_model_ = a->getKinematicModel();
   planning_scene_ = a->getPlanningScene();
-  acm_ = a->getACM();
+  // acm_ = a->getACM();
   astar_ = a->getAStar();
 }
 
@@ -56,14 +54,9 @@ std::shared_ptr<planning_scene::PlanningScene> const &Agent::getPlanningScene()
   return planning_scene_;
 }
 
-unsigned int const &Agent::getID()
+std::string const &Agent::getID()
 {
   return id_;
-}
-
-std::string const &Agent::getPlanningGroup()
-{
-  return planning_group_;
 }
 
 std::shared_ptr<PRM> &Agent::getPRM()
@@ -116,15 +109,15 @@ std::vector<std::shared_ptr<Vertex>> Agent::getPRMPath()
   return prm_path_;
 }
 
-std::vector<std::shared_ptr<Vertex>> Agent::getDiscreitzedPath()
+std::vector<std::shared_ptr<Vertex>> Agent::getDiscretizedPath()
 {
   return discretized_path_;
 }
 
-double Agent::getPathCost()
-{
-  return path_cost_;
-}
+// double Agent::getPathCost()
+// {
+//   return path_cost_;
+// }
 
 std::shared_ptr<robot_model_loader::RobotModelLoader> const &Agent::getRobotModelLoader()
 {
@@ -136,10 +129,10 @@ std::shared_ptr<moveit::core::RobotModelPtr> const &Agent::getKinematicModel()
   return kinematic_model_;
 }
 
-collision_detection::AllowedCollisionMatrix const &Agent::getACM()
-{
-  return acm_;
-}
+// collision_detection::AllowedCollisionMatrix const &Agent::getACM()
+// {
+//   return acm_;
+// }
 
 bool Agent::compute_joint_limits(const std::string &base_frame, const std::string &tip_frame)
 {

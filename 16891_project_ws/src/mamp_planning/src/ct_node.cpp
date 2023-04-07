@@ -13,11 +13,11 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   cost_ = 0;
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
-  agents_ = n->getAgents();
-  // for (int i = 0; i < n->getAgents().size(); ++i)
-  // {
-  //   agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
-  // }
+  // agents_ = n->getAgents();
+  for (int i = 0; i < n->getAgents().size(); ++i)
+  {
+    agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
+  }
 }
 
 void CTNode::addConstraint(Constraint c)
@@ -41,7 +41,7 @@ std::vector<Constraint> CTNode::getConstraints()
   return constraints_;
 }
 
-std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> CTNode::getPaths()
+std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> CTNode::getPaths()
 {
   return paths_;
 }
