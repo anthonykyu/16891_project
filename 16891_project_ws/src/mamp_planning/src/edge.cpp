@@ -42,3 +42,14 @@ double Edge::getTraversalTime()
 {
   return traversal_time_;
 }
+
+std::shared_ptr<std::vector<std::vector<double>>> Edge::getVertices()
+{
+  std::shared_ptr<std::vector<std::vector<double>>> vertex_list; //(new std::vector<Vertex>>);
+  for (auto x : vertices_)
+  {
+    vertex_list->push_back(x.second->getJointPos());
+  }
+
+  return vertex_list;
+}

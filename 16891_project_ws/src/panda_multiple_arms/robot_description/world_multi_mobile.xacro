@@ -20,7 +20,7 @@
   <link name="mobile_4_temp"/>
 
   <!-- Mobile Robot 1 -->
-  <joint name="mobile_1_x" type="prismatic">
+  <joint name="mobile_1_1" type="prismatic">
       <parent link="world"/>
       <child link="mobile_1_temp"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -28,7 +28,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
 
-  <joint name="mobile_1_y" type="prismatic">
+  <joint name="mobile_1_2" type="prismatic">
       <parent link="mobile_1_temp"/>
       <child link="mobile_1"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -38,7 +38,7 @@
 
 
   <!-- Mobile Robot 2 -->
-  <joint name="mobile_2_x" type="prismatic">
+  <joint name="mobile_2_1" type="prismatic">
       <parent link="world"/>
       <child link="mobile_2_temp"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -46,7 +46,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
 
-  <joint name="mobile_2_y" type="prismatic">
+  <joint name="mobile_2_2" type="prismatic">
       <parent link="mobile_2_temp"/>
       <child link="mobile_2"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -56,7 +56,7 @@
 
 
   <!-- Mobile Robot 3 -->
-  <joint name="mobile_3_x" type="prismatic">
+  <joint name="mobile_3_1" type="prismatic">
       <parent link="world"/>
       <child link="mobile_3_temp"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -64,7 +64,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
 
-  <joint name="mobile_3_y" type="prismatic">
+  <joint name="mobile_3_2" type="prismatic">
       <parent link="mobile_3_temp"/>
       <child link="mobile_3"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -73,7 +73,7 @@
   </joint>
 
   <!-- Mobile Robot 4 -->
-  <joint name="mobile_4_x" type="prismatic">
+  <joint name="mobile_4_1" type="prismatic">
       <parent link="world"/>
       <child link="mobile_4_temp"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -81,7 +81,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
 
-  <joint name="mobile_4_y" type="prismatic">
+  <joint name="mobile_4_2" type="prismatic">
       <parent link="mobile_4_temp"/>
       <child link="mobile_4"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>

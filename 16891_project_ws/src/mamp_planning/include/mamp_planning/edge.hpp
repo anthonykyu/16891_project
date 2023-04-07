@@ -17,6 +17,7 @@ public:
     double const &getCost();
     void setTraversalTime(double t);
     double getTraversalTime();
+    std::shared_ptr<std::vector<std::vector<double>>> getVertices();
 
 private:
     double cost_;

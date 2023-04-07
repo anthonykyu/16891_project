@@ -11,7 +11,8 @@
   <link name="mobile_1_temp"/>
 
   <!-- Mobile Robot 1 -->
-  <joint name="mobile_1_x" type="prismatic">
+  <!-- Joint x -->
+  <joint name="mobile_1_1" type="prismatic"> 
       <parent link="world"/>
       <child link="mobile_1_temp"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
@@ -19,7 +20,8 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
 
-  <joint name="mobile_1_y" type="prismatic">
+  <!-- Joint y -->
+  <joint name="mobile_1_2" type="prismatic">
       <parent link="mobile_1_temp"/>
       <child link="mobile_1"/>
       <limit effort="1000.0" lower="0" upper="10" velocity="1"/>

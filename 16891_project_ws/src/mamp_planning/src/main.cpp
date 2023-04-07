@@ -9,46 +9,68 @@ int main(int argc, char **argv)
   ROS_INFO("Heyyy");
   CBSMP planner_;
 
+
+
+
+
+
+
   // Let's make an agent and see if the collision testing works
   // Agent test_agent_("../../panda_multiple_arms/robot_description/world_single_mobile.urdf",)
 
-  // robot_model_loader::RobotModelLoader robot_model_loader("../../panda_multiple_arms/robot_description/world_single_mobile.urdf");
-  // robot_model_loader::RobotModelLoader robot_model_loader("src/panda_multiple_arms/robot_description/world_single_mobile.urdf");
 
   // Initialize a planning scene
   robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
+  // robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
   // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
+  // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
   const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
   planning_scene::PlanningScene planning_scene(kinematic_model);
-
-  // Add in a mobile robot
-  // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
-  
 
 
   collision_detection::CollisionRequest collision_request;
   collision_detection::CollisionResult collision_result;
   planning_scene.checkSelfCollision(collision_request, collision_result);
-  // planning_scene.checkCollision(collision_request, collision_result);
   ROS_INFO_STREAM("Test 1: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
 
 
-  moveit::core::RobotState& current_state = planning_scene.getCurrentStateNonConst();
-  // ROS_INFO_STREAM("state is" << (current_state));
-  current_state.setToRandomPositions();
-  // ROS_INFO_STREAM("state is" << (current_state));
-
   ROS_INFO_STREAM("~~~~~~~~~~~~~~~~~~");
-  ROS_INFO_STREAM("Variables names are " << current_state.getVariableCount());
-  collision_result.clear();
+  moveit::core::RobotState copied_state = planning_scene.getCurrentStateNonConst();
+  ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
 
-  collision_detection::AllowedCollisionMatrix acm = planning_scene.getAllowedCollisionMatrix();
+  auto names = copied_state.getVariableNames();
+  for (auto name : names) 
+  {
+    ROS_INFO_STREAM("Variable: " << name);
+  }
+
+  // ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
+  // current_state.setToRandomPositions();
+
+  // Set the variables using the appropriate names
+  std::vector<std::string> robot_names {"mobile_1", "mobile_2", "mobile_3", "mobile_4"};
+  std::vector<std::string> joint_names;
+
+  for (std::string name : robot_names)
+  {
+    joint_names.push_back(name + "_" + "1");
+    joint_names.push_back(name + "_" + "2");
+  }
+
+
+  std::vector<double> positions{1.76, 3, 1.76, 3, 8, 8, 1.76, 3};
+  // copied_state.setVariablePositions(positions);
+  copied_state.setVariablePositions(joint_names, positions);
+
+  collision_result.clear();
+  // collision_detection::AllowedCollisionMatrix acm = planning_scene.getAllowedCollisionMatrix();
   collision_request.contacts = true;
   collision_request.max_contacts = 1000;
 
   // planning_scene.checkCollision(collision_request, collision_result, current_state, acm);
-  planning_scene.checkSelfCollision(collision_request, collision_result);
+  planning_scene.checkSelfCollision(collision_request, collision_result, copied_state);
   ROS_INFO_STREAM("Test 2: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
+
   collision_detection::CollisionResult::ContactMap::const_iterator it;
   for (it = collision_result.contacts.begin(); it != collision_result.contacts.end(); ++it)
   {
