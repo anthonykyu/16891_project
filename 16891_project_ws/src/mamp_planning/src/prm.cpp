@@ -43,25 +43,26 @@ void PRM::GetNeighbors(shared_ptr<Vertex> q_new, vector<shared_ptr<Vertex>> grap
 
 shared_ptr<Vertex> PRM::GetRandomVertex(int dof)
 {
-    shared_ptr<Vertex> q_rand;
-    auto q_rand_pos = q_rand->getJointPos();
+    // use Vertex class to create a new vertex
+    vector<double> q_rand_pos;
     for (int i = 0; i < dof; ++i)
     {
       q_rand_pos[i] = (double)rand() / (double)RAND_MAX;
     }
+    shared_ptr<Vertex> q_rand = make_shared<Vertex>(q_rand_pos, node_id_++);
+
     return q_rand;
 }
 
 shared_ptr<Vertex> PRM::GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
 {
     // create a new vertex
-    shared_ptr<Vertex> q_new = make_shared<Vertex>(q_new->getJointPos(), q_new->getId());
     double distance = GetDistance(q_near, q);
     int num_steps = (int)(distance / r);
 
     if (num_steps < 2)
     {
-        q_new = q;
+        shared_ptr<Vertex> q_new = make_shared<Vertex>(q->getJointPos(), q->getId());
         return q_new;
     }
 
@@ -72,7 +73,8 @@ shared_ptr<Vertex> PRM::GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex
         unit_vector[i] = q_near->getJointPos()[i] + unit_vector[i] * epsilon_;
 
     }
-    q_new->setJointPos(unit_vector);
+    shared_ptr<Vertex> q_new = make_shared<Vertex>(unit_vector, node_id_++);
+
     return q_new;
 
 }
@@ -116,7 +118,9 @@ bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
         {
             unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
         }
-        if (!CheckCollision(unit_vector))
+
+        
+        if (!CheckCollision(unit_vector)) 
         {
             return false;
         }
@@ -141,6 +145,7 @@ void PRM::BuildPRM()
     for (int i = 0; i < num_samples_; i++)
     {
         shared_ptr<Vertex> q_rand = GetRandomVertex(dof_);
+        //NOTE: if the given configuration is valid, need to check with Hardik
         if (CheckCollision(q_rand->getJointPos()))
         {
             continue;
