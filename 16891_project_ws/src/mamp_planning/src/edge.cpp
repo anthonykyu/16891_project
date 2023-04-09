@@ -48,9 +48,12 @@ double Edge::getTraversalTime()
 
 std::shared_ptr<std::vector<std::vector<double>>> Edge::getVertexPositions()
 {
-  std::shared_ptr<std::vector<std::vector<double>>> vertex_list; //(new std::vector<Vertex>>);
+  auto vertex_list = std::make_shared<std::vector<std::vector<double>>>(); //(new std::vector<Vertex>>);
+
   for (std::shared_ptr<Vertex> x : ordered_vertices_)
   {
+    // printf("size of joint pos %d", x->getJointPos().size());
+    printf("size of joint pos %ld", x->getId());
     vertex_list->push_back(x->getJointPos());
   }
 

@@ -38,6 +38,7 @@ public:
     void setJointPos(std::vector<double> joint_pos);
     void setComponentId(unsigned int component_id);
     void setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood);
+    void addToNeighborhood(std::shared_ptr<Vertex> new_neighbor);
     // std::tuple<double, unsigned int> getComparisonTuple();
 
 private:

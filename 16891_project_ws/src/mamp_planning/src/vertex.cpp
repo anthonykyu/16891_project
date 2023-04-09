@@ -117,6 +117,11 @@ void Vertex::setNeighborhood(std::vector<std::shared_ptr<Vertex>> neighborhood)
   neighborhood_ = neighborhood;
 }
 
+void Vertex::addToNeighborhood(std::shared_ptr<Vertex> new_neighbor)
+{
+  neighborhood_.push_back(new_neighbor);
+}
+
 // std::tuple<double, unsigned int> Vertex::getComparisonTuple()
 // {
 //   return std::make_tuple(getF(), getId());

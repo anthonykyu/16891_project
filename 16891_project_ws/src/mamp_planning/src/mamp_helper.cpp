@@ -207,7 +207,10 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
 {
 
     // Discretize edge into a series of vertices for collision checking
+    // ROS_INFO("Edge has: ", )
     std::vector<std::shared_ptr<Vertex>> discrete_steps = discretizeEdge(edge, jnt_vel_lim, timestep);
+
+    ROS_INFO("Made Discrete Steps");
 
 
     // Check each vertex for collisions in the given planning_scene
@@ -216,9 +219,13 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
     bool test_val = false;
     std::shared_ptr<Vertex> last_vertex = discrete_steps[0];
 
+    ROS_INFO("Made Gathered the last vertex Steps");
+
     for (std::shared_ptr<Vertex> discrete_vertex : discrete_steps)
     {
         test_val = detectVertexCollision(planning_scene, discrete_vertex);
+
+        ROS_INFO("Ran detect vertex collision in the for loop");
 
         if (test_val == true)
         {
@@ -239,17 +246,27 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
 std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
 {
 
+    ROS_INFO("FIRST LINE");
+
     // Get positions of the two vertices
     std::shared_ptr<std::vector<std::vector<double>>> vertices = edge->getVertexPositions();
     int num_joints = vertices->at(0).size();
 
+    ROS_INFO("Gathered vertex positions %ld", num_joints);
+
+
     // Calculate difference between the vertices
-    std::vector<double> diff(num_joints);
+    std::vector<double> diff(num_joints, 0.0);
     double largest_division = 0; 
     double curr_division = 0;
+    ROS_INFO("But diff is %ld", diff.size());
+
     for (int i=0; i<diff.size(); ++i)
     {
         diff[i] = vertices->at(1).at(i) - vertices->at(0).at(i);
+        ROS_INFO("Here");
+        ROS_INFO("diff %f", diff[i]);
+        ROS_INFO("vel_lim %f", jnt_vel_lim[i]);
         curr_division = diff[i] / (jnt_vel_lim[i] * timestep);
 
         if (curr_division > largest_division)
@@ -257,6 +274,9 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
             largest_division = curr_division;
         }
     }
+
+    ROS_INFO("Calculated differences");
+
 
     // Generate number of divisions. Use the largest number of divisions
     double divisions = ceil(largest_division);

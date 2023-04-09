@@ -14,7 +14,7 @@ CBSMP::CBSMP()
 
   initialized_ = false;
   S_ = 1;
-  timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
+  // timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
   X_ = 0.5;
 }
