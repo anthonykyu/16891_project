@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<!-- rosrun xacro xacro panda_multiple_arms.xacro -o panda_multiple_arms.urdf -->
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="test">
+  
+  <xacro:property name="height" value="0.5" /> 
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <material name="green">
+    <color rgba="0 0.8 0 1"/>
+  </material>
+
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+
+  <!-- Did not set a default for the name of the robot to require a name -->
+  <!-- Follow the convention "mobile_1" -->
+  <!-- Expected dims 0.25 unless the map changes -->
+
+  <xacro:macro name="mobile_robot" params="name dims color">
+    <link name="${name}" default = "mobile_bot_unnamed">
+      <visual>
+        <geometry>
+          <cylinder length="${height}" radius="${dims}"/>
+        </geometry>
+        <material name="${color}"/>
+        <origin rpy = "0 0 0" xyz="0 0 ${height/2}"/>
+      </visual>
+
+      <collision>
+        <geometry>
+          <cylinder length="${height}" radius="${dims}"/>
+        </geometry>
+        <origin rpy = "0 0 0" xyz="0 0 ${height/2}"/>
+      </collision>
+    </link>
+  </xacro:macro>
+
+  <!-- <xacro:mobile_robot name="mobile_bot_1" dims="0.25" color="white"/> -->
+
+</robot>

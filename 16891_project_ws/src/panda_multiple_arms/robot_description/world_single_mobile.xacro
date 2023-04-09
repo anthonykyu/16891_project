@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_single_mobile">
+
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/walls.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/mobile_robot.xacro" />
+
+  <xacro:walls_world/>
+  <xacro:mobile_robot name="mobile_1" dims="0.25" color="white"/>
+  <link name="mobile_1_temp"/>
+
+  <!-- Mobile Robot 1 -->
+  <!-- Joint x -->
+  <joint name="mobile_1_1" type="prismatic"> 
+      <parent link="world"/>
+      <child link="mobile_1_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Joint y -->
+  <joint name="mobile_1_2" type="prismatic">
+      <parent link="mobile_1_temp"/>
+      <child link="mobile_1"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+</robot>
+

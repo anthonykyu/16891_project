@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(mamp_planning)
+project(panda_multiple_arms)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,23 +8,19 @@ project(mamp_planning)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  roscpp
-  rospy
-  std_msgs
-  moveit_msgs
-  kdl_parser
-  urdf
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
+	roscpp
+
+	# for robot arm pose
+	geometry_msgs
+
+	# for moveit planning
+	moveit_ros_planning_interface
+	moveit_ros_planning
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(orocos_kdl REQUIRED
-urdf_model REQUIRED
-Eigen 3 3.3 REQUIRED
-)
+
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -77,11 +73,10 @@ Eigen 3 3.3 REQUIRED
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-  moveit_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -113,12 +108,10 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include ${Eigen3_INCLUDE_DIRS}
-#  LIBRARIES mamp_planning
- CATKIN_DEPENDS roscpp rospy std_msgs kdl_parser urdf eigen
- moveit_core
- moveit_ros_planning_interface
- DEPENDS orocos_kdl urdf_model
+#  INCLUDE_DIRS include
+#  LIBRARIES panda_multiple_arms
+#  CATKIN_DEPENDS other_catkin_pkg
+#  DEPENDS system_lib
 )
 
 ###########
@@ -128,13 +121,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
+# include
+${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/mamp_planning.cpp
+#   src/${PROJECT_NAME}/panda_multiple_arms.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -145,23 +138,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/main.cpp
-                                    src/vertex.cpp
-                                    src/agent.cpp
-                                    src/astar.cpp
-                                    src/cbs_mp.cpp
-                                    src/ct_node.cpp
-                                    src/open_list.cpp
-                                    src/dstar_lite.cpp
-                                    src/edge.cpp
-                                    src/pbs_dstar_mp.cpp
-                                    src/pbs_node.cpp
-                                    src/prm.cpp
-                                    src/mamp_helper.cpp
-                                    )
-add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-# add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+# add_executable(${PROJECT_NAME}_node src/panda_multiple_arms_node.cpp)
+add_executable(plan_simple_motion src/plan_simple_motion.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -172,11 +150,12 @@ target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(plan_simple_motion ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(plan_simple_motion
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -194,9 +173,9 @@ target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS ${PROJECT_NAME}_node
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# install(TARGETS ${PROJECT_NAME}_node
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html
@@ -207,11 +186,11 @@ install(TARGETS ${PROJECT_NAME}_node
 # )
 
 ## Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  # FILES_MATCHING PATTERN "*.h"
-  # PATTERN ".svn" EXCLUDE
-)
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
@@ -225,7 +204,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_mamp_planning.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_panda_multiple_arms.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
