@@ -23,6 +23,10 @@ private:
     int num_samples_;
     int dof_;
     int node_id_;
+    std::shared_ptr<Vertex> start_;
+    std::shared_ptr<Vertex> goal_;
+    std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
+    std::vector<double> jnt_vel_lim_;
     bool CheckCollision(std::vector<double> joint_pos);
     double GetDistance(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2);
     void GetNeighbors(std::shared_ptr<Vertex> q_new, std::vector<std::shared_ptr<Vertex>> graph, double radius);
@@ -30,7 +34,7 @@ private:
     std::shared_ptr<Vertex> GetNewVertex(std::shared_ptr<Vertex> q_near,std::shared_ptr<Vertex> q, int r);
     std::shared_ptr<Vertex> GetNearestVertex(std::shared_ptr<Vertex> q, std::vector<std::shared_ptr<Vertex>> nodes, int max_id);
     bool Connect(std::shared_ptr<Vertex> q1, std::shared_ptr<Vertex> q2);
-    void GetPath(std::shared_ptr<Vertex> q_start, std::shared_ptr<Vertex> q_goal, std::vector<std::shared_ptr<Vertex>> nodes);
+    void GetPath(std::vector<std::shared_ptr<Vertex>> nodes);
     void BuildPRM();
 
 

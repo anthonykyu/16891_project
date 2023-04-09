@@ -6,6 +6,9 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
 {
   radius_ = 0.5;
   num_samples_ = 15000;
+  start_ = start;
+  goal_ = goal;
+  planning_scene_ = planning_scene;
 }
 
 bool PRM::CheckCollision(vector<double> joint_pos)
@@ -119,7 +122,7 @@ bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
             unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
         }
 
-        
+        // how do I check collision for these joint positionss in the world?        
         if (!CheckCollision(unit_vector)) 
         {
             return false;
@@ -128,10 +131,10 @@ bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
     return false;
 }
 
-void PRM::GetPath(shared_ptr<Vertex> q_start, shared_ptr<Vertex> q_goal, vector<shared_ptr<Vertex>> nodes)
+void PRM::GetPath(vector<shared_ptr<Vertex>> nodes)
 {
-    shared_ptr<Vertex> q = q_goal;
-    while (q->getId() != q_start->getId())
+    shared_ptr<Vertex> q = goal_;
+    while (q->getId() != start_->getId())
     {
         PRMpath_.push_back(q);
         q = q->getParent();
@@ -146,10 +149,10 @@ void PRM::BuildPRM()
     {
         shared_ptr<Vertex> q_rand = GetRandomVertex(dof_);
         //NOTE: if the given configuration is valid, need to check with Hardik
-        if (CheckCollision(q_rand->getJointPos()))
-        {
-            continue;
-        }
+        // if (CheckCollision(q_rand->getJointPos()))
+        // {
+        //     continue;
+        // }
 
         q_rand->setId(PRMgraph_.size());
         PRMgraph_.push_back(q_rand);
@@ -174,8 +177,21 @@ void PRM::BuildPRM()
                     {
                         q_rand->setComponentId(q_near->getComponentId());
                         shared_ptr<Edge> edge = make_shared<Edge>(q_rand, q_near);
-                        q_rand->addEdge(q_near, edge);
-                        q_near->addEdge(q_rand, edge);
+                        auto coll = detectEdgeCollision(planning_scene, edge, jnt_vel_lim_, timestep_);
+                        if (coll.first == false)
+                        {
+                            q_rand->addEdge(q_near, edge);
+                            q_near->addEdge(q_rand, edge);
+                        }
+                        // otherwise add an edge until it's collision free
+                        else
+                        {
+                            q_rand = coll.second;
+                            shared_ptr<Edge> collision_free_edge = make_shared<Edge>(q_rand, q_near);
+                            q_rand->addEdge(q_near, collision_free_edge);
+                            q_near->addEdge(q_rand, collision_free_edge);
+
+                        }
                         for (int k = 0; k < PRMgraph_.size(); ++k)
                         {
                                 PRMgraph_[k]->setComponentId(q_rand->getComponentId());    
