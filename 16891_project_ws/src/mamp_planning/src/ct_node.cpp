@@ -1,10 +1,11 @@
 #include "mamp_planning/ct_node.hpp"
 
-CTNode::CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<Agent>> agents)
+CTNode::CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<Agent>> agents, std::shared_ptr<MAMP_Helper> &mamp_helper)
 {
   cost_ = 0;
   id_ = id;
   agents_ = agents;
+  mamp_helper_ = mamp_helper;
 }
 
 CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
@@ -13,11 +14,17 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   cost_ = 0;
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
+  mamp_helper_ = n->getMAMPHelper();
   // agents_ = n->getAgents();
   for (auto agent : n->getAgents())
   {
     agents_.insert({agent.first, std::make_shared<Agent>(agent.second)});
   }
+}
+
+std::shared_ptr<MAMP_Helper> &CTNode::getMAMPHelper()
+{
+  return mamp_helper_;
 }
 
 void CTNode::addConstraint(Constraint c)
@@ -58,7 +65,7 @@ std::tuple<double, unsigned int> CTNode::getComparisonTuple()
 
 void CTNode::detectCollisions()
 {
-  collisions_ = MAMP_Helper::detectAgentAgentCollisions(paths_);
+  collisions_ = mamp_helper_->detectAgentAgentCollisions(paths_);
 }
 
 size_t CTNode::numCollisions()

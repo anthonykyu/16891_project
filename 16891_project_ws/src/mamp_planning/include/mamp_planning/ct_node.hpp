@@ -9,7 +9,7 @@
 class CTNode
 {
 public:
-    CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<Agent>> agents);
+    CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<Agent>> agents, std::shared_ptr<MAMP_Helper> &mamp_helper);
     CTNode(unsigned int id, std::shared_ptr<CTNode> &n);
     //TODO: add constraints for each agent
     void addConstraint(Constraint c);
@@ -22,6 +22,7 @@ public:
     void detectCollisions();
     size_t numCollisions();
     unsigned int getId();
+    std::shared_ptr<MAMP_Helper> &getMAMPHelper();
 
 
 
@@ -33,7 +34,7 @@ private:
     std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> paths_;
     std::vector<Collision> collisions_;
     std::vector<Constraint> constraints_;
-
+    std::shared_ptr<MAMP_Helper> mamp_helper_;
 };
 
 struct CompareCTNode

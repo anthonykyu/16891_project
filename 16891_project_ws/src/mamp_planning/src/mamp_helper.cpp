@@ -13,7 +13,7 @@ MAMP_Helper::MAMP_Helper(const std::string &full_world_description)
 
     auto robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
     auto kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
-    MAMP_Helper::planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
+    planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 }
 
 
@@ -151,7 +151,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         std::shared_ptr<Vertex> check_vertex = std::make_shared<Vertex>(convertVerticesToJoints(curr_vertices), 0); // the id does not matter here
         std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions;
         // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
-        bool test_val = detectVertexCollision(MAMP_Helper::planning_scene_, check_vertex, list_of_collisions);
+        bool test_val = detectVertexCollision(planning_scene_, check_vertex, list_of_collisions);
         
         if (test_val == true){
             // Go through and create collision objects 

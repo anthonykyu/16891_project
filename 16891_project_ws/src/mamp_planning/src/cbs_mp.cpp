@@ -24,7 +24,7 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
   ROS_INFO("In Timer!");
   unsigned int node_id = 0;
   unsigned int N = 0;
-  std::shared_ptr<CTNode> root = std::make_shared<CTNode>(++node_id, agents_);
+  std::shared_ptr<CTNode> root = std::make_shared<CTNode>(++node_id, agents_, mamp_helper_);
   root->detectCollisions();
   root->computeCost();
   open_list_.insert(root->getComparisonTuple(), root);
