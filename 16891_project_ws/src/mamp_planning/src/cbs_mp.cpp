@@ -69,7 +69,7 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
 bool CBSMP::shouldResample(unsigned int N)
 {
   double p = 1.0 - pow(X_, alpha_*N/S_);
-  return (rand()/RAND_MAX) < p;
+  return ((double)rand()/(double)RAND_MAX) < p;
 }
 
 
