@@ -27,6 +27,7 @@ private:
     std::shared_ptr<Vertex> goal_;
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
     std::vector<double> jnt_vel_lim_;
+    double timestep_;
     bool CheckCollision(std::vector<double> joint_pos);
     double GetDistance(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2);
     void GetNeighbors(std::shared_ptr<Vertex> q_new, std::vector<std::shared_ptr<Vertex>> graph, double radius);

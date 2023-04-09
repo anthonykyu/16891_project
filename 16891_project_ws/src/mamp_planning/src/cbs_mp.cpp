@@ -15,8 +15,8 @@ CBSMP::CBSMP()
   initialized_ = false;
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
-
-  
+  alpha_ = 0.05;
+  X_ = 0.5;
 }
 
 void CBSMP::timerCallback(const ros::TimerEvent &)
@@ -68,8 +68,8 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
 
 bool CBSMP::shouldResample(unsigned int N)
 {
-  // TODO:
-  return false;
+  double p = 1.0 - pow(X_, alpha_*N/S_);
+  return (rand()/RAND_MAX) < p;
 }
 
 

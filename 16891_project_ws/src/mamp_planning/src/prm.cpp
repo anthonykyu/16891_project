@@ -9,6 +9,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
   start_ = start;
   goal_ = goal;
   planning_scene_ = planning_scene;
+  timestep_ = timestep;
 }
 
 bool PRM::CheckCollision(vector<double> joint_pos)
@@ -139,7 +140,7 @@ void PRM::GetPath(vector<shared_ptr<Vertex>> nodes)
         PRMpath_.push_back(q);
         q = q->getParent();
     }
-    PRMpath_.push_back(q_start);
+    PRMpath_.push_back(start_);
 }
 
 void PRM::BuildPRM()
@@ -177,7 +178,7 @@ void PRM::BuildPRM()
                     {
                         q_rand->setComponentId(q_near->getComponentId());
                         shared_ptr<Edge> edge = make_shared<Edge>(q_rand, q_near);
-                        auto coll = detectEdgeCollision(planning_scene, edge, jnt_vel_lim_, timestep_);
+                        auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, edge, jnt_vel_lim_, timestep_);
                         if (coll.first == false)
                         {
                             q_rand->addEdge(q_near, edge);
