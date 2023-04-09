@@ -1,23 +1,31 @@
 #include "mamp_planning/mamp_helper.hpp"
 
 
-
-
-
-
 MAMP_Helper::MAMP_Helper(const std::string &full_world_description)
 // Take in the parameter describing the whole world
 // Load up the planning scene for the entire world
 {
-    robot_model_loader::RobotModelLoader robot_model_loader(full_world_description);
-    const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
-    planning_scene_ = planning_scene::PlanningScene(kinematic_model);
+    // robot_model_loader::RobotModelLoader robot_model_loader(full_world_description);
+    // const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+    // planning_scene_ = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
+    // setPlanningScene(std::make_shared<planning_scene::PlanningScene>(kinematic_model));
+    
+
+    auto robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
+    auto kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
+    planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 }
 
 
-static bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
-                                               std::shared_ptr<Vertex> vertex, 
-                                               std::vector<std::pair<std::string, std::string>>& list_of_collisions = NULL)
+// std::shared_ptr<planning_scene::PlanningScene> const &MAMP_Helper::getPlanningScene()
+// {
+//   return planning_scene_;
+// }
+
+
+bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
+                                        std::shared_ptr<Vertex> vertex, 
+                                        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = NULL)
 {
     // Set the planning scene
     moveit::core::RobotState copied_state = planning_scene->getCurrentStateNonConst();
@@ -40,7 +48,7 @@ static bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::P
             ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
 
             // std::pair<std::string, std::string> 
-            list_of_collisions.push_back(std::pair<std::string, std::string>(it->first.first, it->first.second));
+            list_of_collisions->push_back(std::pair<std::string, std::string>(it->first.first, it->first.second));
         }
         return true;
     } 
@@ -54,7 +62,7 @@ static bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::P
     return true; // Should never get here!
 }
 
-
+// Helper function for detectAgentAgentCollisions
 std::vector<double> convertVerticesToJoints(std::vector<std::shared_ptr<Vertex>>& curr_vertices)
 {
     std::vector<double> output_joints;
@@ -77,17 +85,16 @@ std::vector<double> convertVerticesToJoints(std::vector<std::shared_ptr<Vertex>>
 // This function is used in the CT node to detect agent-agent collisions
 // The input is an unordered map, with the key being the agent id, and the value is the agent discretized path
 // static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths)
-static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths)
+std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths)
 {
     // Use the global planning scene to step each agent (planning group) 
     // through their respective path (given input). At each timestep,
     // check for collisions and append collisions to the output vector.
 
-
     // Let's find the longest path first
     unsigned int longest_path_size = 0;
-    std::vector<str::string> robot_names;
-    std::vector<str::string> joint_names;
+    std::vector<std::string> robot_names;
+    std::vector<std::string> joint_names;
     // int total_joints = 0;
     for (auto path_pair : paths)
     {
@@ -101,7 +108,7 @@ static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unord
         int num_joints = path_pair.second.at(0)->getJointPos().size();
         // total_joints = total_joints + num_joints;
         
-        for (int j; j < num_joints; ++i)
+        for (int j; j < num_joints; ++j)
         {
             joint_names.push_back(path_pair.first + "_" + std::to_string(j+1));
         }
@@ -123,32 +130,33 @@ static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unord
         for (auto robot : paths)
         {
             // For this robot, get the appropriate joints for the robot at timestep t
-            std::vector<double> curr_joints;
+            std::shared_ptr<Vertex> curr_vertex;
             if (t >= robot.second.size())
             {
                 // Use the last position of the robot
                 // curr_joints = robot.second.at(robot.second.end());
                 // curr_joints = robot.second[robot.second.size() - 1]->getJointPos();
-                curr_vertices = robot.second[robot.second.size() - 1];
+                curr_vertex = robot.second[robot.second.size() - 1];
             }
             else
             {
                 // curr_joints = robot.second[t]->getJointPos();
-                curr_vertices = robot.second[t];
+                curr_vertex = robot.second[t];
             }
             
-            
+            curr_vertices.push_back(curr_vertex);
         }
 
         // Do the collision check with the multi-agent planning scene
         std::shared_ptr<Vertex> check_vertex = std::make_shared<Vertex>(convertVerticesToJoints(curr_vertices), 0); // the id does not matter here
-        std::vector<std::pair<std::string, std::string>> list_of_collisions;
+        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions;
+        // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
         bool test_val = detectVertexCollision(planning_scene_, check_vertex, list_of_collisions);
         
         if (test_val == true){
             // Go through and create collision objects 
 
-            for (auto collision_pair : list_of_collisions)
+            for (auto collision_pair : *list_of_collisions)
             {
                 // Check if either part of the collision is not an arm or a mobile robot
                 if (collision_pair.first.substr(0,3) != "mob" || collision_pair.first.substr(0,3) != "arm")
@@ -191,21 +199,20 @@ static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unord
 }
 
 
-// TODO: This function should return the last possible vector that it can go till, right?
 // Use this function in PRM to detect whether an edge is valid; it will discretize the edge and check for collisions with the environment
-// static bool MAMP_Helper::detectEdgeCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, std::shared_ptr<Edge> edge,
-//                                              std::vector<double> &jnt_vel_lim, double timestep)
-static std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
+std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
                                                                                  std::shared_ptr<Edge> edge,
                                                                                  std::vector<double> &jnt_vel_lim,
                                                                                  double timestep)
 {
-    // This function will be used in the PRM generation.
-    // Essentially this calls the discretizeEdge function to break down the given edge input
-    // and then calls detectVertexCollision to check for collisions at the vertex with the environment
 
+    // Discretize edge into a series of vertices for collision checking
     std::vector<std::shared_ptr<Vertex>> discrete_steps = discretizeEdge(edge, jnt_vel_lim, timestep);
 
+
+    // Check each vertex for collisions in the given planning_scene
+    // Return false if no collisions are found, with the opposite vertex of the edge
+    // Return true if a colliision is found, with the last vertex that was collision free, in the direction of v2.
     bool test_val = false;
     std::shared_ptr<Vertex> last_vertex = discrete_steps[0];
 
@@ -215,27 +222,25 @@ static std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision
 
         if (test_val == true)
         {
+            last_vertex->setId(discrete_steps[-1]->getId());
             return std::pair<bool, std::shared_ptr<Vertex>>(true, last_vertex);
         }
-        else{
+        else
+        {
             last_vertex = discrete_vertex;
         }
     }
 
-
-    return std::pair<bool, std::shared_ptr<Vertex>>(false, last_vertex);
+    return std::pair<bool, std::shared_ptr<Vertex>>(false, discrete_steps[-1]); // The vertex returned here should just be ignored.
 }
 
 
 // Use this function to discretize an edge into smaller vertices based on the max velocity limit and timestep
-static std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
-// static std::vector<std::vector<double>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
+std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
 {
-    // This function breaks down a given edge into a list of vertices to check for collisions
-    // The discretization is based off of the max joint velocity and timestep given as inputs
 
     // Get positions of the two vertices
-    std::shared_ptr<std::vector<std::vector<double>>> vertices = edge->getVertices();
+    std::shared_ptr<std::vector<std::vector<double>>> vertices = edge->getVertexPositions();
     int num_joints = vertices->at(0).size();
 
     // Calculate difference between the vertices
@@ -268,44 +273,15 @@ static std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::sha
         }
 
         std::shared_ptr<Vertex> new_vertex (new Vertex(new_joints, 0));
+        output.push_back(new_vertex);
     }
 
     return output;
 
-
-
-    // double diff_x = vertices[1].first - vertices[0].first;
-    // double diff_y = vertices[1].second - vertices[0].second;
-
-    // double max_x_step = jnt_vel_lim[0] * timestep;
-    // double max_y_step = jnt_vel_lim[1] * timestep;
-
-    // double x_steps = diff_x / max_x_step;
-    // double y_steps = diff_y / max_y_step;
-
-    // int divisions = (int) ceil(max(x_steps, y_steps));
-    // double x_step = diff_x/divisions;
-    // double y_step = diff_y/divisions;
-
-    // // double curr_x = vertices[0].first;
-    // // double curr_y = vertices[0].second;
-
-    // std::vector<std::shared_ptr<Vertex>> output;
-    // for (int i=0, i < divisions + 1, ++i)
-    // {   
-    //     std::shared_ptr<Vertex> new_vertex (new Vertex(std::vector<double> {vertices[0].first + x_step*i, vertices[0].second + y_step*i}, 0)); // Keeping all id's 0 here as they are irrelevant.
-    //     output.push_back(new_vertex);
-    // }
-
-    // // return std::vector<std::shared_ptr<Vertex>>();
-    // return output;
-
-
-
 }
 
 
-static bool MAMP_Helper::validJointPos(std::shared_ptr<Vertex> vertex, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim)
+bool MAMP_Helper::validJointPos(std::shared_ptr<Vertex> vertex, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim)
 {
     std::vector<double> vertex_joints = vertex->getJointPos();
     for (int i=0; i<jnt_upper_lim.size(); ++i)
@@ -322,18 +298,95 @@ static bool MAMP_Helper::validJointPos(std::shared_ptr<Vertex> vertex, std::vect
 
 
 
-// Use this function to discretize an edge
-static std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdgeDirected(std::shared_ptr<Vertex> start_vertex, std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
+// Use this function to discretize an edge, it WILL RETURN THE START AND END VERTICES FOR THAT EDGE again in the path
+std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdgeDirected(std::shared_ptr<Vertex> start_vertex,
+                                                                         std::shared_ptr<Edge> edge,
+                                                                         std::vector<double> &jnt_vel_lim,
+                                                                         double timestep)
 {
-    // This function breaks down a given edge into a list of vertices where order matters (starting from start_vertex).
-    // This functions the same as discretizeEdge, but will be used when finding a path
-    // for an agent. This will be used in A* or D* Lite, and the output are the vertices
-    // inserted into the Agent's path.
+    
+    // Base Variables
+    int num_joints = jnt_vel_lim.size();
+    // std::shared_ptr<std::vector<std::vector<double>>> start_end_positions = edge->getVertexPositionsInGivenOrder(start_vertex);
+    std::vector<double> start_joint_positions = start_vertex->getJointPos();
+    std::vector<double> end_joint_positions = edge->getOpposingVertex(start_vertex)->getJointPos();
 
-    // We need each step to take the same amount of time.
 
+    //*******************************//
+    // Build out the movement_vector //
+    //*******************************//
 
+    // Just move how much you can, in the direction we're going, at maximum speed
+    // The last increment should be just however much is left.
 
-    // Make sure to also point back to the edge that the new vertex was from so we can backtrack later.
+    // Retrive the unit edge of this vector
+    std::pair<double, std::vector<double>> mag_and_unit_pair = edge->getMagnitudeAndUnitVector(start_vertex);
+    std::vector<double> unit_vector = mag_and_unit_pair.second;
+
+    std::vector<double> movement_vector(num_joints); // Defined as moving full velocity for the given timestep in direction of unit_vector.
+    for (int j=0; j < num_joints; ++j)
+    {
+        // For context, max_movable_distance[j] = jnt_vel_lim[j] * timestep;
+        movement_vector[j] = unit_vector[j] * (jnt_vel_lim[j] * timestep);
+    }
+
+    //********************************//
+    // Build out the path of vertixes //
+    //********************************//
+    
+    int goals_reached_count = 0;
+    std::vector<std::shared_ptr<Vertex>> output;
+    start_vertex->setPRMEdge(edge);
+    output.push_back(start_vertex);
+
+    while (goals_reached_count < num_joints)
+    {
+        // For each joint, start with the previous vertex's joint positions
+        // If distance between that vertex and the goal vertex is smaller than the step to take, just use the last vertex's joint and mark the goal as reached.
+        // At the end, if all goals are reached then add on the goal vertex at the end and return.
+
+        // Reset the goals reached counter
+        goals_reached_count = 0;
+
+        // Build the intermediate set of joints
+        std::vector<double> new_joints(num_joints);
+
+        for (int j=0; j < num_joints; j++)
+        {
+            if ((end_joint_positions[j] - output[-1]->getJointPos()[j]) < movement_vector[j])
+            {
+                // don't move the joint if its within range of its goal
+                new_joints[j] = output[-1]->getJointPos()[j];
+                goals_reached_count += 1;
+            }
+            else
+            {
+                // move the joint by the full amount if its not within range of its goal yet
+                new_joints[j] = output[-1]->getJointPos()[j] + movement_vector[j];
+            }            
+        }
+
+        if (goals_reached_count == num_joints)
+        {
+            // Add on the final vertex, not the new_joints
+            auto final_vertex = edge->getOpposingVertex(start_vertex);
+            final_vertex -> setPRMEdge(edge);
+            output.push_back(final_vertex);
+
+            // And return from the function
+            return output;
+        }
+        else
+        {
+            // Add a vertex with these new joints
+            std::shared_ptr<Vertex> new_vertex = std::make_shared<Vertex>(new_joints, 0);
+            new_vertex->setPRMEdge(edge);
+            output.push_back(new_vertex);
+        }
+    }
+
+    ROS_ERROR("Never should get here in discretizeEdgeDirected");
+
     return std::vector<std::shared_ptr<Vertex>>();
+
 }

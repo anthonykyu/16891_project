@@ -34,7 +34,8 @@ class MAMP_Helper
     // CONSTRUCTOR
     MAMP_Helper(const std::string &full_world_description); 
     
-    std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene() {return planning_scene_;}
+    std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();// {return planning_scene_;}
+    void setPlanningScene(std::shared_ptr<planning_scene::PlanningScene> new_scene) {planning_scene_ = new_scene;}
 
 
     // ********************** //
@@ -44,7 +45,7 @@ class MAMP_Helper
     // Use this function to detect if a vertex is colliding with the environment
     static bool detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
                                       std::shared_ptr<Vertex> vertex, 
-                                      std::vector<std::pair<std::string,std::string>>& list_of_collisions);
+                                      std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions);
       // Uses the given planning scene and vertex to determine if the agent is colliding
       // with the environment of the planning scene. Returns true if colliding.
     // {
@@ -53,7 +54,7 @@ class MAMP_Helper
 
     // This function is used in the CT node to detect agent-agent collisions
     // The input is an unordered map, with the key being the agent id, and the value is the agent discretized path
-    static std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths);
+    std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths);
       // Use the global planning scene to step each agent (planning group) 
       // through their respective path (given input). At each timestep,
       // check for collisions and append collisions to the output vector.
@@ -94,16 +95,13 @@ class MAMP_Helper
     // }
 
     // Use this function to discretize an edge
-    static std::vector<std::shared_ptr<Vertex>> discretizeEdgeDirected(std::shared_ptr<Vertex> start_vertex, std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
-    {
+    static std::vector<std::shared_ptr<Vertex>> discretizeEdgeDirected(std::shared_ptr<Vertex> start_vertex, std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep);
       // This function breaks down a given edge into a list of vertices where order matters (starting from start_vertex).
       // This functions the same as discretizeEdge, but will be used when finding a path
       // for an agent. This will be used in A* or D* Lite, and the output are the vertices
       // inserted into the Agent's path.
 
       // Make sure to also point back to the edge that the new vertex was from so we can backtrack later.
-      return std::vector<std::shared_ptr<Vertex>>();
-    }
 
     static std::vector<Constraint> resolveCollision(Collision &collision)
     {
@@ -159,6 +157,6 @@ class MAMP_Helper
     }
 
   private:
-    static std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
+    std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
 
 };
