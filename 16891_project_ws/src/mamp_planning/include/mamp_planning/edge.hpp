@@ -15,6 +15,8 @@ public:
     void changeValidity(bool validity);
     std::shared_ptr<Vertex> getOpposingVertex(std::shared_ptr<Vertex> v);
     double const &getCost();
+    void setTraversalTime(double t);
+    double getTraversalTime();
 
 private:
     double cost_;

@@ -25,7 +25,7 @@ Agent::Agent(const std::string &robot_description, const std::string &collision_
   prm_ = std::make_shared<PRM>(planning_scene_, timestep_,
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
                                start_, goal_);
-  astar_ = std::make_shared<AStar>(prm_);
+  astar_ = std::make_shared<AStar>(timestep_);
 }
 
 Agent::Agent(std::shared_ptr<Agent> &a)
@@ -46,7 +46,27 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   kinematic_model_ = a->getKinematicModel();
   planning_scene_ = a->getPlanningScene();
   // acm_ = a->getACM();
-  astar_ = a->getAStar();
+  astar_ = std::make_shared<AStar>(timestep_);;
+}
+
+bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints)
+{
+  if (astar_->computePRMPath(start_, goal_, constraints))
+  {
+    prm_path_ = astar_->getPRMPath(start_, goal_);
+    for (int i = 0; i < prm_path_.size()-1; ++i)
+    {
+      discretized_path_.push_back(prm_path_[i]);
+      std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
+      for (auto v : dv)
+      {
+        discretized_path_.push_back(v);
+      }
+    }
+    discretized_path_.push_back(prm_path_[prm_path_.size()-1]);
+    return true;
+  }
+  return false;
 }
 
 std::shared_ptr<planning_scene::PlanningScene> const &Agent::getPlanningScene()

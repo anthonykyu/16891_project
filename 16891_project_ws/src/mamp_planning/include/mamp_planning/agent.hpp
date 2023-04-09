@@ -32,6 +32,7 @@ public:
     urdf::Model const &getURDF();
     double const &getTimestep();
     std::shared_ptr<AStar> &getAStar();
+    bool computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints);
     std::vector<std::shared_ptr<Vertex>> getPRMPath();
     std::vector<std::shared_ptr<Vertex>> getDiscretizedPath();
     // double getPathCost();

@@ -1,6 +1,6 @@
 #include "mamp_planning/ct_node.hpp"
 
-CTNode::CTNode(unsigned int id, std::vector<std::shared_ptr<Agent>> agents)
+CTNode::CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<Agent>> agents)
 {
   cost_ = 0;
   id_ = id;
@@ -14,9 +14,9 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
   // agents_ = n->getAgents();
-  for (int i = 0; i < n->getAgents().size(); ++i)
+  for (auto agent : n->getAgents())
   {
-    agents_.push_back(std::make_shared<Agent>(n->getAgents()[i]));
+    agents_.insert({agent.first, std::make_shared<Agent>(agent.second)});
   }
 }
 
@@ -46,7 +46,7 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> CTNode::ge
   return paths_;
 }
 
-std::vector<std::shared_ptr<Agent>> CTNode::getAgents()
+std::unordered_map<std::string, std::shared_ptr<Agent>> CTNode::getAgents()
 {
   return agents_;
 }

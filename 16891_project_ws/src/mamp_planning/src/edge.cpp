@@ -32,3 +32,13 @@ double const &Edge::getCost()
 {
   return cost_;
 }
+
+void Edge::setTraversalTime(double t)
+{
+  traversal_time_ = t;
+}
+
+double Edge::getTraversalTime()
+{
+  return traversal_time_;
+}

@@ -35,7 +35,7 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
       // TODO: resample routine
       ++S_;
     }
-    std::shared_ptr<CTNode> node = open_list_.pop();
+    std::shared_ptr<CTNode> node = open_list_.pop().second;
     ++N;
     if (node->numCollisions() == 0)
     {
@@ -48,6 +48,17 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
     n1->addConstraint(constraints[0]);
     n2->addConstraint(constraints[1]);
     // TODO: Get n1 and n2 to recompute paths for specific agents affected
+    n1->getAgents().find(constraints[0].agent_id)->second->computeSingleAgentPath(
+      MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id));
+    n1->getPaths().erase({constraints[0].agent_id});
+    n1->getPaths().insert({constraints[0].agent_id, n1->getAgents().find(constraints[0].agent_id)->second->getPRMPath()});
+    n1->computeCost();
+    n2->getAgents().find(constraints[1].agent_id)->second->computeSingleAgentPath(
+      MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id));
+    n2->getPaths().erase({constraints[1].agent_id});
+    n2->getPaths().insert({constraints[1].agent_id, n2->getAgents().find(constraints[1].agent_id)->second->getPRMPath()});
+    n2->computeCost();
+    // insert n1 and n2 into open list of cbs
     open_list_.insert(n1->getComparisonTuple(), n1);
     open_list_.insert(n2->getComparisonTuple(), n2);
     N += 2;

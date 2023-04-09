@@ -4,6 +4,8 @@
 #include <set>
 #include <map>
 #include <memory>
+#include <tuple>
+#include <utility>
 #include "mamp_planning/vertex.hpp"
 
 namespace hash_tuple
@@ -71,7 +73,7 @@ public:
   OpenList();
 
   // pop - removes top element and returns it
-  std::shared_ptr<T> pop();
+  std::pair<Ttuple, std::shared_ptr<T>> pop();
 
   // checks to see if vertex is already in the open list, if so, replace it
   // use this function to also reorder the position of the vertex within the list
@@ -96,16 +98,17 @@ OpenList<Ttuple, T, hashT>::OpenList()
 
 // pop - removes top element and returns it
 template <typename Ttuple, class T, typename hashT>
-std::shared_ptr<T> OpenList<Ttuple, T, hashT>::pop()
+std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop()
 {
   if (check_list_.size() == 0 || ordered_list_.size() == 0)
   {
-    return nullptr;
+    return std::pair<Ttuple, std::shared_ptr<T>>();
   }
   auto s = ordered_list_.begin();
+  std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
   ordered_list_.erase(s);
   check_list_.erase(s->first);
-  return s->second;
+  return v;
 }
 
 // checks to see if vertex is already in the open list, if so, replace it, if not, insert
