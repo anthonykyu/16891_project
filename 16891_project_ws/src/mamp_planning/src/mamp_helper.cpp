@@ -25,40 +25,58 @@ MAMP_Helper::MAMP_Helper(const std::string &full_world_description)
 
 bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
                                         std::shared_ptr<Vertex> vertex, 
-                                        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = NULL)
+                                        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = nullptr)
 {
     // Set the planning scene
+    // ROS_INFO("Start detectVertexCollision function");
     moveit::core::RobotState copied_state = planning_scene->getCurrentStateNonConst();
+    // ROS_INFO("Before joint pos");
     copied_state.setVariablePositions(vertex->getJointPos());
+    // ROS_INFO("After joint pos set");
 
     // Prepare to make a request for collision check
     collision_detection::CollisionRequest collision_request;
+    // ROS_INFO("Made a request for collision check");
+
     collision_request.contacts = true; // We want to know where the contact happens
     collision_request.max_contacts = 100;
-
     // Check for collisions
     collision_detection::CollisionResult collision_result;
+    // ROS_INFO("Set collision request and result");
+    // for (int i=0; i<vertex->getJointPos().size(); ++i){
+    //     ROS_INFO("Joint %f", copied_state.getVariableNames()[i]);
+    //     ROS_INFO("From the vertex it should be %f", vertex->getJointPos()[i]);
+    // }
+
     planning_scene->checkSelfCollision(collision_request, collision_result, copied_state);
-    
+    // ROS_INFO("Done checking for vertex collisions");
     // If there IS a collision...
     if (collision_result.contact_count > 0){
+
         collision_detection::CollisionResult::ContactMap::const_iterator it;
         for (it = collision_result.contacts.begin(); it != collision_result.contacts.end(); ++it)
         {
-            ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
+            // ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
 
             // std::pair<std::string, std::string> 
-            list_of_collisions->push_back(std::pair<std::string, std::string>(it->first.first, it->first.second));
+            if (list_of_collisions)
+            {
+                // ROS_INFO("Add to list of collisions");
+                list_of_collisions->push_back(std::pair<std::string, std::string>(it->first.first, it->first.second));
+                // ROS_INFO("Added to list of collisions");
+            }
         }
         return true;
     } 
     
     // If there IS NO collision...
     else {
-        ROS_INFO("No Collisions!");
+        // ROS_INFO("End detectVertexCollision function");
+
+        // ROS_INFO("No Collisions!");
         return false;
     }
-    
+    // ROS_INFO("End detectVertexCollision function");    
     return true; // Should never get here!
 }
 
@@ -205,12 +223,12 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
                                                                                  std::vector<double> &jnt_vel_lim,
                                                                                  double timestep)
 {
-
+    // ROS_INFO("Start detectEdgeCollision");
     // Discretize edge into a series of vertices for collision checking
     // ROS_INFO("Edge has: ", )
     std::vector<std::shared_ptr<Vertex>> discrete_steps = discretizeEdge(edge, jnt_vel_lim, timestep);
 
-    ROS_INFO("Made Discrete Steps");
+    // ROS_INFO("Made Discrete Steps");
 
 
     // Check each vertex for collisions in the given planning_scene
@@ -219,26 +237,36 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
     bool test_val = false;
     std::shared_ptr<Vertex> last_vertex = discrete_steps[0];
 
-    ROS_INFO("Made Gathered the last vertex Steps");
+    // ROS_INFO("Made Gathered the last vertex Steps");
+    // ROS_INFO("discrete_steps.size():%ld", discrete_steps.size());
+    // for (int i = 0; i < discrete_steps.size(); ++i)
+    // {
+    //     ROS_INFO("Iteration %d:\t Joint 0 Position:%f", i, discrete_steps[i]->getJointPos()[0]);
+    // }
+    int temp_divisions = 1;
 
     for (std::shared_ptr<Vertex> discrete_vertex : discrete_steps)
     {
+        // ROS_INFO("In edge collision forloop");
         test_val = detectVertexCollision(planning_scene, discrete_vertex);
+        // ROS_INFO("test val is %d", test_val);
+        // ROS_INFO("Ran detect vertex collision in the for loop");
 
-        ROS_INFO("Ran detect vertex collision in the for loop");
-
-        if (test_val == true)
+        if (test_val) // collision
         {
-            last_vertex->setId(discrete_steps[-1]->getId());
+            last_vertex->setId(discrete_steps[discrete_steps.size()-1]->getId());
+            edge->setDivisions(temp_divisions);
             return std::pair<bool, std::shared_ptr<Vertex>>(true, last_vertex);
         }
         else
         {
             last_vertex = discrete_vertex;
+            temp_divisions++;
         }
     }
-
-    return std::pair<bool, std::shared_ptr<Vertex>>(false, discrete_steps[-1]); // The vertex returned here should just be ignored.
+    // ROS_INFO("Exiting detectEdgeCollision");ROS_INFO("Start detectEdgeCollision");
+    ROS_INFO("End detectEdgeCollision");
+    return std::pair<bool, std::shared_ptr<Vertex>>(false, discrete_steps[discrete_steps.size()-1]); // The vertex returned here should just be ignored.
 }
 
 
@@ -246,27 +274,24 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
 std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
 {
 
-    ROS_INFO("FIRST LINE");
+    // ROS_INFO("DiscretizeEdge START");
 
     // Get positions of the two vertices
     std::shared_ptr<std::vector<std::vector<double>>> vertices = edge->getVertexPositions();
     int num_joints = vertices->at(0).size();
 
-    ROS_INFO("Gathered vertex positions %ld", num_joints);
-
-
     // Calculate difference between the vertices
     std::vector<double> diff(num_joints, 0.0);
-    double largest_division = 0; 
+    double largest_division = 1; 
     double curr_division = 0;
-    ROS_INFO("But diff is %ld", diff.size());
+    // ROS_INFO("But diff is %ld", diff.size());
 
     for (int i=0; i<diff.size(); ++i)
     {
         diff[i] = vertices->at(1).at(i) - vertices->at(0).at(i);
-        ROS_INFO("Here");
-        ROS_INFO("diff %f", diff[i]);
-        ROS_INFO("vel_lim %f", jnt_vel_lim[i]);
+        // ROS_INFO("Here");
+        // ROS_INFO("diff %f", diff[i]);
+        // ROS_INFO("vel_lim %f", jnt_vel_lim[i]);
         curr_division = diff[i] / (jnt_vel_lim[i] * timestep);
 
         if (curr_division > largest_division)
@@ -274,12 +299,13 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
             largest_division = curr_division;
         }
     }
-
-    ROS_INFO("Calculated differences");
+    // ROS_INFO("Calculated differences");
 
 
     // Generate number of divisions. Use the largest number of divisions
     double divisions = ceil(largest_division);
+    edge->setTraversalTime(timestep * divisions);
+    edge->setDivisions(divisions);
 
     // Create a set of new vertices (including start and end) that can be checked for collisions
     std::vector<std::shared_ptr<Vertex>> output;
@@ -295,6 +321,9 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
         std::shared_ptr<Vertex> new_vertex (new Vertex(new_joints, 0));
         output.push_back(new_vertex);
     }
+
+
+    // ROS_INFO("DiscretizeEdge END");
 
     return output;
 
@@ -325,88 +354,116 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdgeDirected(std::sh
                                                                          double timestep)
 {
     
-    // Base Variables
-    int num_joints = jnt_vel_lim.size();
-    // std::shared_ptr<std::vector<std::vector<double>>> start_end_positions = edge->getVertexPositionsInGivenOrder(start_vertex);
-    std::vector<double> start_joint_positions = start_vertex->getJointPos();
-    std::vector<double> end_joint_positions = edge->getOpposingVertex(start_vertex)->getJointPos();
-
-
-    //*******************************//
-    // Build out the movement_vector //
-    //*******************************//
-
-    // Just move how much you can, in the direction we're going, at maximum speed
-    // The last increment should be just however much is left.
-
-    // Retrive the unit edge of this vector
-    std::pair<double, std::vector<double>> mag_and_unit_pair = edge->getMagnitudeAndUnitVector(start_vertex);
-    std::vector<double> unit_vector = mag_and_unit_pair.second;
-
-    std::vector<double> movement_vector(num_joints); // Defined as moving full velocity for the given timestep in direction of unit_vector.
-    for (int j=0; j < num_joints; ++j)
-    {
-        // For context, max_movable_distance[j] = jnt_vel_lim[j] * timestep;
-        movement_vector[j] = unit_vector[j] * (jnt_vel_lim[j] * timestep);
-    }
-
-    //********************************//
-    // Build out the path of vertixes //
-    //********************************//
+    /*
+    We have a set of vertices.
+    We have a limiting factor at maximum velocity for one joint.
+    Maybe all joints don't have to move at maximum velocity, but they should move in a linear interpolated constant vel profile.
+    v1 - a1 - a2 - a3 - a4 - a5 - v2
+    Return a1 to a5 only
     
-    int goals_reached_count = 0;
-    std::vector<std::shared_ptr<Vertex>> output;
-    start_vertex->setPRMEdge(edge);
-    output.push_back(start_vertex);
 
-    while (goals_reached_count < num_joints)
+    */
+
+    std::vector<std::shared_ptr<Vertex>> undirected = discretizeEdge(edge, jnt_vel_lim, timestep);
+    if (undirected[0]->getId() != start_vertex->getId())
     {
-        // For each joint, start with the previous vertex's joint positions
-        // If distance between that vertex and the goal vertex is smaller than the step to take, just use the last vertex's joint and mark the goal as reached.
-        // At the end, if all goals are reached then add on the goal vertex at the end and return.
-
-        // Reset the goals reached counter
-        goals_reached_count = 0;
-
-        // Build the intermediate set of joints
-        std::vector<double> new_joints(num_joints);
-
-        for (int j=0; j < num_joints; j++)
-        {
-            if ((end_joint_positions[j] - output[-1]->getJointPos()[j]) < movement_vector[j])
-            {
-                // don't move the joint if its within range of its goal
-                new_joints[j] = output[-1]->getJointPos()[j];
-                goals_reached_count += 1;
-            }
-            else
-            {
-                // move the joint by the full amount if its not within range of its goal yet
-                new_joints[j] = output[-1]->getJointPos()[j] + movement_vector[j];
-            }            
-        }
-
-        if (goals_reached_count == num_joints)
-        {
-            // Add on the final vertex, not the new_joints
-            auto final_vertex = edge->getOpposingVertex(start_vertex);
-            final_vertex -> setPRMEdge(edge);
-            output.push_back(final_vertex);
-
-            // And return from the function
-            return output;
-        }
-        else
-        {
-            // Add a vertex with these new joints
-            std::shared_ptr<Vertex> new_vertex = std::make_shared<Vertex>(new_joints, 0);
-            new_vertex->setPRMEdge(edge);
-            output.push_back(new_vertex);
-        }
+        std::reverse(undirected.begin(), undirected.end());
     }
+    undirected.erase(undirected.begin());
+    undirected.erase(undirected.end());
+    return undirected;
 
-    ROS_ERROR("Never should get here in discretizeEdgeDirected");
 
-    return std::vector<std::shared_ptr<Vertex>>();
+    // // Base Variables
+    // int num_joints = jnt_vel_lim.size();
+    // // std::shared_ptr<std::vector<std::vector<double>>> start_end_positions = edge->getVertexPositionsInGivenOrder(start_vertex);
+    // std::vector<double> start_joint_positions = start_vertex->getJointPos();
+    // std::vector<double> end_joint_positions = edge->getOpposingVertex(start_vertex)->getJointPos();
+
+    // ROS_INFO("In discretizeEdgeDirected");
+
+    // //*******************************//
+    // // Build out the movement_vector //
+    // //*******************************//
+
+    // // Just move how much you can, in the direction we're going, at maximum speed
+    // // The last increment should be just however much is left.
+
+    // // Retrive the unit edge of this vector
+    // std::pair<double, std::vector<double>> mag_and_unit_pair = edge->getMagnitudeAndUnitVector(start_vertex);
+    // std::vector<double> unit_vector = mag_and_unit_pair.second;
+
+    // ROS_INFO("Calculated magnitude and unit vector");
+
+
+    // std::vector<double> movement_vector(num_joints); // Defined as moving full velocity for the given timestep in direction of unit_vector.
+    // for (int j=0; j < num_joints; ++j)
+    // {
+    //     // For context, max_movable_distance[j] = jnt_vel_lim[j] * timestep;
+    //     movement_vector[j] = unit_vector[j] * (jnt_vel_lim[j] * timestep);
+    // }
+
+    // ROS_INFO("Generated the movement vector");
+
+    // //********************************//
+    // // Build out the path of vertixes //
+    // //********************************//
+    
+    // int goals_reached_count = 0;
+    // std::vector<std::shared_ptr<Vertex>> output;
+    // start_vertex->setPRMEdge(edge);
+    // output.push_back(start_vertex);
+
+    // ROS_INFO("About to hit the while loop");
+
+    // while (goals_reached_count < num_joints)
+    // {
+    //     // For each joint, start with the previous vertex's joint positions
+    //     // If distance between that vertex and the goal vertex is smaller than the step to take, just use the last vertex's joint and mark the goal as reached.
+    //     // At the end, if all goals are reached then add on the goal vertex at the end and return.
+
+    //     // Reset the goals reached counter
+    //     goals_reached_count = 0;
+
+    //     // Build the intermediate set of joints
+    //     std::vector<double> new_joints(num_joints);
+
+    //     for (int j=0; j < num_joints; j++)
+    //     {
+    //         if ((end_joint_positions[j] - output[output.size()-1]->getJointPos()[j]) < movement_vector[j])
+    //         {
+    //             // don't move the joint if its within range of its goal
+    //             new_joints[j] = output[output.size()-1]->getJointPos()[j];
+    //             goals_reached_count += 1;
+    //         }
+    //         else
+    //         {
+    //             // move the joint by the full amount if its not within range of its goal yet
+    //             new_joints[j] = output[output.size()-1]->getJointPos()[j] + movement_vector[j];
+    //         }            
+    //     }
+
+    //     if (goals_reached_count == num_joints)
+    //     {
+    //         // Add on the final vertex, not the new_joints
+    //         auto final_vertex = edge->getOpposingVertex(start_vertex);
+    //         final_vertex -> setPRMEdge(edge);
+    //         output.push_back(final_vertex);
+
+    //         // And return from the function
+    //         return output;
+    //     }
+    //     else
+    //     {
+    //         // Add a vertex with these new joints
+    //         std::shared_ptr<Vertex> new_vertex = std::make_shared<Vertex>(new_joints, 0);
+    //         new_vertex->setPRMEdge(edge);
+    //         output.push_back(new_vertex);
+    //     }
+    // }
+
+    // ROS_ERROR("Never should get here in discretizeEdgeDirected");
+
+    // return std::vector<std::shared_ptr<Vertex>>();
 
 }

@@ -13,7 +13,21 @@ int main(int argc, char **argv)
   // auto kinematic_model = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
   // planning_scene = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 
+  srand(0);
 
+  // OpenList<std::tuple<double, int>, Vertex, hash_tuple::hash<std::tuple<double, int>>> open;
+  // auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
+  // open.insert(std::make_tuple(0, 101), start_vertex);
+  // open.insert(std::make_tuple(5, 10), start_vertex);
+  // open.insert(std::make_tuple(3, 1), start_vertex);
+  // open.insert(std::make_tuple(10, 2), start_vertex);
+  // open.insert(std::make_tuple(2, 4), start_vertex);
+  // open.insert(std::make_tuple(9, 5), start_vertex);
+  // while (open.size() > 0)
+  // {
+  //   auto v = open.pop();
+  //   ROS_INFO("F value: %d", std::get<1>(v.first));
+  // }
 
   // Initialize a planning scene
   // robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
@@ -25,13 +39,15 @@ int main(int argc, char **argv)
 
   // Declare needed variables
   double ts = 0.1;
-  std::vector<double> jnt_vel_lim{1,1};
+  std::vector<double> jnt_vel_lim{1.0,1.0};
   std::vector<double> jnt_lower_lim{0,0};
   std::vector<double> jnt_upper_lim{10,10};
   auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
-  auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9,25, 9,25}, 0);
+  auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9.25, 9.25}, 0);
 
   auto myPRM = PRM(planning_scene, ts, jnt_vel_lim, jnt_upper_lim, jnt_lower_lim, start_vertex, end_vertex);
+  auto myAStar = AStar(ts);
+  
 
   ROS_INFO("Before the PRM building");
 
@@ -39,8 +55,56 @@ int main(int argc, char **argv)
   myPRM.BuildPRM();
 
 
-  ROS_INFO("We here");
+  ROS_INFO("We built PRM....YAYYYYYY! AStar now.");
   
+  std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints;
+  bool succ = myAStar.computePRMPath(start_vertex, end_vertex, constraints);
+  std::vector<std::shared_ptr<Vertex>> prm_path;
+  std::vector<std::shared_ptr<Vertex>> discretized_path; 
+
+  if (succ)
+  {
+    prm_path = myAStar.getPRMPath(start_vertex, end_vertex);
+    ROS_INFO("Starting to discretize");
+    for (int i = 0; i < prm_path.size()-1; ++i)
+    {
+      discretized_path.push_back(prm_path[i]);
+      ROS_INFO("Starting to discretize in da for loop");
+      std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path[i], prm_path[i]->getEdges().find(prm_path[i+1])->second, jnt_vel_lim, ts);
+      ROS_INFO("Done with discretize");
+      std::reverse(dv.begin(), dv.end());
+      for (auto v : dv)
+      {
+        discretized_path.push_back(v);
+      }
+    }
+    discretized_path.push_back(prm_path[prm_path.size()-1]);
+  }
+  ROS_INFO("We here, double YAYYYYYY: %d", succ);
+
+  for (auto v : prm_path)
+  {
+    for (int i = 0; i < v->getJointPos().size(); ++i)
+    {
+      std::cout << v->getJointPos()[i] << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << prm_path.size() << std::endl;
+
+  ROS_INFO("Discretized Path below:");
+
+  for (auto v : discretized_path)
+  {
+    for (int i = 0; i < v->getJointPos().size(); ++i)
+    {
+      std::cout << v->getJointPos()[i] << ", ";
+    }
+    std::cout << std::endl;
+  }
+  std::cout << discretized_path.size() << std::endl;
+
+
   // std::vector<double> joint_values = { 0.0, 0.0, 0.0, -2.9, 0.0, 1.4, 0.0 };
   // const moveit::core::JointModelGroup* joint_model_group = current_state.getJointModelGroup("panda_arm");
   // current_state.setJointGroupPositions(joint_model_group, joint_values);

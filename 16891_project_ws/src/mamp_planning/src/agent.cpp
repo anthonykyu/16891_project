@@ -58,6 +58,7 @@ bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Con
     {
       discretized_path_.push_back(prm_path_[i]);
       std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
+      std::reverse(dv.begin(), dv.end());
       for (auto v : dv)
       {
         discretized_path_.push_back(v);

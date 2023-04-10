@@ -17,6 +17,8 @@ public:
     double const &getCost();
     void setTraversalTime(double t);
     double getTraversalTime();
+    void setDivisions(double divisions);
+    double getDivisions();
     std::shared_ptr<std::vector<std::vector<double>>> getVertexPositions();
     std::shared_ptr<std::vector<std::vector<double>>> getVertexPositionsInGivenOrder(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2);
     std::pair<double, std::vector<double>> getMagnitudeAndUnitVector(std::shared_ptr<Vertex> start_vertex);
@@ -25,6 +27,7 @@ private:
     double cost_;
     bool valid_;
     double traversal_time_;
+    double divisions_;
     
     std::vector<std::shared_ptr<Vertex>> ordered_vertices_;
     std::unordered_map<unsigned int, std::shared_ptr<Vertex>> vertices_;

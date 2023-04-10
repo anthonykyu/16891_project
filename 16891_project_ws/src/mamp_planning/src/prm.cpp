@@ -4,7 +4,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
         std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal)
 {
-  radius_ = 0.5;
+  radius_ = 1.0;
   num_samples_ = 500;
   start_ = start;
   goal_ = goal;
@@ -56,19 +56,27 @@ void PRM::GetNeighbors(shared_ptr<Vertex> q_new, double radius)
 
 shared_ptr<Vertex> PRM::GetRandomVertex()
 {
+    ROS_INFO("GetRandomVertex starts here");
     // use Vertex class to create a new vertex
     vector<double> q_rand_pos(dof_);
     for (int i = 0; i < dof_; ++i)
     {
       q_rand_pos[i] = jnt_lower_lim_[i] + (((double)rand() / (double)RAND_MAX) * (jnt_upper_lim_[i] - jnt_lower_lim_[i])) ;
-      printf("This is %f\n", q_rand_pos[i]);
+    //   printf("This is %f\n", q_rand_pos[i]);
     }
     shared_ptr<Vertex> q_rand = make_shared<Vertex>(q_rand_pos, node_id_++);
-    printf("Now we have %ld\n", q_rand->getJointPos().size());
+    // printf("Now we have %ld\n", q_rand->getJointPos().size());
 
-    // TODO: Shivani add the function to check if this is a valid set of joint positions, otherwise make a new set.
-    // TODO: Get a vertex collision check, could be hitting an obstacle
-
+    while(MAMP_Helper::detectVertexCollision(planning_scene_, q_rand, nullptr))
+    {
+        for (int i = 0; i < dof_; ++i)
+        {
+        q_rand_pos[i] = jnt_lower_lim_[i] + (((double)rand() / (double)RAND_MAX) * (jnt_upper_lim_[i] - jnt_lower_lim_[i])) ;
+        //   printf("This is %f\n", q_rand_pos[i]);
+        }
+        q_rand->setJointPos(q_rand_pos);
+    }
+    ROS_INFO("GetRandomVertex ends here");
     return q_rand;
 }
 
@@ -159,11 +167,18 @@ void PRM::GetPath(vector<shared_ptr<Vertex>> nodes)
 
 void PRM::BuildPRM()
 {
-    int component = 0;
-
-    ROS_INFO("I got into the function");
-    for (int i = 0; i < num_samples_; i++)
+    unsigned int component = 0;
+    start_->setComponentId(component++);
+    goal_->setComponentId(component++);
+    PRMgraph_.push_back(start_);
+    PRMgraph_.push_back(goal_);
+    ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
+    
+    ROS_INFO("BuldPRM starts here");
+    for (int i = 0; start_->getComponentId() != goal_->getComponentId(); i++)
     {
+        ROS_INFO("Component value: %d", component);
+        ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
         shared_ptr<Vertex> q_rand = GetRandomVertex();
         //NOTE: if the given configuration is valid, need to check with Hardik
         // if (CheckCollision(q_rand->getJointPos()))
@@ -174,43 +189,48 @@ void PRM::BuildPRM()
         ROS_INFO("~~~~ Iteration %d", i);
 
         PRMgraph_.push_back(q_rand);
+        q_rand->setComponentId(component++);
         GetNeighbors(q_rand, radius_);
 
-        ROS_INFO("We have NEIGHBOURS that we know.");
+        // ROS_INFO("We have NEIGHBOURS that we know.");
 
         // if the neighborhood is empty, then the new vertex is a new component
         if (q_rand->getNeighborhood().empty())
         {
+
             q_rand->setComponentId(component);
+            // ROS_INFO("q_rand comp id %d", q_rand->getComponentId());
             component++;
             continue;
         }
         
-        ROS_INFO("It has neighbors. Let's add edges.");
+        // ROS_INFO("It has neighbors. Let's add edges.");
 
         for(int j = 0; j < q_rand->getNeighborhood().size(); j++)
         {
             shared_ptr<Vertex> q_near = q_rand->getNeighborhood()[j];
-            ROS_INFO("Obtained a neighbor");
+            // ROS_INFO("Obtained a neighbor");
 
             // If you're already in the same component, you can skip everything else!
             if (q_rand->getComponentId() == q_near->getComponentId())
             {
                 continue;
             }
-            ROS_INFO("Got past componnent check");
+            // ROS_INFO("Got past componnent check");
 
 
             shared_ptr<Edge> edge = make_shared<Edge>(q_near, q_rand);
-            ROS_INFO("Q_near has joints: %ld", q_near->getJointPos().size());
+            // ROS_INFO("Q_near has joints: %ld", q_near->getJointPos().size());
             auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, edge, jnt_vel_lim_, timestep_);
 
-            ROS_INFO("Executed Collision Check");
+
+            // ROS_INFO("Executed Collision Check");
             if (coll.first == false) // no collision
             {
                 q_rand->addEdge(q_near, edge);
                 q_near->addEdge(q_rand, edge);
                 // PRMgraph_.push_back(q_rand);
+                ROS_INFO("Traversal Time for normal edge: %f \t %f", edge->getDivisions(), edge->getTraversalTime());
             }
 
             // otherwise add an edge until the point it is collision free
@@ -222,9 +242,17 @@ void PRM::BuildPRM()
                     // coll.second->setComponentId(q_rand->getComponentId());
                     coll.second->setId(node_id_++);
                     coll.second->setComponentId(q_near->getComponentId());
+                    // ROS_INFO("q_near comp id: %d", q_near->getComponentId());
+                    // ROS_INFO("coll.second comp id: %d", coll.second->getComponentId());
+
                     PRMgraph_.push_back(coll.second);
 
                     shared_ptr<Edge> collision_free_edge = make_shared<Edge>(q_near, coll.second);
+                    // ROS_INFO("edge divisions %f", edge.getDivisions());
+
+                    collision_free_edge->setDivisions(edge->getDivisions());
+                    collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
+                    ROS_INFO("Traversal Time for REWRITTEN edge: %f \t %f", collision_free_edge->getDivisions(), collision_free_edge->getTraversalTime());
                     coll.second->addEdge(q_near, collision_free_edge);
                     q_near->addEdge(coll.second, collision_free_edge);
 
@@ -238,7 +266,9 @@ void PRM::BuildPRM()
                 // q_rand->setComponentId(q_near->getComponentId());
 
                 int overwrite_id = q_near->getComponentId();
+                // ROS_INFO("overwrite id %d", overwrite_id);
                 int new_id = q_rand->getComponentId();
+                // ROS_INFO("new_id id %d", new_id);
 
                 for (auto v : PRMgraph_)
                 {
@@ -257,4 +287,6 @@ void PRM::BuildPRM()
         }
         
     }
+    ROS_INFO("BuldPRM ends here");
+
 }
