@@ -40,6 +40,7 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
     if (node->numCollisions() == 0)
     {
       // TODO: publish path and return
+      return;
     }
     Collision c = node->getNextCollision();
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
@@ -49,12 +50,12 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
     n2->addConstraint(constraints[1]);
     // TODO: Get n1 and n2 to recompute paths for specific agents affected
     n1->getAgents().find(constraints[0].agent_id)->second->computeSingleAgentPath(
-      MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id));
+      MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id), n1->getMaxConstraintTime());
     n1->getPaths().erase({constraints[0].agent_id});
     n1->getPaths().insert({constraints[0].agent_id, n1->getAgents().find(constraints[0].agent_id)->second->getPRMPath()});
     n1->computeCost();
     n2->getAgents().find(constraints[1].agent_id)->second->computeSingleAgentPath(
-      MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id));
+      MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id), n2->getMaxConstraintTime());
     n2->getPaths().erase({constraints[1].agent_id});
     n2->getPaths().insert({constraints[1].agent_id, n2->getAgents().find(constraints[1].agent_id)->second->getPRMPath()});
     n2->computeCost();

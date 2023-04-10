@@ -65,17 +65,20 @@ int main(int argc, char **argv)
   if (succ)
   {
     prm_path = myAStar.getPRMPath(start_vertex, end_vertex);
-    ROS_INFO("Starting to discretize");
+    // ROS_INFO("Starting to discretize");
     for (int i = 0; i < prm_path.size()-1; ++i)
     {
       discretized_path.push_back(prm_path[i]);
-      ROS_INFO("Starting to discretize in da for loop");
-      std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path[i], prm_path[i]->getEdges().find(prm_path[i+1])->second, jnt_vel_lim, ts);
-      ROS_INFO("Done with discretize");
-      std::reverse(dv.begin(), dv.end());
-      for (auto v : dv)
+      // ROS_INFO("Starting to discretize in da for loop");
+      if (prm_path[i]->getId() != prm_path[i+1]->getId())
       {
-        discretized_path.push_back(v);
+        std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path[i], prm_path[i]->getEdges().find(prm_path[i+1])->second, jnt_vel_lim, ts);
+        // ROS_INFO("Done with discretize");
+        std::reverse(dv.begin(), dv.end());
+        for (auto v : dv)
+        {
+          discretized_path.push_back(v);
+        }
       }
     }
     discretized_path.push_back(prm_path[prm_path.size()-1]);

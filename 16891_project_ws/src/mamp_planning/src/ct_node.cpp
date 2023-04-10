@@ -6,12 +6,14 @@ CTNode::CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<
   id_ = id;
   agents_ = agents;
   mamp_helper_ = mamp_helper;
+  max_constraint_time_ = 0;
 }
 
 CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
 {
   id_ = id;
   cost_ = 0;
+  max_constraint_time_ = n->getMaxConstraintTime();
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
   mamp_helper_ = n->getMAMPHelper();
@@ -22,6 +24,11 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   }
 }
 
+double CTNode::getMaxConstraintTime()
+{
+  return max_constraint_time_;
+}
+
 std::shared_ptr<MAMP_Helper> &CTNode::getMAMPHelper()
 {
   return mamp_helper_;
@@ -30,6 +37,10 @@ std::shared_ptr<MAMP_Helper> &CTNode::getMAMPHelper()
 void CTNode::addConstraint(Constraint c)
 {
   constraints_.push_back(c);
+  if (c.time_step > max_constraint_time_)
+  {
+    max_constraint_time_ = c.time_step;
+  }
 }
 
 Collision &CTNode::getNextCollision()

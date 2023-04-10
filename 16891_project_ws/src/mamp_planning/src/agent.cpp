@@ -49,19 +49,22 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   astar_ = std::make_shared<AStar>(timestep_);;
 }
 
-bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints)
+bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time)
 {
-  if (astar_->computePRMPath(start_, goal_, constraints))
+  if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
   {
     prm_path_ = astar_->getPRMPath(start_, goal_);
     for (int i = 0; i < prm_path_.size()-1; ++i)
     {
       discretized_path_.push_back(prm_path_[i]);
-      std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
-      std::reverse(dv.begin(), dv.end());
-      for (auto v : dv)
+      if (prm_path_[i]->getId() != prm_path_[i+1]->getId())
       {
-        discretized_path_.push_back(v);
+        std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
+        std::reverse(dv.begin(), dv.end());
+        for (auto v : dv)
+        {
+          discretized_path_.push_back(v);
+        }
       }
     }
     discretized_path_.push_back(prm_path_[prm_path_.size()-1]);

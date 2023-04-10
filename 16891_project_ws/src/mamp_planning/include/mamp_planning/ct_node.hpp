@@ -23,6 +23,7 @@ public:
     size_t numCollisions();
     unsigned int getId();
     std::shared_ptr<MAMP_Helper> &getMAMPHelper();
+    double getMaxConstraintTime();
 
 
 
@@ -34,6 +35,7 @@ private:
     std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> paths_;
     std::vector<Collision> collisions_;
     std::vector<Constraint> constraints_;
+    double max_constraint_time_;
     std::shared_ptr<MAMP_Helper> mamp_helper_;
 };
 

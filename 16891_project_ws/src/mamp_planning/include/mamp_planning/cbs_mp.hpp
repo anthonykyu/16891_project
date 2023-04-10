@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "ros/ros.h"
 #include "mamp_planning/agent.hpp"
 #include "mamp_planning/ct_node.hpp"

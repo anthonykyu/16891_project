@@ -17,8 +17,7 @@ public:
     
     AStar(double timestep);
     // AStar(std::shared_ptr<PRM> &prm);
-    bool computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints);
-    std::vector<std::shared_ptr<Vertex>> getDiscretizedPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints);
+    bool computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time = 0);
     std::vector<std::shared_ptr<Vertex>> getPRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal);
     // AStar(std::shared_ptr<AStar> &astar);
     // AStar(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<Agent> agent, std::vector<Constraint> constraints);
@@ -41,7 +40,7 @@ private:
     // std::shared_ptr<PRM> prm_;
     // std::unordered_map<std::tuple<unsigned int, double>, double, hash_tuple::hash<std::tuple<unsigned int, double>>> v_;
     double path_time_;
-    void computeHeuristics(std::shared_ptr<Vertex> goal);
+    double computeHeuristics(std::shared_ptr<Vertex> goal);
     bool isValid(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge);
     bool isConstrained(std::shared_ptr<Edge> edge, double current_time, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints);
 };
