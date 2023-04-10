@@ -1,0 +1,5 @@
+Mobile1
+2
+0.75,0.75
+9.25,9.25
+single_mobile_robot_description

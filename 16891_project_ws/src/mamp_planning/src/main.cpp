@@ -2,7 +2,9 @@
 #include "mamp_planning/cbs_mp.hpp"
 #include "mamp_planning/pbs_dstar_mp.hpp"
 #include "mamp_planning/agent.hpp"
-
+#include <iostream>
+#include <fstream>
+#include <sstream>
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mamp_planning_node");
@@ -29,7 +31,89 @@ int main(int argc, char **argv)
   //   ROS_INFO("F value: %d", std::get<1>(v.first));
   // }
 
-  // Initialize a planning scene
+  
+
+  // Declare needed variables
+
+  // Load the robot name, start and goal states from a text file
+  std::string robot_name;
+  int dof;
+  std::vector<double> start_pos;
+  std::vector<double> goal_pos;
+  std::string robot_description;
+
+  ifstream file("/home/shivani0812/16891_project/16891_project_ws/src/mamp_planning/src/agent_1.txt");
+  if(!file.is_open())
+  {
+    ROS_ERROR("Could not open file");
+    return 0;
+  }
+
+  int line_num = 0;
+  std::string line;
+  while(getline(file,line))
+  {
+    line_num++;
+
+    // create a stringstream of each line
+    std::stringstream ss(line);
+
+    if (line_num==1)
+      ss >> robot_name;
+    else if (line_num==2)
+    {
+      ss >> dof;
+    
+      
+    }
+    else if (line_num==3)
+    {
+      double val;
+      for (int i = 0; i < dof; i++) {
+          string str_val;
+          getline(ss, str_val, ',');
+          val = stod(str_val);
+          start_pos.push_back(val);
+      }  
+    }
+    else if (line_num==4)
+    {
+      double val;
+      for (int i = 0; i < dof; i++) {
+          string str_val;
+          getline(ss, str_val, ',');
+          val = stod(str_val);
+          goal_pos.push_back(val);
+      }
+    }
+    else if (line_num==5)
+      ss >> robot_description;
+    else
+  {
+      cerr << "Unexpected line" << endl;
+      return 0;
+  }
+}
+
+file.close();
+
+// Print the parsed values
+    cout << "Robot name: " << robot_name << endl;
+    cout << "DOF: " << dof << endl;
+    cout << "Start position: ";
+    for (double pos : start_pos) {
+        cout << pos << " ";
+    }
+    cout << endl;
+    cout << "Goal position: ";
+    for (double pos : goal_pos) {
+        cout << pos << " ";
+    }
+    cout << endl;
+    cout << "Robot description: " << robot_description << endl;
+      
+
+// Initialize a planning scene
   // robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
   robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
   // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
@@ -37,13 +121,15 @@ int main(int argc, char **argv)
   const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
   auto planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
 
-  // Declare needed variables
+  // Initialize the agent
+  auto start_vertex = std::make_shared<Vertex> (start_pos, 1);
+  auto end_vertex = std::make_shared<Vertex> (goal_pos, 0);
   double ts = 0.1;
   std::vector<double> jnt_vel_lim{1.0,1.0};
   std::vector<double> jnt_lower_lim{0,0};
   std::vector<double> jnt_upper_lim{10,10};
-  auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
-  auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9.25, 9.25}, 0);
+  // auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
+  // auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9.25, 9.25}, 0);
 
   auto myPRM = PRM(planning_scene, ts, jnt_vel_lim, jnt_upper_lim, jnt_lower_lim, start_vertex, end_vertex);
   auto myAStar = AStar(ts);
@@ -52,7 +138,7 @@ int main(int argc, char **argv)
   ROS_INFO("Before the PRM building");
 
   // PRM.BuildPRM();
-  myPRM.BuildPRM();
+  myPRM.buildPRM();
 
 
   ROS_INFO("We built PRM....YAYYYYYY! AStar now.");

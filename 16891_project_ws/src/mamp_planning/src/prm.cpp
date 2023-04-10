@@ -19,12 +19,12 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
 
 }
 
-bool PRM::CheckCollision(vector<double> joint_pos)
+bool PRM::checkCollision(vector<double> joint_pos)
 {
     return false;
 }
 
-double PRM::GetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
+double PRM::getDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
 {
   double distance = 0;
   for (int i = 0; i < v1->getJointPos().size(); ++i)
@@ -35,7 +35,7 @@ double PRM::GetDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
   return sqrt(distance);
 }
 
-void PRM::GetNeighbors(shared_ptr<Vertex> q_new, double radius)
+void PRM::getNeighbors(shared_ptr<Vertex> q_new, double radius)
 {
   for (int i = 0; i < PRMgraph_.size(); ++i)
   {
@@ -46,7 +46,7 @@ void PRM::GetNeighbors(shared_ptr<Vertex> q_new, double radius)
     }
 
     // If the node is within range, then add it to my neighbors
-    double distance = GetDistance(q_new, PRMgraph_[i]);
+    double distance = getDistance(q_new, PRMgraph_[i]);
     if (distance <= radius)
     {
         q_new->addToNeighborhood(PRMgraph_[i]);
@@ -54,7 +54,7 @@ void PRM::GetNeighbors(shared_ptr<Vertex> q_new, double radius)
   }
 }
 
-shared_ptr<Vertex> PRM::GetRandomVertex()
+shared_ptr<Vertex> PRM::getRandomVertex()
 {
     ROS_INFO("GetRandomVertex starts here");
     // use Vertex class to create a new vertex
@@ -80,10 +80,10 @@ shared_ptr<Vertex> PRM::GetRandomVertex()
     return q_rand;
 }
 
-shared_ptr<Vertex> PRM::GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
+shared_ptr<Vertex> PRM::getNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
 {
     // create a new vertex
-    double distance = GetDistance(q_near, q);
+    double distance = getDistance(q_near, q);
     int num_steps = (int)(distance / r);
 
     if (num_steps < 2)
@@ -105,7 +105,7 @@ shared_ptr<Vertex> PRM::GetNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex
 
 }
 
-shared_ptr<Vertex> PRM::GetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
+shared_ptr<Vertex> PRM::getNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
 {
     double min_distance = 1000000;
     shared_ptr<Vertex> q_near;
@@ -116,7 +116,7 @@ shared_ptr<Vertex> PRM::GetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr
             continue;
         }
 
-        double distance = GetDistance(q, nodes[i]);
+        double distance = getDistance(q, nodes[i]);
         if (distance < min_distance)
         {
             min_distance = distance;
@@ -126,9 +126,9 @@ shared_ptr<Vertex> PRM::GetNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr
     return q_near;
 }
 
-bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
+bool PRM::connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
 {
-    double distance = GetDistance(q1, q2);
+    double distance = getDistance(q1, q2);
     int num_steps = (int)(distance / epsilon_);
     if (num_steps < 2)
     {
@@ -146,7 +146,7 @@ bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
         }
 
         // how do I check collision for these joint positionss in the world?        
-        if (!CheckCollision(unit_vector)) 
+        if (!checkCollision(unit_vector)) 
         {
             return false;
         }
@@ -154,7 +154,7 @@ bool PRM::Connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
     return false;
 }
 
-void PRM::GetPath(vector<shared_ptr<Vertex>> nodes)
+void PRM::getPath(vector<shared_ptr<Vertex>> nodes)
 {
     shared_ptr<Vertex> q = goal_;
     while (q->getId() != start_->getId())
@@ -165,7 +165,7 @@ void PRM::GetPath(vector<shared_ptr<Vertex>> nodes)
     PRMpath_.push_back(start_);
 }
 
-void PRM::BuildPRM()
+void PRM::buildPRM()
 {
     unsigned int component = 0;
     start_->setComponentId(component++);
@@ -179,7 +179,7 @@ void PRM::BuildPRM()
     {
         ROS_INFO("Component value: %d", component);
         ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
-        shared_ptr<Vertex> q_rand = GetRandomVertex();
+        shared_ptr<Vertex> q_rand = getRandomVertex();
         //NOTE: if the given configuration is valid, need to check with Hardik
         // if (CheckCollision(q_rand->getJointPos()))
         // {
@@ -190,7 +190,7 @@ void PRM::BuildPRM()
 
         PRMgraph_.push_back(q_rand);
         q_rand->setComponentId(component++);
-        GetNeighbors(q_rand, radius_);
+        getNeighbors(q_rand, radius_);
 
         // ROS_INFO("We have NEIGHBOURS that we know.");
 
