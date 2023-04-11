@@ -167,7 +167,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
 
         // Do the collision check with the multi-agent planning scene
         std::shared_ptr<Vertex> check_vertex = std::make_shared<Vertex>(convertVerticesToJoints(curr_vertices), 0); // the id does not matter here
-        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions;
+        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = std::make_shared<std::vector<std::pair<std::string, std::string>>>();
         // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
         bool test_val = detectVertexCollision(planning_scene_, check_vertex, list_of_collisions);
         
