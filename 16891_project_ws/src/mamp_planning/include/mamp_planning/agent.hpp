@@ -16,7 +16,7 @@
 class Agent
 {
 public:
-    Agent(const std::string &robot_description, const std::string &collision_robot_description,
+    Agent(const std::string &robot_description, const std::string &robot_description_name,
         const std::string &base_frame, const std::string &tip_frame, std::string &id,
         double &timestep, std::vector<double> start, std::vector<double> goal);
     Agent(std::shared_ptr<Agent> &a);
@@ -32,7 +32,7 @@ public:
     urdf::Model const &getURDF();
     double const &getTimestep();
     std::shared_ptr<AStar> &getAStar();
-    bool computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time = 0);
+    bool computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints = std::unordered_map<std::shared_ptr<Edge>, Constraint>(), double max_constraint_time = 0);
     std::vector<std::shared_ptr<Vertex>> getPRMPath();
     std::vector<std::shared_ptr<Vertex>> getDiscretizedPath();
     // double getPathCost();

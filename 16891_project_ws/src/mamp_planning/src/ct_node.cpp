@@ -59,7 +59,7 @@ std::vector<Constraint> CTNode::getConstraints()
   return constraints_;
 }
 
-std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> CTNode::getPaths()
+std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &CTNode::getPaths()
 {
   return paths_;
 }

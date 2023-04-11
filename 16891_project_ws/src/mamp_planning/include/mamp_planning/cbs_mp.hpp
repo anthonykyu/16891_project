@@ -10,13 +10,16 @@ class CBSMP
 {
     public:
     CBSMP();
+    void initialize(std::vector<std::shared_ptr<Agent>> &agents);
+    ros::NodeHandle n_;
 
 
     private:
     void timerCallback(const ros::TimerEvent&);
     bool shouldResample(unsigned int N);
+    bool replanCBS();
+    void printPaths(std::shared_ptr<CTNode> node);
 
-    ros::NodeHandle n_;
     ros::Timer timer_;
 
     bool initialized_;

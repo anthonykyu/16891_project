@@ -1,6 +1,6 @@
 #include "mamp_planning/agent.hpp"
 
-Agent::Agent(const std::string &robot_description, const std::string &collision_robot_description,
+Agent::Agent(const std::string &robot_description, const std::string &robot_description_name,
              const std::string &base_frame, const std::string &tip_frame, std::string &id,
              double &timestep, std::vector<double> start, std::vector<double> goal)
 {
@@ -14,13 +14,13 @@ Agent::Agent(const std::string &robot_description, const std::string &collision_
   }
   id_ = id;
 
-  robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(collision_robot_description);
+  robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(robot_description_name);
   kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
   planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 
   timestep_ = timestep;
   // path_cost_ = std::numeric_limits<double>::infinity();
-  start_ = std::make_shared<Vertex>(start, 0);
+  start_ = std::make_shared<Vertex>(start, 1);
   goal_ = std::make_shared<Vertex>(goal, 0);
   prm_ = std::make_shared<PRM>(planning_scene_, timestep_,
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
@@ -46,7 +46,7 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   kinematic_model_ = a->getKinematicModel();
   planning_scene_ = a->getPlanningScene();
   // acm_ = a->getACM();
-  astar_ = std::make_shared<AStar>(timestep_);;
+  astar_ = std::make_shared<AStar>(timestep_);
 }
 
 bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time)
