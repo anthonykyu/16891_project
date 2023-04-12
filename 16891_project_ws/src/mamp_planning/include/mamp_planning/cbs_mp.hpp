@@ -9,7 +9,7 @@
 class CBSMP
 {
     public:
-    CBSMP();
+    CBSMP(std::string &world_planning_scene, double timestep);
     void initialize(std::vector<std::shared_ptr<Agent>> &agents);
     ros::NodeHandle n_;
 
@@ -19,6 +19,8 @@ class CBSMP
     bool shouldResample(unsigned int N);
     bool replanCBS();
     void printPaths(std::shared_ptr<CTNode> node);
+    void printConstraints(std::vector<Constraint> node);
+    void printCollision(Collision c);
 
     ros::Timer timer_;
 

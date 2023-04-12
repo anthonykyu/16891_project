@@ -6,11 +6,20 @@ AStar::AStar(double timestep)
   path_time_ = -1;
 }
 
-bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time)
+bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, 
+std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
+double max_constraint_time)
 {
+  // ROS_INFO("Running an episode of Astar search");
+  open_list_.clear();
+  closed_list_.clear();
+  parent_map_.clear();
+  g_.clear();
+  h_.clear();
+
   double max_time = computeHeuristics(goal) + max_constraint_time;
-  ROS_INFO("h size: %ld", h_.size());
-  ROS_INFO("max time: %f", max_time);
+  // ROS_INFO("h size: %ld", h_.size());
+  // ROS_INFO("max time: %f", max_time);
   // ROS_INFO("Computed heuristics");
   open_list_.insert(std::make_tuple(h_[start->getId()], start->getId(), 0), start);
   g_.insert({std::make_tuple(start->getId(), 0), 0});
@@ -21,15 +30,15 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
     auto v = open_list_.pop();
     double g = g_.find(std::make_tuple(v.second->getId(), std::get<2>(v.first)))->second;
     double h = h_[v.second->getId()];
-    ROS_INFO("g: %f, h: %f", g, h);
+    // ROS_INFO("g: %f, h: %f", g, h);
     // ROS_INFO("v id: %d, goal id: %d", v.second->getId(), goal->getId());
     // ROS_INFO("Inside the while loop: after pop");
     double current_time = std::get<2>(v.first);
-    ROS_INFO("current time %f", current_time);
+    // ROS_INFO("current time %f", current_time);
     if (v.second->getId() == goal->getId() && current_time > max_constraint_time)
     {
       // ROS_INFO("Yayyyyyy found the goal");
-      path_time_ = std::get<2>(v.first);
+      path_time_ = current_time;
       return true;
     }
     std::tuple<unsigned int, double> v_closed_tuple = std::make_tuple(v.second->getId(), current_time);
@@ -40,7 +49,7 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
       // For staying in same spot
       std::tuple<unsigned int, double> vn_closed_tuple = std::make_tuple(v.second->getId(), current_time + timestep_);
       // ROS_INFO("created vn closed tuple");
-      if (closed_list_.find(vn_closed_tuple) == closed_list_.end()) // && !isConstrained(neighbor.second, current_time, constraints))
+      if (closed_list_.find(vn_closed_tuple) == closed_list_.end() && !isConstrained(v.second ,nullptr, current_time, constraints))
       {
         // ROS_INFO("Before new_g");
         // ROS_INFO("v closed value %f",v_closed_tuple->second);
@@ -56,8 +65,10 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
           double old_g = g_.find(vn_closed_tuple)->second;
           if (old_g > new_g)
           {
+            g_.erase(vn_closed_tuple);
             g_.insert({vn_closed_tuple, new_g});
             open_list_.insert(vn_open_tuple, v.second);
+            parent_map_.erase(std::make_tuple(v.second, current_time + timestep_));
             parent_map_.insert({std::make_tuple(v.second, current_time + timestep_), std::make_tuple(v.second, current_time)});
           }
         }
@@ -65,6 +76,7 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
         {
           g_.insert({vn_closed_tuple, new_g});
           open_list_.insert(vn_open_tuple, v.second);
+          parent_map_.erase(std::make_tuple(v.second, current_time + timestep_));
           parent_map_.insert({std::make_tuple(v.second, current_time + timestep_), std::make_tuple(v.second, current_time)});
         }
       }
@@ -78,7 +90,7 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
         std::tuple<unsigned int, double> n_closed_tuple = std::make_tuple(neighbor.first->getId(), current_time + neighbor.second->getTraversalTime());
         if (closed_list_.find(n_closed_tuple) == closed_list_.end() &&
             isValid(neighbor.first, neighbor.second) && 
-            !isConstrained(neighbor.second, current_time, constraints) &&
+            !isConstrained(neighbor.first, neighbor.second, current_time, constraints) &&
             current_time <= max_time)
         {
           // ROS_INFO("Neighbors: inside the first if of the foor loop");
@@ -92,9 +104,11 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
             // ROS_INFO("Neighbors: Got old g");
             if (old_g > new_g)
             {
+              g_.erase(n_closed_tuple);
               g_.insert({n_closed_tuple, new_g});
               open_list_.insert(n_open_tuple, neighbor.first);
               // ROS_INFO("Neighbors: overwrote old g");
+              parent_map_.erase(std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()));
               parent_map_.insert({std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()),
                                   std::make_tuple(v.second, current_time)});
             }
@@ -104,10 +118,15 @@ bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex
             g_.insert({n_closed_tuple, new_g});
             open_list_.insert(n_open_tuple, neighbor.first);
             // ROS_INFO("Neighbors: inserted new g");
+            parent_map_.erase(std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()));
             parent_map_.insert({std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()),
                                 std::make_tuple(v.second, current_time)});
           }
         }
+        // else
+        // {
+        //   ROS_INFO("SKIPPED");
+        // }
       }
     }
     // ROS_INFO("Did not insert into closed list");
@@ -121,13 +140,16 @@ std::vector<std::shared_ptr<Vertex>> AStar::getPRMPath(std::shared_ptr<Vertex> s
   std::shared_ptr<Vertex> v = goal;
   std::tuple<std::shared_ptr<Vertex>, double> v_time = std::make_tuple(goal, path_time_);
   prm_path.push_back(v);
-  while (v != start)
+  double time = path_time_;
+  while (v != start || time != 0)
   {
     v_time = parent_map_.find(v_time)->second;
     v = std::get<0>(v_time);
+    time = std::get<1>(v_time);
     prm_path.push_back(v);
   }
   std::reverse(prm_path.begin(), prm_path.end());
+  // ROS_INFO("Returning a path from Astar");
   return prm_path;
 }
 
@@ -163,6 +185,7 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
             double new_h = h_.find(v->getId())->second + neighbor.second->getTraversalTime();
             if (old_h > new_h)
             {
+              h_.erase(neighbor.first->getId());
               h_.insert({neighbor.first->getId(), new_h});
               open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), neighbor.first);
             }
@@ -183,12 +206,169 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
   return max_time;
 }
 
-bool AStar::isConstrained(std::shared_ptr<Edge> edge, double current_time, std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints)
+bool AStar::isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge, double current_time,
+std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints)
 {
-  auto constraint = constraints.find(edge);
-  return constraint != constraints.end() && 
-          ((constraint->second.time_step > current_time && constraint->second.time_step < (current_time + edge->getTraversalTime())) ||
-          (constraint->second.time_step < -1.0*current_time && constraint->second.time_step > -1.0*(current_time + edge->getTraversalTime())));
+  auto constraint = constraints.second.find(edge);
+  auto constrained_vertex = constraints.first.find(vertex);
+  
+
+  if (edge)
+  {
+    bool edge_constrained = constraint != constraints.second.end();
+    if (edge_constrained)
+    {
+      for (auto c : constraint->second)
+      {
+        edge_constrained = ((c.time_step >= current_time && c.time_step <= (current_time + edge->getTraversalTime())) ||
+                          (c.time_step <= -1.0*current_time && c.time_step >= -1.0*(current_time + edge->getTraversalTime())));
+        if (edge_constrained)
+          return true;
+      }
+    }
+     
+    bool vertex_constrained = constrained_vertex != constraints.first.end();
+    if (vertex_constrained)
+    {
+      for (auto c : constrained_vertex->second)
+      {
+        // ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
+        // ROS_INFO("Neighbor Time: %f", current_time + edge->getTraversalTime());
+        // ROS_INFO("Equality check: %d", c.time_step >= (current_time + edge->getTraversalTime() - timestep_) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_));
+        // ROS_INFO("Neighbor Vertex: ");
+        // for (double j : vertex->getJointPos())
+        // {
+        //   ROS_INFO("%f, ", j);
+        // }
+        // ROS_INFO("Constraint Vertex: ");
+        // for (double j : c.joint_pos_vertex->getJointPos())
+        // {
+        //   ROS_INFO("%f, ", j);
+        // }
+        vertex_constrained = (c.time_step >= (current_time + edge->getTraversalTime() - timestep_) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_)) ||
+                            (c.time_step <= -1.0*(current_time + edge->getTraversalTime() - timestep_) && c.time_step >= -1.0*(current_time + edge->getTraversalTime() + timestep_));
+        // ROS_INFO("Vertex Constrained: %d", vertex_constrained);
+        if (vertex_constrained)
+          return true;
+      }
+    }
+          
+    // if (edge_constrained)
+    // {
+    //   ROS_INFO("Edge Constrained!!!");
+    //   // ROS_INFO("%s, %d, %f", constraint->second.agent_id.c_str(), constraint->second.is_vertex_constraint, constraint->second.time_step);
+
+    //   ROS_INFO("Trying to travel to Vertex at time %f with travel time %f and constraint time %f: ", current_time, edge->getTraversalTime(), constraint->second.time_step);
+    //   // for (double j : vertex->getJointPos())
+    //   // {
+    //   //   ROS_INFO("%f, ", j);
+    //   // }
+
+    //   if (constraint->second.is_vertex_constraint)
+    //   {
+    //     ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", constraint->second.agent_id.c_str(), constraint->second.time_step);
+    //     for (double j : constraint->second.joint_pos_vertex->getJointPos())
+    //     {
+    //       ROS_INFO("%f, ", j);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     ROS_INFO("Edge Constraint: Agent: %s, Time: %f", constraint->second.agent_id.c_str(), constraint->second.time_step);
+    //     auto joint_positions = *(constraint->second.joint_pos_edge->getVertexPositions());
+    //     for (auto vec : joint_positions)
+    //     {
+    //       ROS_INFO("Vertex: ");
+    //       for (double j : vec)
+    //       {
+    //         ROS_INFO("%f, ", j);
+    //       }
+    //     }
+    //   }
+    // }
+    // if (vertex_constrained)
+    // {
+    //   ROS_INFO("Vertex Constrained!!!");
+    //   // ROS_INFO("%s, %d, %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.is_vertex_constraint, constrained_vertex->second.time_step);
+
+    //   ROS_INFO("Trying to travel to Vertex at time %f: ", current_time);
+    //   for (double j : vertex->getJointPos())
+    //   {
+    //     ROS_INFO("%f, ", j);
+    //   }
+
+    //   if (constrained_vertex->second.is_vertex_constraint)
+    //   {
+    //     ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.time_step);
+    //     for (double j : constrained_vertex->second.joint_pos_vertex->getJointPos())
+    //     {
+    //       ROS_INFO("%f, ", j);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     ROS_INFO("Edge Constraint: Agent: %s, Time: %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.time_step);
+    //     auto joint_positions = *(constrained_vertex->second.joint_pos_edge->getVertexPositions());
+    //     for (auto vec : joint_positions)
+    //     {
+    //       ROS_INFO("Vertex: ");
+    //       for (double j : vec)
+    //       {
+    //         ROS_INFO("%f, ", j);
+    //       }
+    //     }
+    //   }
+    // }
+  }
+  else
+  {
+    bool vertex_constrained = constrained_vertex != constraints.first.end();
+    if (vertex_constrained)
+    {
+      for (auto c : constrained_vertex->second)
+      {
+        vertex_constrained = (c.time_step >= (current_time) && c.time_step <= (current_time + 2.0*timestep_)) ||
+                            (c.time_step <= -1.0*(current_time) && c.time_step >= -1.0*(current_time + 2.0*timestep_));
+        if (vertex_constrained)
+          return true;
+      }
+    }
+    // if (vertex_constrained)
+    // {
+    //   ROS_INFO("Vertex Constrained!!!");
+    //   // ROS_INFO("%s, %d, %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.is_vertex_constraint, constrained_vertex->second.time_step);
+
+    //   ROS_INFO("Trying to travel to Vertex at time %f: ", current_time);
+    //   for (double j : vertex->getJointPos())
+    //   {
+    //     ROS_INFO("%f, ", j);
+    //   }
+
+    //   if (constrained_vertex->second.is_vertex_constraint)
+    //   {
+    //     ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.time_step);
+    //     for (double j : constrained_vertex->second.joint_pos_vertex->getJointPos())
+    //     {
+    //       ROS_INFO("%f, ", j);
+    //     }
+    //   }
+    //   else
+    //   {
+    //     // ROS_INFO("Edge Constraint: Agent: %s, Time: %f", constrained_vertex->second.agent_id.c_str(), constrained_vertex->second.time_step);
+    //     auto joint_positions = *(constrained_vertex->second.joint_pos_edge->getVertexPositions());
+    //     for (auto vec : joint_positions)
+    //     {
+    //       ROS_INFO("Vertex: ");
+    //       for (double j : vec)
+    //       {
+    //         ROS_INFO("%f, ", j);
+    //       }
+    //     }
+    //   }
+    // }
+
+  }
+  return false;  
 }
 
 bool AStar::isValid(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge)

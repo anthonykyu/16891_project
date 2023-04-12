@@ -84,6 +84,8 @@ public:
 
   size_t size();
 
+  void clear();
+
 private:
   std::unordered_map<Ttuple, std::shared_ptr<T>, hashT> check_list_;
   std::map<Ttuple, std::shared_ptr<T>> ordered_list_;
@@ -94,6 +96,13 @@ private:
 template <typename Ttuple, class T, typename hashT>
 OpenList<Ttuple, T, hashT>::OpenList()
 {
+}
+
+template <typename Ttuple, class T, typename hashT>
+void OpenList<Ttuple, T, hashT>::clear()
+{
+  check_list_.clear();
+  ordered_list_.clear();
 }
 
 // pop - removes top element and returns it

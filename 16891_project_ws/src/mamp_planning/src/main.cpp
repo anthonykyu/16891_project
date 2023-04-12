@@ -72,10 +72,11 @@ int main(int argc, char **argv)
   srand(0);
   ROS_INFO("Heyyy");
   double timestep = 0.1;
-  CBSMP planner_;
+  std::string world_planning_scene = "multi_mobile_robot_description";
+  CBSMP planner_(world_planning_scene, timestep);
 
-  // std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep);
-  // planner_.initialize(agents);
+  std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep);
+  planner_.initialize(agents);
   // ROS_INFO("Number of agents: %ld", agents.size());
   // ROS_INFO("Agent ID: %s", agents[0]->getID().c_str());
   // ROS_INFO("Agent Start: %f, %f", agents[0]->getStart()->getJointPos()[0], agents[0]->getStart()->getJointPos()[1]);
@@ -91,82 +92,82 @@ int main(int argc, char **argv)
   // ROS_INFO("Agent Lower Lim: %f, %f", agents[1]->getLowerJointLimit()[0], agents[0]->getLowerJointLimit()[1]);
 
 
-  // Initialize a planning scene
-  // robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
-  robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
-  // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
-  // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
-  const moveit::core::RobotModelPtr &kinematic_model = robot_model_loader.getModel();
-  auto planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
+  // // Initialize a planning scene
+  // // robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
+  // robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
+  // // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
+  // // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
+  // const moveit::core::RobotModelPtr &kinematic_model = robot_model_loader.getModel();
+  // auto planning_scene = std::make_shared<planning_scene::PlanningScene>(kinematic_model);
 
-  // Initialize the agent
-  double ts = 0.1;
-  std::vector<double> jnt_vel_lim{1.0, 1.0};
-  std::vector<double> jnt_lower_lim{0, 0};
-  std::vector<double> jnt_upper_lim{10, 10};
-  auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
-  auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9.25, 9.25}, 0);
+  // // Initialize the agent
+  // double ts = 0.1;
+  // std::vector<double> jnt_vel_lim{1.0, 1.0};
+  // std::vector<double> jnt_lower_lim{0, 0};
+  // std::vector<double> jnt_upper_lim{10, 10};
+  // auto start_vertex = std::make_shared<Vertex> (std::vector<double>{0.75, 0.75}, 1);
+  // auto end_vertex = std::make_shared<Vertex> (std::vector<double>{9.25, 9.25}, 0);
 
-  auto myPRM = PRM(planning_scene, ts, jnt_vel_lim, jnt_upper_lim, jnt_lower_lim, start_vertex, end_vertex);
-  auto myAStar = AStar(ts);
+  // auto myPRM = PRM(planning_scene, ts, jnt_vel_lim, jnt_upper_lim, jnt_lower_lim, start_vertex, end_vertex);
+  // auto myAStar = AStar(ts);
 
-  ROS_INFO("Before the PRM building");
+  // ROS_INFO("Before the PRM building");
 
-  // PRM.BuildPRM();
-  myPRM.buildPRM();
+  // // PRM.BuildPRM();
+  // myPRM.buildPRM();
 
-  ROS_INFO("We built PRM....YAYYYYYY! AStar now.");
+  // ROS_INFO("We built PRM....YAYYYYYY! AStar now.");
 
-  std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints;
-  bool succ = myAStar.computePRMPath(start_vertex, end_vertex, constraints);
-  std::vector<std::shared_ptr<Vertex>> prm_path;
-  std::vector<std::shared_ptr<Vertex>> discretized_path;
+  // std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints;
+  // bool succ = myAStar.computePRMPath(start_vertex, end_vertex, constraints);
+  // std::vector<std::shared_ptr<Vertex>> prm_path;
+  // std::vector<std::shared_ptr<Vertex>> discretized_path;
 
-  if (succ)
-  {
-    prm_path = myAStar.getPRMPath(start_vertex, end_vertex);
-    // ROS_INFO("Starting to discretize");
-    for (int i = 0; i < prm_path.size() - 1; ++i)
-    {
-      discretized_path.push_back(prm_path[i]);
-      // ROS_INFO("Starting to discretize in da for loop");
-      if (prm_path[i]->getId() != prm_path[i + 1]->getId())
-      {
-        std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path[i], prm_path[i]->getEdges().find(prm_path[i + 1])->second, jnt_vel_lim, ts);
-        // ROS_INFO("Done with discretize");
-        std::reverse(dv.begin(), dv.end());
-        for (auto v : dv)
-        {
-          discretized_path.push_back(v);
-        }
-      }
-    }
-    discretized_path.push_back(prm_path[prm_path.size() - 1]);
-  }
-  ROS_INFO("We here, double YAYYYYYY: %d", succ);
+  // if (succ)
+  // {
+  //   prm_path = myAStar.getPRMPath(start_vertex, end_vertex);
+  //   // ROS_INFO("Starting to discretize");
+  //   for (int i = 0; i < prm_path.size() - 1; ++i)
+  //   {
+  //     discretized_path.push_back(prm_path[i]);
+  //     // ROS_INFO("Starting to discretize in da for loop");
+  //     if (prm_path[i]->getId() != prm_path[i + 1]->getId())
+  //     {
+  //       std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path[i], prm_path[i]->getEdges().find(prm_path[i + 1])->second, jnt_vel_lim, ts);
+  //       // ROS_INFO("Done with discretize");
+  //       std::reverse(dv.begin(), dv.end());
+  //       for (auto v : dv)
+  //       {
+  //         discretized_path.push_back(v);
+  //       }
+  //     }
+  //   }
+  //   discretized_path.push_back(prm_path[prm_path.size() - 1]);
+  // }
+  // ROS_INFO("We here, double YAYYYYYY: %d", succ);
 
-  for (auto v : prm_path)
-  {
-    for (int i = 0; i < v->getJointPos().size(); ++i)
-    {
-      std::cout << v->getJointPos()[i] << ", ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << prm_path.size() << std::endl;
+  // for (auto v : prm_path)
+  // {
+  //   for (int i = 0; i < v->getJointPos().size(); ++i)
+  //   {
+  //     std::cout << v->getJointPos()[i] << ", ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+  // std::cout << prm_path.size() << std::endl;
 
-  ROS_INFO("Discretized Path below:");
+  // ROS_INFO("Discretized Path below:");
 
-  for (auto v : discretized_path)
-  {
-    for (int i = 0; i < v->getJointPos().size(); ++i)
-    {
-      std::cout << v->getJointPos()[i] << ", ";
-    }
-    std::cout << std::endl;
-  }
-  std::cout << discretized_path.size() << std::endl;
-  ROS_INFO("PRM Size: %ld", myPRM.PRMgraph_.size());
+  // for (auto v : discretized_path)
+  // {
+  //   for (int i = 0; i < v->getJointPos().size(); ++i)
+  //   {
+  //     std::cout << v->getJointPos()[i] << ", ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+  // std::cout << discretized_path.size() << std::endl;
+  // ROS_INFO("PRM Size: %ld", myPRM.PRMgraph_.size());
   
 
   ros::spin();

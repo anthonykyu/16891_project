@@ -51,10 +51,10 @@ Collision &CTNode::getNextCollision()
 
 void CTNode::computeCost()
 {
-  cost_ = MAMP_Helper::getSumOfCosts(paths_);
+  cost_ = mamp_helper_->getSumOfCosts(paths_);
 }
 
-std::vector<Constraint> CTNode::getConstraints()
+std::vector<Constraint> &CTNode::getConstraints()
 {
   return constraints_;
 }
@@ -64,7 +64,7 @@ std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &CTNode::g
   return paths_;
 }
 
-std::unordered_map<std::string, std::shared_ptr<Agent>> CTNode::getAgents()
+std::unordered_map<std::string, std::shared_ptr<Agent>> &CTNode::getAgents()
 {
   return agents_;
 }

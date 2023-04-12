@@ -1,2 +1,4 @@
 mobile_1,2,0.75,0.75,9.25,9.25,single_mobile_robot_description,world,mobile_1
 mobile_2,2,9.25,9.25,0.75,0.75,single_mobile_robot_description,world,mobile_1
+mobile_3,2,0.50,1.25,9.00,7.00,single_mobile_robot_description,world,mobile_1
+mobile_4,2,9.00,7.00,0.50,1.25,single_mobile_robot_description,world,mobile_1

@@ -49,8 +49,13 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   astar_ = std::make_shared<AStar>(timestep_);
 }
 
-bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Constraint> constraints, double max_constraint_time)
+bool Agent::computeSingleAgentPath(
+  std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>,
+  std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints, 
+  double max_constraint_time)
 {
+  discretized_path_.clear();
+  // ROS_INFO("Cleared discretized path: %ld", discretized_path_.size());
   if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
   {
     prm_path_ = astar_->getPRMPath(start_, goal_);
@@ -65,9 +70,37 @@ bool Agent::computeSingleAgentPath(std::unordered_map<std::shared_ptr<Edge>, Con
         {
           discretized_path_.push_back(v);
         }
+        // ROS_INFO("dv size: %ld", dv.size());
       }
     }
     discretized_path_.push_back(prm_path_[prm_path_.size()-1]);
+    // for (int i = 0; i < 10; ++i)
+    // {
+    //   ROS_INFO("PRM Vertex %d", i);
+    //   for (auto v : prm_path_[i]->getJointPos())
+    //   {
+    //     ROS_INFO("%f, ", v);
+    //   }
+    // }
+    // for (int i = 0; i < 10; ++i)
+    // {
+    //   ROS_INFO("Disc Vertex %d", i);
+    //   for (auto v : discretized_path_[i]->getJointPos())
+    //   {
+    //     ROS_INFO("%f, ", v);
+    //   }
+    // }
+    // for (auto constraint : constraints.second)
+    // {
+    //   for (int i = 0; i < discretized_path_.size(); ++i)
+    //   {
+    //     auto v = discretized_path_[i];
+    //     if (v->getPRMEdge() && constraint.first == v->getPRMEdge())
+    //     {
+    //       ROS_ERROR("Constraint not checked!!!, Timestep: %f", i*timestep_);
+    //     }
+    //   }
+    // }
     return true;
   }
   return false;

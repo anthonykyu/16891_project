@@ -1,7 +1,7 @@
 #include "mamp_planning/mamp_helper.hpp"
 
 
-MAMP_Helper::MAMP_Helper(const std::string &full_world_description)
+MAMP_Helper::MAMP_Helper(const std::string &full_world_description, double timestep)
 // Take in the parameter describing the whole world
 // Load up the planning scene for the entire world
 {
@@ -14,6 +14,7 @@ MAMP_Helper::MAMP_Helper(const std::string &full_world_description)
     auto robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
     auto kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
     planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
+    timestep_ = timestep;
 }
 
 
@@ -32,6 +33,14 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
     moveit::core::RobotState copied_state = planning_scene->getCurrentStateNonConst();
     // ROS_INFO("Before joint pos");
     copied_state.setVariablePositions(vertex->getJointPos());
+    // ROS_INFO("%ld", copied_state.getVariableCount());
+    // ROS_INFO("size %ld", vertex->getJointPos().size());
+    // auto names = copied_state.getVariableNames();
+    // ROS_INFO("Printing variable names:");
+    // for (auto n : names)
+    // {
+    //     ROS_INFO("%s", n.c_str());
+    // }
     // ROS_INFO("After joint pos set");
 
     // Prepare to make a request for collision check
@@ -81,18 +90,35 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
 }
 
 // Helper function for detectAgentAgentCollisions
-std::vector<double> convertVerticesToJoints(std::vector<std::shared_ptr<Vertex>>& curr_vertices)
+std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<planning_scene::PlanningScene> planning_scene, std::vector<std::string> &robot_names, std::vector<std::shared_ptr<Vertex>>& curr_vertices)
 {
+    moveit::core::RobotState copied_state = planning_scene->getCurrentStateNonConst();
+    auto names = copied_state.getVariableNames();
+    // ROS_INFO("Number of names: %ld", names.size());
+    // ROS_INFO("Printing variable names:");
+    // for (auto n : names)
+    // {
+    //     ROS_INFO("%s", n.c_str());
+    // }
+    int dof = names.size() / robot_names.size();
     std::vector<double> output_joints;
-    for (std::shared_ptr<Vertex> vertex : curr_vertices)
+    for (int i = 0; i < names.size(); i+=dof)
     {
-        std::vector<double> curr_joints;
-        curr_joints = vertex->getJointPos();
+        int idx = 0;
+        for (int j = 0; j < robot_names.size(); ++j)
+        {
+            if (names[i].find(robot_names[j]) != std::string::npos)
+            {
+                idx = j;
+            }
+        }
+        std::vector<double> curr_joints = curr_vertices[idx]->getJointPos();
+        // ROS_INFO("curr_joints size %ld", curr_joints.size());
 
         // Add the collected joints into the joint_positions
-        for (int j=0; j < curr_joints.size(); ++j)
+        for (int k=0; k < curr_joints.size(); ++k)
         {
-            output_joints.push_back(curr_joints.at(j));
+            output_joints.push_back(curr_joints.at(k));
         }
     }
 
@@ -113,9 +139,11 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
     unsigned int longest_path_size = 0;
     std::vector<std::string> robot_names;
     std::vector<std::string> joint_names;
+    // ROS_INFO("Initialized vectors in agent agent col");
     // int total_joints = 0;
     for (auto path_pair : paths)
     {
+        // ROS_INFO("Inside the for loop");
         // Update our longest path size
         if (path_pair.second.size() > longest_path_size)
         {
@@ -126,12 +154,16 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         int num_joints = path_pair.second.at(0)->getJointPos().size();
         // total_joints = total_joints + num_joints;
         
-        for (int j; j < num_joints; ++j)
+
+        for (int j=0; j < num_joints; ++j)
         {
+            // ROS_INFO("The number of joints is %ld", num_joints);
+            // ROS_INFO("Inside the next for loop");
             joint_names.push_back(path_pair.first + "_" + std::to_string(j+1));
         }
         
         // Update our collection of robot names
+        // ROS_INFO("%s", path_pair.first.c_str());
         robot_names.push_back(path_pair.first);
     }
 
@@ -140,6 +172,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
     // We use the MAMP_Helper's own planning scene for this check
     for (int t = 0; t < longest_path_size; ++t)
     {
+        // ROS_INFO("Inside 2nd for loop");
+
         // std::vector<double> joint_positions(joint_names.size());
         // std::vector<double> joint_positions;
         std::vector<std::shared_ptr<Vertex>> curr_vertices;
@@ -148,6 +182,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         for (auto robot : paths)
         {
             // For this robot, get the appropriate joints for the robot at timestep t
+            // ROS_INFO("Inside inner for loop of 2nd for loop");
+            
             std::shared_ptr<Vertex> curr_vertex;
             if (t >= robot.second.size())
             {
@@ -165,11 +201,21 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
             curr_vertices.push_back(curr_vertex);
         }
 
+        // ROS_INFO("About to start the collision check");
+
         // Do the collision check with the multi-agent planning scene
-        std::shared_ptr<Vertex> check_vertex = std::make_shared<Vertex>(convertVerticesToJoints(curr_vertices), 0); // the id does not matter here
+        std::shared_ptr<Vertex> check_vertex = std::make_shared<Vertex>(convertVerticesToJoints(planning_scene_, robot_names, curr_vertices), 0); // the id does not matter here
+        // ROS_INFO("About to start the collision check + 1");
         std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = std::make_shared<std::vector<std::pair<std::string, std::string>>>();
+        // ROS_INFO("About to start the collision check + 2");
         // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
         bool test_val = detectVertexCollision(planning_scene_, check_vertex, list_of_collisions);
+        
+        
+        // ROS_INFO("Finished the collision check");
+        
+        std::string mobile_string= "mob";
+        std::string arm_string = "arm";
         
         if (test_val == true){
             // Go through and create collision objects 
@@ -177,29 +223,48 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
             for (auto collision_pair : *list_of_collisions)
             {
                 // Check if either part of the collision is not an arm or a mobile robot
-                if (collision_pair.first.substr(0,3) != "mob" || collision_pair.first.substr(0,3) != "arm")
+                if (!((std::strcmp(collision_pair.first.substr(0,3).c_str(), mobile_string.c_str()) != 0 ||
+                    std::strcmp(collision_pair.second.substr(0,3).c_str(), mobile_string.c_str()) != 0) ||
+                    (std::strcmp(collision_pair.first.substr(0,3).c_str(), arm_string.c_str()) != 0 ||
+                    std::strcmp(collision_pair.second.substr(0,3).c_str(), arm_string.c_str()) != 0)))
                 {
                     ROS_ERROR("Collision found with a non-agent (i.e. environment) which should not happen if low-level search worked correctly.");
                 }
                 
                 // Return the first collision we've found
                 Collision first_collision;
-                first_collision.timestep = t;
+                first_collision.timestep = t * timestep_;
                 first_collision.agent_id1 = collision_pair.first;
                 first_collision.agent_id2 = collision_pair.second;
                 
                 // Retrive the edge of that vertex at this timestep.
                 for (int n=0; n < robot_names.size(); ++n)
                 {
-                    if (robot_names[n] == collision_pair.first)
+                    // if (robot_names[n] == collision_pair.first)
+                    if (std::strcmp(robot_names[n].c_str(), collision_pair.first.c_str()) == 0)
                     {
                         first_collision.location1 = curr_vertices[n]->getPRMEdge();
+                        if (first_collision.location1 == nullptr)
+                        {
+                            first_collision.location1_is_vertex = true;
+                            first_collision.location1_vertex = curr_vertices[n];
+                        }
                     }
-                    else if (robot_names[n] == collision_pair.second)
+                    // else if (robot_names[n] == collision_pair.second)
+                    else if (std::strcmp(robot_names[n].c_str(), collision_pair.second.c_str()) == 0)
                     {
                         first_collision.location2 = curr_vertices[n]->getPRMEdge();
+                        if (first_collision.location2 == nullptr)
+                        {
+                            first_collision.location2_is_vertex = true;
+                            first_collision.location2_vertex = curr_vertices[n];
+                        }
                     }
                 }
+                // if (!first_collision.location1 || !first_collision.location2)
+                // {
+                //     ROS_ERROR("NULL PRM EDGE!!!");
+                // }
 
                 // TODO: Add some way to check that both location1 and location2 got filled up
                 return std::vector<Collision>{first_collision};
@@ -319,6 +384,7 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
         }
 
         std::shared_ptr<Vertex> new_vertex (new Vertex(new_joints, 0));
+        new_vertex->setPRMEdge(edge);
         output.push_back(new_vertex);
     }
 
