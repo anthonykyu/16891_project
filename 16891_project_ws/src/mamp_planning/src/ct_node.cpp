@@ -88,3 +88,8 @@ unsigned int CTNode::getId()
 {
   return id_;
 }
+
+double CTNode::getCost()
+{
+  return cost_;
+}

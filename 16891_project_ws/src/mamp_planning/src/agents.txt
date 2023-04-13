@@ -1,4 +1,9 @@
-mobile_1,2,0.75,0.75,9.25,9.25,single_mobile_robot_description,world,mobile_1
-mobile_2,2,9.25,9.25,0.75,0.75,single_mobile_robot_description,world,mobile_1
-mobile_3,2,0.50,1.25,9.00,7.00,single_mobile_robot_description,world,mobile_1
-mobile_4,2,9.00,7.00,0.50,1.25,single_mobile_robot_description,world,mobile_1
+mobile_1,2,2.5,0.8,5.0,9.2,single_mobile_robot_description,world,mobile_1
+mobile_2,2,5.0,9.2,0.8,7.5,single_mobile_robot_description,world,mobile_1
+mobile_3,2,0.8,7.5,7.5,0.8,single_mobile_robot_description,world,mobile_1
+mobile_4,2,7.5,0.8,0.8,5.0,single_mobile_robot_description,world,mobile_1
+mobile_5,2,0.8,5.0,2.5,0.8,single_mobile_robot_description,world,mobile_1
+mobile_6,2,2.5,0.8,5.0,0.8,single_mobile_robot_description,world,mobile_1
+mobile_7,2,5.0,0.8,0.8,2.5,single_mobile_robot_description,world,mobile_1
+mobile_8,2,0.8,2.5,7.5,9.2,single_mobile_robot_description,world,mobile_1
+mobile_9,2,7.5,9.2,2.5,0.8,single_mobile_robot_description,world,mobile_1

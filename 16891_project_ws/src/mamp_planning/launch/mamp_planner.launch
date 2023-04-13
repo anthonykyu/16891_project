@@ -2,8 +2,12 @@
 <launch>
 	<param name="mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/mobile_test.urdf" />
 	<param name="environment_description" command=" cat $(find panda_multiple_arms)/robot_description/walls_test.urdf" />
-	<param name="single_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile.urdf" />
-	<param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile.urdf" />
+	<!-- <param name="single_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile.urdf" /> -->
+	<param name="single_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile_no_shelves.urdf" />
+	<!-- <param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile.urdf" /> -->
+	<param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile_no_shelves.urdf" />
+	<!-- <param name="party_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_party_mobile.urdf" /> -->
+	<param name="party_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_party_mobile_no_shelves.urdf" />
 	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>
 	
 

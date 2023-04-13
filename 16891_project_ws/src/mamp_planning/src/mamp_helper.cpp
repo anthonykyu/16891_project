@@ -319,7 +319,11 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
 
         if (test_val) // collision
         {
-            last_vertex->setId(discrete_steps[discrete_steps.size()-1]->getId());
+            // if (last_vertex->getId() == discrete_steps[0]->getId())
+            // {
+            //     ROS_ERROR("q_near has collided?????");
+            // }
+            // last_vertex->setId(discrete_steps[discrete_steps.size()-1]->getId());
             edge->setDivisions(temp_divisions);
             return std::pair<bool, std::shared_ptr<Vertex>>(true, last_vertex);
         }
@@ -330,7 +334,7 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
         }
     }
     // ROS_INFO("Exiting detectEdgeCollision");ROS_INFO("Start detectEdgeCollision");
-    ROS_INFO("End detectEdgeCollision");
+    // ROS_INFO("End detectEdgeCollision");
     return std::pair<bool, std::shared_ptr<Vertex>>(false, discrete_steps[discrete_steps.size()-1]); // The vertex returned here should just be ignored.
 }
 
@@ -357,12 +361,16 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
         // ROS_INFO("Here");
         // ROS_INFO("diff %f", diff[i]);
         // ROS_INFO("vel_lim %f", jnt_vel_lim[i]);
-        curr_division = diff[i] / (jnt_vel_lim[i] * timestep);
+        curr_division = abs(diff[i]) / (jnt_vel_lim[i] * timestep);
+        // ROS_INFO("curr_division %f", curr_division);
 
         if (curr_division > largest_division)
         {
+            
             largest_division = curr_division;
         }
+        // ROS_INFO("largest_division %f", largest_division);
+
     }
     // ROS_INFO("Calculated differences");
 
@@ -374,7 +382,12 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
 
     // Create a set of new vertices (including start and end) that can be checked for collisions
     std::vector<std::shared_ptr<Vertex>> output;
-    for (int i=0; i < (int) (divisions+1); ++i)
+
+    // Add the first vertex
+    output.push_back(edge->ordered_vertices_[0]);
+    
+
+    for (int i=1; i < (int) (divisions); ++i)
     {
         // Build the intermediate set of joints
         std::vector<double> new_joints(num_joints);
@@ -388,6 +401,11 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
         output.push_back(new_vertex);
     }
 
+    // Add the last vertex
+    output.push_back(edge->ordered_vertices_[1]);
+
+    // output[0]->setPRMEdge(edge);
+    // output[output.size()-1]->setPRMEdge(edge);
 
     // ROS_INFO("DiscretizeEdge END");
 
@@ -430,7 +448,11 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdgeDirected(std::sh
 
     */
 
+
+    // What we want from discretizeEdge
+    // - 
     std::vector<std::shared_ptr<Vertex>> undirected = discretizeEdge(edge, jnt_vel_lim, timestep);
+    // ROS_WARN("Discrteized path for this edge is of size %ld", undirected.size());
     if (undirected[0]->getId() != start_vertex->getId())
     {
         std::reverse(undirected.begin(), undirected.end());

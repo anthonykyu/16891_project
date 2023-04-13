@@ -54,24 +54,38 @@ bool Agent::computeSingleAgentPath(
   std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints, 
   double max_constraint_time)
 {
+  // ROS_INFO("About to clear discretized path");
   discretized_path_.clear();
   // ROS_INFO("Cleared discretized path: %ld", discretized_path_.size());
   if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
   {
+    // ROS_INFO("Computed PRM Path!");
+
     prm_path_ = astar_->getPRMPath(start_, goal_);
+    // ROS_INFO("Got PRM Path!");
     for (int i = 0; i < prm_path_.size()-1; ++i)
     {
       discretized_path_.push_back(prm_path_[i]);
+      // ROS_WARN("ID comparison(%ld, %ld)", prm_path_[i]->getId(), prm_path_[i+1]->getId());
+      // for (int j = 0; j < prm_path_[i]->getJointPos().size(); ++j)
+      // {
+      //   // ROS_INFO("Joint Pos %d: %f versus %f", j, prm_path_[i]->getJointPos()[j], prm_path_[i+1]->getJointPos()[j]);
+      // }
       if (prm_path_[i]->getId() != prm_path_[i+1]->getId())
       {
+        // ROS_INFO("Got into the if statement");
         std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
-        std::reverse(dv.begin(), dv.end());
+        // std::reverse(dv.begin(), dv.end());
         for (auto v : dv)
         {
           discretized_path_.push_back(v);
         }
         // ROS_INFO("dv size: %ld", dv.size());
       }
+      // else
+      // {
+      //   ROS_ERROR("whooopsies");
+      // }
     }
     discretized_path_.push_back(prm_path_[prm_path_.size()-1]);
     // for (int i = 0; i < 10; ++i)
@@ -103,6 +117,8 @@ bool Agent::computeSingleAgentPath(
     // }
     return true;
   }
+
+  // ROS_ERROR("computeSingleAgentPath: Failed to compute PRM Path");
   return false;
 }
 

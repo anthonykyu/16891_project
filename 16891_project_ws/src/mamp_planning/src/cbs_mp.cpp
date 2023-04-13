@@ -6,7 +6,7 @@ CBSMP::CBSMP(std::string &world_planning_scene, double timestep)
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
-  X_ = 0.5;
+  X_ = 0.9;
   mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
@@ -160,15 +160,23 @@ bool CBSMP::replanCBS()
   while (open_list_.size() > 0)
   {
     iteration++;
-    // ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
+    ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
     
     if (shouldResample(N))
     {
       // TODO: resample routine
+      ROS_INFO("Resampling now!!!");
+      for (auto a : agents_)
+      {
+        a.second->getPRM()->expandPRM();
+      }
       ++S_;
     }
     std::shared_ptr<CTNode> node = open_list_.pop().second;
-    // ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
+    ++N;
+
+    ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
+    ROS_INFO("Cost of Node: %f", node->getCost());
     // printConstraints(node->getConstraints());
     // ++N;
     if (node->numCollisions() == 0)
@@ -176,7 +184,7 @@ bool CBSMP::replanCBS()
       // TODO: publish path and return
       // ROS_INFO("No collisions!!!");
       // ROS_INFO("Number of Constraints: %ld", node->getConstraints().size());
-      // printPaths(node);
+      printPaths(node);
       return true;
     }
     Collision c = node->getNextCollision();
@@ -253,7 +261,6 @@ bool CBSMP::replanCBS()
       // ROS_INFO("Next collision at %f between %s %s", n1->getNextCollision().timestep, n1->getNextCollision().agent_id1.c_str(), n1->getNextCollision().agent_id2.c_str());
       n1->computeCost();
       open_list_.insert(n1->getComparisonTuple(), n1);
-      ++N;
     }
     // else
     // {
@@ -266,7 +273,6 @@ bool CBSMP::replanCBS()
       n2->detectCollisions();
       n2->computeCost();
       open_list_.insert(n2->getComparisonTuple(), n2);
-      ++N;
     }
     // else
     // {

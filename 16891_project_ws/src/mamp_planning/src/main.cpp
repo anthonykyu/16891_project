@@ -73,7 +73,9 @@ int main(int argc, char **argv)
   srand(0);
   ROS_INFO("Heyyy");
   double timestep = 0.1;
-  std::string world_planning_scene = "multi_mobile_robot_description";
+  // std::string world_planning_scene = "single_mobile_robot_description";
+  // std::string world_planning_scene = "multi_mobile_robot_description";
+  std::string world_planning_scene = "party_mobile_robot_description";
   CBSMP planner_(world_planning_scene, timestep);
 
   std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep);
@@ -94,7 +96,7 @@ int main(int argc, char **argv)
 
   VizTools viz(planner_.get_mamp_helper()->getPlanningScene());
 
-  viz.run_simulation_single_agent(agents[0]);
+  // viz.run_simulation_single_agent(agents[0]);
   // viz.run_simulation_single_agent(agents[0], 1, 2);
   viz.run_simulation_all_agents(agents, 1, 2);
   viz.run_simulation_all_agents(agents, 0);

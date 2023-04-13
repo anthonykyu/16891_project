@@ -24,6 +24,7 @@ public:
     unsigned int getId();
     std::shared_ptr<MAMP_Helper> &getMAMPHelper();
     double getMaxConstraintTime();
+    double getCost();
 
 
 

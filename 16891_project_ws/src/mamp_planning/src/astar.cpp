@@ -94,10 +94,23 @@ double max_constraint_time)
             current_time <= max_time)
         {
           // ROS_INFO("Neighbors: inside the first if of the foor loop");
+          // ROS_INFO("neighbor.second %d", neighbor.second != nullptr);
+          // ROS_INFO("neighbor.second->getTraversalTime() %f", neighbor.second->getTraversalTime());
           double new_g = g_.find(v_closed_tuple)->second + neighbor.second->getTraversalTime();
+          // ROS_INFO("neighbor.second->getTraversalTime() %f", neighbor.second->getTraversalTime());
+          // ROS_INFO("neighbor.first->getId()->second %d", neighbor.first->getId());
+          // ROS_INFO("current_time %f", current_time);
+          // ROS_INFO("h_.find(neighbor.first->getId()) %f", h_.find(neighbor.first->getId())->first);
+
+          // ROS_INFO("neighbor.first->getId() %d", neighbor.first->getId());
+          // ROS_INFO("h_.find(neighbor.first->getId()) %d", h_.find(neighbor.first->getId()) == h_.end());
+          
+          // ROS_INFO("h_.find(neighbor.first->getId())->first %d", h_.find(neighbor.first->getId())->first);
+          // ROS_INFO("h_.find(neighbor.first->getId())->second %f", h_.find(neighbor.first->getId())->second);
           std::tuple<double, unsigned int, double> n_open_tuple = std::make_tuple(new_g + h_.find(neighbor.first->getId())->second,
                                                                                   neighbor.first->getId(), 
                                                                                   current_time + neighbor.second->getTraversalTime());
+          // ROS_INFO("Neighbors: about to calc g and insert");
           if (g_.find(n_closed_tuple) != g_.end())
           {
             double old_g = g_.find(n_closed_tuple)->second;
@@ -155,6 +168,7 @@ std::vector<std::shared_ptr<Vertex>> AStar::getPRMPath(std::shared_ptr<Vertex> s
 
 double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
 {
+  // ROS_INFO("Computing heuristics");
   OpenList<std::tuple<double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int>>> open_list_h;
   std::unordered_set<std::shared_ptr<Vertex>> closed_list_h;
   double max_time = 0;
