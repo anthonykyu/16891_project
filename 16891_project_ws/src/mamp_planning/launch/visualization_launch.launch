@@ -13,8 +13,6 @@
 
   <!-- Start the controllers and robot state publisher-->
   <!-- <include file="$(find mamp_planning)/launch/control_utils.launch"/> -->
-
-
   <!-- <node name="visualization_node" pkg="mamp_planning" type="visualization_node"/> -->
 
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />

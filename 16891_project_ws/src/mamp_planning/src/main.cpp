@@ -93,10 +93,96 @@ int main(int argc, char **argv)
   // ROS_INFO("Agent Lower Lim: %f, %f", agents[1]->getLowerJointLimit()[0], agents[0]->getLowerJointLimit()[1]);
 
   VizTools viz(planner_.get_mamp_helper()->getPlanningScene());
-  // viz.run_simulation_single_agent(planning_scene, prm_path);
-  // viz.run_simulation_single_agent(planning_scene, discretized_path);
-  viz.run_simulation_single_agent(agents[0]->getPlanningScene(), agents[0]->getPRMPath());
-  viz.run_simulation_single_agent(agents[0]->getPlanningScene(), agents[0]->getDiscretizedPath());
+
+  viz.run_simulation_single_agent(agents[0]);
+  // viz.run_simulation_single_agent(agents[0], 1, 2);
+  viz.run_simulation_all_agents(agents, 1, 2);
+  viz.run_simulation_all_agents(agents, 0);
+
+  ros::spin();
+  return 0;
+}
+
+
+
+
+
+
+
+  // auto robot_model_loader = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
+  // auto kinematic_model = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
+  // planning_scene = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
+
+  // std::vector<double> joint_values = { 0.0, 0.0, 0.0, -2.9, 0.0, 1.4, 0.0 };
+  // const moveit::core::JointModelGroup* joint_model_group = current_state.getJointModelGroup("panda_arm");
+  // current_state.setJointGroupPositions(joint_model_group, joint_values);
+  // ROS_INFO_STREAM("Test 4: Current state is "
+  // << (current_state.satisfiesBounds(joint_model_group) ? "valid" : "not valid"));
+
+// // Let's make an agent and see if the collision testing works
+// // Agent test_agent_("../../panda_multiple_arms/robot_description/world_single_mobile.urdf",)
+
+// // Initialize a planning scene
+// robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
+// // robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
+// // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
+// // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
+// const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+// planning_scene::PlanningScene planning_scene(kinematic_model);
+
+// collision_detection::CollisionRequest collision_request;
+// collision_detection::CollisionResult collision_result;
+// planning_scene.checkSelfCollision(collision_request, collision_result);
+// ROS_INFO_STREAM("Test 1: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
+
+// ROS_INFO_STREAM("~~~~~~~~~~~~~~~~~~");
+// moveit::core::RobotState copied_state = planning_scene.getCurrentStateNonConst();
+// ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
+
+// auto names = copied_state.getVariableNames();
+// for (auto name : names)
+// {
+//   ROS_INFO_STREAM("Variable: " << name);
+// }
+
+// // ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
+// // current_state.setToRandomPositions();
+
+// // Set the variables using the appropriate names
+// std::vector<std::string> robot_names {"mobile_1", "mobile_2", "mobile_3", "mobile_4"};
+// std::vector<std::string> joint_names;
+
+// for (std::string name : robot_names)
+// {
+//   joint_names.push_back(name + "_" + "1");
+//   joint_names.push_back(name + "_" + "2");
+// }
+
+// std::vector<double> positions{1.76, 3, 1.76, 3, 8, 8, 1.76, 3};
+// // copied_state.setVariablePositions(positions);
+// copied_state.setVariablePositions(joint_names, positions);
+
+// collision_result.clear();
+// // collision_detection::AllowedCollisionMatrix acm = planning_scene.getAllowedCollisionMatrix();
+// collision_request.contacts = true;
+// collision_request.max_contacts = 1000;
+
+// // planning_scene.checkCollision(collision_request, collision_result, current_state, acm);
+// planning_scene.checkSelfCollision(collision_request, collision_result, copied_state);
+// ROS_INFO_STREAM("Test 2: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
+
+// collision_detection::CollisionResult::ContactMap::const_iterator it;
+// for (it = collision_result.contacts.begin(); it != collision_result.contacts.end(); ++it)
+// {
+//   ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
+// }
+
+
+
+
+
+
+
 
 
   // // Initialize a planning scene
@@ -176,74 +262,3 @@ int main(int argc, char **argv)
   // std::cout << discretized_path.size() << std::endl;
   // ROS_INFO("PRM Size: %ld", myPRM.PRMgraph_.size());
   
-
-  ros::spin();
-  return 0;
-}
-  // auto robot_model_loader = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
-  // auto kinematic_model = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
-  // planning_scene = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
-
-  // std::vector<double> joint_values = { 0.0, 0.0, 0.0, -2.9, 0.0, 1.4, 0.0 };
-  // const moveit::core::JointModelGroup* joint_model_group = current_state.getJointModelGroup("panda_arm");
-  // current_state.setJointGroupPositions(joint_model_group, joint_values);
-  // ROS_INFO_STREAM("Test 4: Current state is "
-  // << (current_state.satisfiesBounds(joint_model_group) ? "valid" : "not valid"));
-
-// // Let's make an agent and see if the collision testing works
-// // Agent test_agent_("../../panda_multiple_arms/robot_description/world_single_mobile.urdf",)
-
-// // Initialize a planning scene
-// robot_model_loader::RobotModelLoader robot_model_loader("multi_mobile_robot_description");
-// // robot_model_loader::RobotModelLoader robot_model_loader("single_mobile_robot_description");
-// // robot_model_loader::RobotModelLoader robot_model_loader("environment_description");
-// // robot_move_loader::RobotModelLoader robo_model_loader("mobile_robot_description");
-// const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
-// planning_scene::PlanningScene planning_scene(kinematic_model);
-
-// collision_detection::CollisionRequest collision_request;
-// collision_detection::CollisionResult collision_result;
-// planning_scene.checkSelfCollision(collision_request, collision_result);
-// ROS_INFO_STREAM("Test 1: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
-
-// ROS_INFO_STREAM("~~~~~~~~~~~~~~~~~~");
-// moveit::core::RobotState copied_state = planning_scene.getCurrentStateNonConst();
-// ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
-
-// auto names = copied_state.getVariableNames();
-// for (auto name : names)
-// {
-//   ROS_INFO_STREAM("Variable: " << name);
-// }
-
-// // ROS_INFO_STREAM("Variables names are " << copied_state.getVariableCount());
-// // current_state.setToRandomPositions();
-
-// // Set the variables using the appropriate names
-// std::vector<std::string> robot_names {"mobile_1", "mobile_2", "mobile_3", "mobile_4"};
-// std::vector<std::string> joint_names;
-
-// for (std::string name : robot_names)
-// {
-//   joint_names.push_back(name + "_" + "1");
-//   joint_names.push_back(name + "_" + "2");
-// }
-
-// std::vector<double> positions{1.76, 3, 1.76, 3, 8, 8, 1.76, 3};
-// // copied_state.setVariablePositions(positions);
-// copied_state.setVariablePositions(joint_names, positions);
-
-// collision_result.clear();
-// // collision_detection::AllowedCollisionMatrix acm = planning_scene.getAllowedCollisionMatrix();
-// collision_request.contacts = true;
-// collision_request.max_contacts = 1000;
-
-// // planning_scene.checkCollision(collision_request, collision_result, current_state, acm);
-// planning_scene.checkSelfCollision(collision_request, collision_result, copied_state);
-// ROS_INFO_STREAM("Test 2: Current state is " << (collision_result.collision ? "IN" : "NOT IN") << " self collision");
-
-// collision_detection::CollisionResult::ContactMap::const_iterator it;
-// for (it = collision_result.contacts.begin(); it != collision_result.contacts.end(); ++it)
-// {
-//   ROS_INFO("Contact between: %s and %s", it->first.first.c_str(), it->first.second.c_str());
-// }

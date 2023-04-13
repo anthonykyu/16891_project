@@ -3,6 +3,7 @@
 #include <moveit/planning_scene/planning_scene.h>
 #include <robot_state_publisher/robot_state_publisher.h>
 #include "mamp_planning/vertex.hpp"
+#include "mamp_planning/agent.hpp"
 
 
 // class Vertex;
@@ -10,8 +11,11 @@ class VizTools
 {
 public:
     VizTools(std::shared_ptr<planning_scene::PlanningScene> planning_scene);
-    void run_simulation_single_agent(std::shared_ptr<planning_scene::PlanningScene> planning_scene, const std::vector<std::shared_ptr<Vertex>> &path);
-    void run_simulation_all_agents(const std::vector<std::shared_ptr<Vertex>> &path);
+    // void run_simulation_single_agent(std::shared_ptr<planning_scene::PlanningScene> planning_scene, const std::vector<std::shared_ptr<Vertex>> &path);
+    void run_simulation_single_agent(std::shared_ptr<Agent> agent, int show_path_option=0, int display_rate=10);
+
+    // void run_simulation_all_agents(const std::vector<std::shared_ptr<Vertex>> &path);
+    void run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> agents, int show_path_option=0, int display_rate=10);
     
 
     // run_simulation 
