@@ -18,10 +18,10 @@ MAMP_Helper::MAMP_Helper(const std::string &full_world_description, double times
 }
 
 
-// std::shared_ptr<planning_scene::PlanningScene> const &MAMP_Helper::getPlanningScene()
-// {
-//   return planning_scene_;
-// }
+std::shared_ptr<planning_scene::PlanningScene> const &MAMP_Helper::getPlanningScene()
+{
+  return planning_scene_;
+}
 
 
 bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 

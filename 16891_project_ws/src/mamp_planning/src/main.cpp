@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include "mamp_planning/viz_tools.hpp"
 
 std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::string file_name, double timestep)
 {
@@ -90,6 +91,12 @@ int main(int argc, char **argv)
   // ROS_INFO("Agent Vel Lim: %f, %f", agents[1]->getJointVelLimit()[0], agents[0]->getJointVelLimit()[1]);
   // ROS_INFO("Agent Upper Lim: %f, %f", agents[1]->getUpperJointLimit()[0], agents[0]->getUpperJointLimit()[1]);
   // ROS_INFO("Agent Lower Lim: %f, %f", agents[1]->getLowerJointLimit()[0], agents[0]->getLowerJointLimit()[1]);
+
+  VizTools viz(planner_.get_mamp_helper()->getPlanningScene());
+  // viz.run_simulation_single_agent(planning_scene, prm_path);
+  // viz.run_simulation_single_agent(planning_scene, discretized_path);
+  viz.run_simulation_single_agent(agents[0]->getPlanningScene(), agents[0]->getPRMPath());
+  viz.run_simulation_single_agent(agents[0]->getPlanningScene(), agents[0]->getDiscretizedPath());
 
 
   // // Initialize a planning scene

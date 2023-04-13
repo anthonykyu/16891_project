@@ -12,7 +12,7 @@ class CBSMP
     CBSMP(std::string &world_planning_scene, double timestep);
     void initialize(std::vector<std::shared_ptr<Agent>> &agents);
     ros::NodeHandle n_;
-
+    std::shared_ptr<MAMP_Helper> get_mamp_helper() {return mamp_helper_;}
 
     private:
     void timerCallback(const ros::TimerEvent&);

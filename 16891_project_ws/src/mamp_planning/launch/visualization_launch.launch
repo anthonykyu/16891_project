@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="model" default="$(find panda_multiple_arms)/robot_description/world_single_mobile.urdf"/>
+  <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find mamp_planning)/rviz/urdf.rviz" />
+
+  <param name="robot_description" command="$(find xacro)/xacro $(arg model)" />
+
+  <!-- <node unless="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" /> -->
+  <!-- <node if="$(arg gui)" name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Start the controllers and robot state publisher-->
+  <!-- <include file="$(find mamp_planning)/launch/control_utils.launch"/> -->
+
+
+  <!-- <node name="visualization_node" pkg="mamp_planning" type="visualization_node"/> -->
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>
