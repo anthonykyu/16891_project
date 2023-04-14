@@ -171,6 +171,7 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
   // ROS_INFO("Computing heuristics");
   OpenList<std::tuple<double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int>>> open_list_h;
   std::unordered_set<std::shared_ptr<Vertex>> closed_list_h;
+  std::unordered_set<std::shared_ptr<Edge>> closed_edge_list;
   double max_time = 0;
   open_list_h.insert(std::make_tuple(0, goal->getId()), goal);
   // ROS_INFO("goal id %d", goal->getId());
@@ -190,7 +191,11 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
         if (closed_list_h.find(neighbor.first) == closed_list_h.end() &&
             isValid(neighbor.first, neighbor.second))  // Valid edge is not in the open list yet
         {
-          max_time += neighbor.second->getTraversalTime();
+          if (closed_edge_list.find(neighbor.second) == closed_edge_list.end())
+          {
+            max_time += neighbor.second->getTraversalTime();
+            closed_edge_list.insert(neighbor.second);
+          }
           // ROS_INFO("Neighbor cost %f", neighbor.second->getTraversalTime());
           if (h_.find(neighbor.first->getId()) != h_.end()) // We have encountered this neighbor before
           {
