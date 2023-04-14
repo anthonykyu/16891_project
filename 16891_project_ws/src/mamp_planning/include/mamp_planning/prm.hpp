@@ -28,6 +28,7 @@ private:
     int node_id_;
     unsigned int component_;
     double expansion_factor_;
+    int connectivity_;
     std::shared_ptr<Vertex> start_;
     std::shared_ptr<Vertex> goal_;
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;

@@ -7,6 +7,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
   radius_ = 3.0;
   num_samples_ = 0;
   expansion_factor_= 0.1;
+  connectivity_ = 8;
   start_ = start;
   goal_ = goal;
   planning_scene_ = planning_scene;
@@ -206,7 +207,7 @@ void PRM::expandPRM()
             // ROS_INFO("Obtained a neighbor");
 
             // If you're already in the same component_, you can skip everything else!
-            if (q_rand->getComponentId() == q_near->getComponentId())
+            if (q_rand->getComponentId() == q_near->getComponentId() && q_near->getEdges().size() > connectivity_)
             {
                 continue;
             }
@@ -333,7 +334,7 @@ void PRM::buildPRM()
             // ROS_INFO("Obtained a neighbor");
 
             // If you're already in the same component_, you can skip everything else!
-            if (q_rand->getComponentId() == q_near->getComponentId())
+            if (q_rand->getComponentId() == q_near->getComponentId() && q_near->getEdges().size() > connectivity_)
             {
                 continue;
             }
