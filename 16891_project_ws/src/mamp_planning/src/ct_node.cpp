@@ -69,9 +69,9 @@ std::unordered_map<std::string, std::shared_ptr<Agent>> &CTNode::getAgents()
   return agents_;
 }
 
-std::tuple<double, unsigned int> CTNode::getComparisonTuple()
+std::tuple<double, unsigned int, unsigned int> CTNode::getComparisonTuple()
 {
-  return std::make_tuple(cost_, id_);
+  return std::make_tuple(cost_, collisions_.size(), id_);
 }
 
 void CTNode::detectCollisions()

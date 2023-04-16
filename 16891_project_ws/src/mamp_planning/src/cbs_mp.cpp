@@ -6,7 +6,7 @@ CBSMP::CBSMP(std::string &world_planning_scene, double timestep)
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
-  X_ = 0.95;
+  X_ = 0.99;
   mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
@@ -179,10 +179,20 @@ bool CBSMP::replanCBS()
     {
       // TODO: resample routine
       ROS_INFO("Resampling now!!!");
-      for (auto a : agents_)
+      auto a = getAgents();
+      #ifdef MP_EN
+        ROS_INFO("Using OMP");
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+      #endif
+      for (int i = 0; i < a.size(); ++i)
       {
-        a.second->getPRM()->expandPRM();
+        a[i]->getPRM()->expandPRM();
       }
+      // for (auto a : agents_)
+      // {
+      //   a.second->getPRM()->expandPRM();
+      // }
       ++S_;
     }
     std::shared_ptr<CTNode> node = open_list_.pop().second;
@@ -204,10 +214,32 @@ bool CBSMP::replanCBS()
     Collision c = node->getNextCollision();
     // ROS_INFO("Collision: Agent 1 - %s, Agent 2 - %s, IsVertex: %d, %d, time: %f", c.agent_id1.c_str(), c.agent_id2.c_str(), c.location1_is_vertex, c.location2_is_vertex, c.timestep);
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
-    printCollision(c);
+    // printCollision(c);
     // printConstraints(constraints);
-    std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++node_id, node);
-    std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++node_id, node);
+    std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
+    std::vector<bool> succ {false, false};
+    #ifdef MP_EN
+        ROS_INFO("Using OMP");
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+    #endif
+    for (int i = 0; i < new_nodes.size(); ++i)
+    {
+      new_nodes[i]->addConstraint(constraints[i]);
+      succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeSingleAgentPath(
+      MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime());
+      if (succ[i])
+      {
+        new_nodes[i]->getPaths().erase(constraints[i].agent_id);
+        new_nodes[i]->getPaths().insert({constraints[i].agent_id, new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDiscretizedPath()});
+        new_nodes[i]->detectCollisions();
+        new_nodes[i]->computeCost();
+        open_list_.insert(new_nodes[i]->getComparisonTuple(), new_nodes[i]);
+      }
+    }
+
+    // std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++node_id, node);
+    // std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++node_id, node);
     // ROS_INFO("constraints[0].agent_id.c_str(): %s", constraints[0].agent_id.c_str());
     // ROS_INFO("constraints[0].time_step: %f", constraints[0].time_step);
     // ROS_INFO("constraints[0].joint_pos_edge->getTraversalTime(): %f", constraints[0].joint_pos_edge->getTraversalTime());
@@ -217,10 +249,10 @@ bool CBSMP::replanCBS()
     // ROS_INFO("constraints[1].joint_pos_edge->getTraversalTime(): %f", constraints[1].joint_pos_edge->getTraversalTime());
     // ROS_INFO("Constraint 1: %s, %f, %f", constraints[1].agent_id.c_str(), constraints[1].time_step, constraints[1].joint_pos_edge->getTraversalTime());
     // printConstraints(n1->getConstraints());
-    n1->addConstraint(constraints[0]);
+    // n1->addConstraint(constraints[0]);
     // ROS_INFO("Full constraint list for n1");
     // printConstraints(n1->getConstraints());
-    n2->addConstraint(constraints[1]);
+    // n2->addConstraint(constraints[1]);
     // TODO: Get n1 and n2 to recompute paths for specific agents affected
     // ROS_INFO("n1's Agent path length: %ld", n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath().size());
     // for (size_t i = 35; i < 38; ++i)
@@ -241,55 +273,55 @@ bool CBSMP::replanCBS()
     //     ROS_INFO("%f,", j);
     //   }
     // }
-    bool succ1 = n1->getAgents().find(constraints[0].agent_id)->second->computeSingleAgentPath(
-      MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id), n1->getMaxConstraintTime());
+    // bool succ1 = n1->getAgents().find(constraints[0].agent_id)->second->computeSingleAgentPath(
+    //   MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id), n1->getMaxConstraintTime());
     
-    bool succ2 = n2->getAgents().find(constraints[1].agent_id)->second->computeSingleAgentPath(
-      MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id), n2->getMaxConstraintTime());
+    // bool succ2 = n2->getAgents().find(constraints[1].agent_id)->second->computeSingleAgentPath(
+    //   MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id), n2->getMaxConstraintTime());
     
     // insert n1 and n2 into open list of cbs
-    if (succ1)
-    {
-      n1->getPaths().erase(constraints[0].agent_id);
-      n1->getPaths().insert({constraints[0].agent_id, n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()});
-      // ROS_INFO("n1's Agent path length after update: %ld", n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath().size());
-      // for (size_t i = 35; i < 38; ++i)
-      // {
-      //   auto v = n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()[i];
-      //   ROS_INFO("Vertex %ld %d", i, v->getPRMEdge() != nullptr);
-      //   for (double j : v->getJointPos())
-      //   {
-      //     ROS_INFO("%f,", j);
-      //   }
-      // }
-      // for (size_t i = 0; i < 15; ++i)
-      // {
-      //   auto v = n1->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()[i];
-      //   ROS_INFO("Vertex %ld", i);
-      //   for (double j : v->getJointPos())
-      //   {
-      //     ROS_INFO("%f,", j);
-      //   }
-      // }
-      n1->detectCollisions();
-      // ROS_INFO("Next collision at %f between %s %s", n1->getNextCollision().timestep, n1->getNextCollision().agent_id1.c_str(), n1->getNextCollision().agent_id2.c_str());
-      n1->computeCost();
-      ROS_INFO("Cost of n1: %f", n1->getCost());
-      open_list_.insert(n1->getComparisonTuple(), n1);
-    }
-    // else
+    // if (succ1)
     // {
-    //   ROS_ERROR("Failed to solve AStar for n1");
+    //   n1->getPaths().erase(constraints[0].agent_id);
+    //   n1->getPaths().insert({constraints[0].agent_id, n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()});
+    //   // ROS_INFO("n1's Agent path length after update: %ld", n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath().size());
+    //   // for (size_t i = 35; i < 38; ++i)
+    //   // {
+    //   //   auto v = n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()[i];
+    //   //   ROS_INFO("Vertex %ld %d", i, v->getPRMEdge() != nullptr);
+    //   //   for (double j : v->getJointPos())
+    //   //   {
+    //   //     ROS_INFO("%f,", j);
+    //   //   }
+    //   // }
+    //   // for (size_t i = 0; i < 15; ++i)
+    //   // {
+    //   //   auto v = n1->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()[i];
+    //   //   ROS_INFO("Vertex %ld", i);
+    //   //   for (double j : v->getJointPos())
+    //   //   {
+    //   //     ROS_INFO("%f,", j);
+    //   //   }
+    //   // }
+    //   n1->detectCollisions();
+    //   // ROS_INFO("Next collision at %f between %s %s", n1->getNextCollision().timestep, n1->getNextCollision().agent_id1.c_str(), n1->getNextCollision().agent_id2.c_str());
+    //   n1->computeCost();
+    //   ROS_INFO("Cost of n1: %f", n1->getCost());
+    //   open_list_.insert(n1->getComparisonTuple(), n1);
     // }
-    if (succ2)
-    {
-      n2->getPaths().erase(constraints[1].agent_id);
-      n2->getPaths().insert({constraints[1].agent_id, n2->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()});
-      n2->detectCollisions();
-      n2->computeCost();
-      ROS_INFO("Cost of n2: %f", n2->getCost());
-      open_list_.insert(n2->getComparisonTuple(), n2);
-    }
+    // // else
+    // // {
+    // //   ROS_ERROR("Failed to solve AStar for n1");
+    // // }
+    // if (succ2)
+    // {
+    //   n2->getPaths().erase(constraints[1].agent_id);
+    //   n2->getPaths().insert({constraints[1].agent_id, n2->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()});
+    //   n2->detectCollisions();
+    //   n2->computeCost();
+    //   ROS_INFO("Cost of n2: %f", n2->getCost());
+    //   open_list_.insert(n2->getComparisonTuple(), n2);
+    // }
     // else
     // {
     //   ROS_ERROR("Failed to solve AStar for n2");

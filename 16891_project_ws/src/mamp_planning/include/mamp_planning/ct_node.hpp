@@ -18,7 +18,7 @@ public:
     std::vector<Constraint> &getConstraints();
     std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &getPaths();
     std::unordered_map<std::string, std::shared_ptr<Agent>> &getAgents();
-    std::tuple<double, unsigned int> getComparisonTuple();
+    std::tuple<double, unsigned int, unsigned int> getComparisonTuple();
     void detectCollisions();
     size_t numCollisions();
     unsigned int getId();

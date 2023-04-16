@@ -4,6 +4,31 @@ project(mamp_planning)
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
+message("Current CPU archtecture: ${CMAKE_SYSTEM_PROCESSOR}")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "(x86)|(X86)|(amd64)|(AMD64)" )
+  include(ProcessorCount)
+  ProcessorCount(N)
+  message("Processer number:  ${N}")
+  if(N GREATER 5)
+    add_definitions(-DMP_EN)
+    add_definitions(-DMP_PROC_NUM=4)
+    message("core for MP:  4")
+  elseif(N GREATER 3)
+    math(EXPR PROC_NUM "${N} - 2")
+    add_definitions(-DMP_EN)
+    add_definitions(-DMP_PROC_NUM="${PROC_NUM}")
+    message("core for MP:  ${PROC_NUM}")
+  else()
+    add_definitions(-DMP_PROC_NUM=1)
+  endif()
+else()
+  add_definitions(-DMP_PROC_NUM=1)
+endif()
+
+find_package(OpenMP QUIET)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}   ${OpenMP_C_FLAGS}")
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages

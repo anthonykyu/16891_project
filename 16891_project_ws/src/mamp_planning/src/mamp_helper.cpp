@@ -170,6 +170,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
 
     // Let's cycle through that many timesteps on each path, and feed those into planning scene accordingly.
     // We use the MAMP_Helper's own planning scene for this check
+    std::vector<Collision> collisions;
     for (int t = 0; t < longest_path_size; ++t)
     {
         // ROS_INFO("Inside 2nd for loop");
@@ -219,9 +220,9 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         
         if (test_val == true){
             // Go through and create collision objects 
-
             for (auto collision_pair : *list_of_collisions)
             {
+
                 // Check if either part of the collision is not an arm or a mobile robot
                 if (!((std::strcmp(collision_pair.first.substr(0,3).c_str(), mobile_string.c_str()) != 0 ||
                     std::strcmp(collision_pair.second.substr(0,3).c_str(), mobile_string.c_str()) != 0) ||
@@ -267,10 +268,11 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                 // }
 
                 // TODO: Add some way to check that both location1 and location2 got filled up
+                // collisions.push_back(first_collision);
                 return std::vector<Collision>{first_collision};
             }
 
-            ROS_ERROR("detectAgentAgentCollision: Never should get here. It means you had collisions but didn't return a Collision object from this class");
+            // ROS_ERROR("detectAgentAgentCollision: Never should get here. It means you had collisions but didn't return a Collision object from this class");
         }
 
         // If we get here the timestep is clear, onto the next timestep!
@@ -278,7 +280,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
     }
     
     // Return an empty collision vector if no collisions were found!
-    return std::vector<Collision>();
+    return collisions;
+    // return std::vector<Collision>();
 }
 
 
