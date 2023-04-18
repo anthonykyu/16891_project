@@ -9,12 +9,12 @@
 #include <ctime>
 #include "mamp_planning/viz_tools.hpp"
 
-std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::string file_name, double timestep)
+std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::string file_name, double timestep, std::string &world_description)
 {
   // Load the robot name, start and goal states from a text file
   
 
-  ifstream file(ros::package::getPath("mamp_planning") + "/src/" + file_name);
+  ifstream file(ros::package::getPath("mamp_planning") + "/tests/" + file_name);
   if (!file.is_open())
   {
     ROS_ERROR("Could not open file");
@@ -23,8 +23,17 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
 
   std::string line;
   std::vector<std::shared_ptr<Agent>> agents;
+  bool is_first_line = true;
   while (getline(file, line))
   {
+    if (is_first_line)
+    {
+      std::stringstream ss(line);
+      getline(ss, world_description,',');
+      is_first_line = false;
+      continue;
+    }
+    
     std::string robot_name;
     int dof;
     std::vector<double> start_pos;
@@ -40,14 +49,14 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
     string dof_string;
     getline(ss, dof_string, ',');
     dof = stoi(dof_string);
-    for (int i = 0; i < dof; ++i)
+    for (int i = 0; i < dof; ++i) // parse the start positions
     {
       string str_val;
       getline(ss, str_val, ',');
       double val = stod(str_val);
       start_pos.push_back(val);
     }
-    for (int i = 0; i < dof; ++i)
+    for (int i = 0; i < dof; ++i) // parse the goal positions
     {
       string str_val;
       getline(ss, str_val, ',');
@@ -75,13 +84,22 @@ int main(int argc, char **argv)
   srand(time(0));
   ROS_INFO("Heyyy");
   double timestep = 0.1;
-  // std::string world_planning_scene = "single_mobile_robot_description";
-  // std::string world_planning_scene = "multi_mobile_robot_description";
-  std::string world_planning_scene = "party_mobile_robot_description";
-  CBSMP planner_(world_planning_scene, timestep);
+  // std::string world_planning_scene = "world_mobile_1";
+  // std::string world_planning_scene = "world_mobile_4";
+  // std::string world_planning_scene = "world_mobile_9";
+  // std::string world_planning_scene = "world_no_shelves_mobile_1";
+  // std::string world_planning_scene = "world_no_shelves_mobile_4";
+  // std::string world_planning_scene = "world_no_shelves_mobile_9";
 
-  std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep);
-  planner_.initialize(agents);
+  CBSMP planner_;
+  std::string world_planning_scene;
+  std::string agents_data_file;
+  planner_.n_.getParam("test", agents_data_file);
+
+  // std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep, world_planning_scene);
+  std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, agents_data_file, timestep, world_planning_scene);
+
+  planner_.initialize(agents, world_planning_scene, timestep);
   // ROS_INFO("Number of agents: %ld", agents.size());
   // ROS_INFO("Agent ID: %s", agents[0]->getID().c_str());
   // ROS_INFO("Agent Start: %f, %f", agents[0]->getStart()->getJointPos()[0], agents[0]->getStart()->getJointPos()[1]);

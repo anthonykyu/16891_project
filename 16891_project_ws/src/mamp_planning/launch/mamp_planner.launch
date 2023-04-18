@@ -1,13 +1,22 @@
 <?xml version="1.0"?>
 <launch>
-	<param name="mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/mobile_test.urdf" />
-	<param name="environment_description" command=" cat $(find panda_multiple_arms)/robot_description/walls_test.urdf" />
-	<!-- <param name="single_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile.urdf" /> -->
-	<param name="single_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_single_mobile_no_shelves.urdf" />
-	<!-- <param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile.urdf" /> -->
-	<param name="multi_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_multi_mobile_no_shelves.urdf" />
-	<!-- <param name="party_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_party_mobile.urdf" /> -->
-	<param name="party_mobile_robot_description" command=" cat $(find panda_multiple_arms)/robot_description/world_party_mobile_no_shelves.urdf" />
+  	<!-- <arg name="trial" default="$(find mamp_planning)/src/agents.txt"/> -->
+  	<arg name="test" default="world_mobile_1_test_0.txt"/>
+	<param name="test" value="$(arg test)"/>
+
+	<param name="mobile_robot" command=" cat $(find panda_multiple_arms)/robot_description/mobile_robot.urdf" />
+	<param name="walls" command=" cat $(find panda_multiple_arms)/robot_description/walls.urdf" />
+
+	<!-- With shelves -->
+	<param name="world_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1.urdf" />
+	<param name="world_mobile_4" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_4.urdf" />
+	<param name="world_mobile_9" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_9.urdf" />
+
+	<!-- Without Shelves -->
+	<param name="world_no_shelves_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_1.urdf" />
+	<param name="world_no_shelves_mobile_4" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_4.urdf" />
+	<param name="world_no_shelves_mobile_9" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_9.urdf" />
+
 	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>
 	
 

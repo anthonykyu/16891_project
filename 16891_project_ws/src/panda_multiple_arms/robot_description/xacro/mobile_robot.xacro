@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <!-- rosrun xacro xacro panda_multiple_arms.xacro -o panda_multiple_arms.urdf -->
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="test">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="mobile_robot">
   
   <xacro:property name="height" value="0.5" /> 
 
