@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <ctime>
 #include "mamp_planning/viz_tools.hpp"
 
 std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::string file_name, double timestep)
@@ -70,7 +71,8 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mamp_planning_node");
-  srand(0);
+  // srand(0);
+  srand(time(0));
   ROS_INFO("Heyyy");
   double timestep = 0.1;
   // std::string world_planning_scene = "single_mobile_robot_description";

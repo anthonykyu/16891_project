@@ -4,7 +4,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
         std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal)
 {
-  radius_ = 3.0;
+  radius_ = 2;
   num_samples_ = 0;
   expansion_factor_= 0.1;
   connectivity_ = 8;

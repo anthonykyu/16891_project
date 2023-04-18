@@ -239,10 +239,35 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
     {
       for (auto c : constraint->second)
       {
-        edge_constrained = ((c.time_step >= current_time && c.time_step <= (current_time + edge->getTraversalTime())) ||
-                          (c.time_step <= -1.0*current_time && c.time_step >= -1.0*(current_time + edge->getTraversalTime())));
+        edge_constrained = ((c.time_step >= (current_time - timestep_/2.0) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_/2.0)) ||
+                          (c.time_step <= -1.0*(current_time - timestep_/2.0) && c.time_step >= -1.0*(current_time + edge->getTraversalTime() + timestep_/2.0)));
         if (edge_constrained)
+        {
+          // if (c.is_vertex_constraint)
+          // {
+          //   ROS_INFO("Address %p", c.joint_pos_vertex.get());
+          //   ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
+          //   for (double j : c.joint_pos_vertex->getJointPos())
+          //   {
+          //     ROS_INFO("%f, ", j);
+          //   }
+          // }
+          // else
+          // {
+          //   ROS_INFO("Address %p", c.joint_pos_edge.get());
+          //   ROS_INFO("Edge Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
+          //   auto joint_positions = *(c.joint_pos_edge->getVertexPositions());
+          //   for (auto vec : joint_positions)
+          //   {
+          //     ROS_INFO("Vertex: ");
+          //     for (double j : vec)
+          //     {
+          //       ROS_INFO("%f, ", j);
+          //     }
+          //   }
+          // }
           return true;
+        }
       }
     }
      

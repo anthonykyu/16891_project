@@ -51,7 +51,8 @@ class MAMP_Helper
     // Use this function to detect if a vertex is colliding with the environment
     static bool detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
                                       std::shared_ptr<Vertex> vertex, 
-                                      std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions);
+                                      std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = nullptr,
+                                      bool compute_contacts = true);
       // Uses the given planning scene and vertex to determine if the agent is colliding
       // with the environment of the planning scene. Returns true if colliding.
     // {
@@ -62,7 +63,7 @@ class MAMP_Helper
 
     // This function is used in the CT node to detect agent-agent collisions
     // The input is an unordered map, with the key being the agent id, and the value is the agent discretized path
-    std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths);
+    std::vector<Collision> detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths, size_t &num_collisions);
       // Use the global planning scene to step each agent (planning group) 
       // through their respective path (given input). At each timestep,
       // check for collisions and append collisions to the output vector.

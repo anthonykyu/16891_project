@@ -7,6 +7,7 @@ CTNode::CTNode(unsigned int id, std::unordered_map<std::string, std::shared_ptr<
   agents_ = agents;
   mamp_helper_ = mamp_helper;
   max_constraint_time_ = 0;
+  num_collisions_ = 0;
 }
 
 CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
@@ -17,6 +18,7 @@ CTNode::CTNode(unsigned int id, std::shared_ptr<CTNode>  &n)
   constraints_ = n->getConstraints();
   paths_ = n->getPaths();
   mamp_helper_ = n->getMAMPHelper();
+  num_collisions_ = 0;
   // agents_ = n->getAgents();
   for (auto agent : n->getAgents())
   {
@@ -69,19 +71,20 @@ std::unordered_map<std::string, std::shared_ptr<Agent>> &CTNode::getAgents()
   return agents_;
 }
 
-std::tuple<double, unsigned int, unsigned int> CTNode::getComparisonTuple()
+std::tuple<double, size_t, unsigned int> CTNode::getComparisonTuple()
 {
-  return std::make_tuple(cost_, collisions_.size(), id_);
+  return std::make_tuple(cost_, num_collisions_, id_);
 }
 
 void CTNode::detectCollisions()
 {
-  collisions_ = mamp_helper_->detectAgentAgentCollisions(paths_);
+  collisions_ = mamp_helper_->detectAgentAgentCollisions(paths_, num_collisions_);
 }
 
 size_t CTNode::numCollisions()
 {
-  return collisions_.size();
+  // return collisions_.size();
+  return num_collisions_;
 }
 
 unsigned int CTNode::getId()

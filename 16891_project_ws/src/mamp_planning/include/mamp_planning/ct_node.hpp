@@ -18,7 +18,7 @@ public:
     std::vector<Constraint> &getConstraints();
     std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &getPaths();
     std::unordered_map<std::string, std::shared_ptr<Agent>> &getAgents();
-    std::tuple<double, unsigned int, unsigned int> getComparisonTuple();
+    std::tuple<double, size_t, unsigned int> getComparisonTuple();
     void detectCollisions();
     size_t numCollisions();
     unsigned int getId();
@@ -38,6 +38,7 @@ private:
     std::vector<Constraint> constraints_;
     double max_constraint_time_;
     std::shared_ptr<MAMP_Helper> mamp_helper_;
+    size_t num_collisions_;
 };
 
 struct CompareCTNode
