@@ -10,8 +10,8 @@
 class CBSMP
 {
     public:
-    CBSMP(std::string &world_planning_scene, double timestep);
-    void initialize(std::vector<std::shared_ptr<Agent>> &agents);
+    CBSMP();
+    void initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep);
     ros::NodeHandle n_;
     std::shared_ptr<MAMP_Helper> get_mamp_helper() {return mamp_helper_;}
     std::vector<std::shared_ptr<Agent>> getAgents();

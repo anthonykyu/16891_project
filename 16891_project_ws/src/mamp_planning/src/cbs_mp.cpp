@@ -1,17 +1,17 @@
 #include "mamp_planning/cbs_mp.hpp"
 
-CBSMP::CBSMP(std::string &world_planning_scene, double timestep)
+CBSMP::CBSMP()
 {
   initialized_ = false;
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
   X_ = 0.99;
-  mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
-void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents)
+void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
 {
+  mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
   // initialize all agents with planning scenes
   for (auto a : agents)
   {

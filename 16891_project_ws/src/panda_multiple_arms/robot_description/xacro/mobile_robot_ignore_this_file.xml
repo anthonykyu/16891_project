@@ -4,8 +4,6 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="walls">
   
 
-
-
   <xacro:macro name="franka_robot" params="arm_id joint_limits">
     <!-- Name of this panda -->
     <!-- Should a franka_gripper be mounted at the flange?" -->

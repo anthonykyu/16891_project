@@ -4,7 +4,7 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <!-- rosrun xacro xacro panda_multiple_arms.xacro -o panda_multiple_arms.urdf -->
-<robot name="test">
+<robot name="mobile_robot">
   <material name="blue">
     <color rgba="0 0 0.8 1"/>
   </material>
