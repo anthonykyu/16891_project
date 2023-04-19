@@ -17,9 +17,13 @@ public:
     
     AStar(double timestep);
     // AStar(std::shared_ptr<PRM> &prm);
-    bool computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal,
+    bool computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
                         std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
                         double max_constraint_time = 0);
+    bool computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal,
+                        std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
+                        double max_constraint_time = 0, double start_time = 0,
+                        bool is_last_waypoint = true);
     std::vector<std::shared_ptr<Vertex>> getPRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal);
     // AStar(std::shared_ptr<AStar> &astar);
     // AStar(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<Agent> agent, std::vector<Constraint> constraints);

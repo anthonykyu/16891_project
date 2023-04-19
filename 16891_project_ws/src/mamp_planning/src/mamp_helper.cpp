@@ -110,7 +110,7 @@ std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<plannin
     // {
     //     ROS_INFO("%s", n.c_str());
     // }
-    int dof = names.size() / robot_names.size();
+    int dof;
     std::vector<double> output_joints;
     for (int i = 0; i < names.size(); i+=dof)
     {
@@ -123,10 +123,11 @@ std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<plannin
             }
         }
         std::vector<double> curr_joints = curr_vertices[idx]->getJointPos();
+        dof = curr_joints.size();
         // ROS_INFO("curr_joints size %ld", curr_joints.size());
 
         // Add the collected joints into the joint_positions
-        for (int k=0; k < curr_joints.size(); ++k)
+        for (int k=0; k < dof; ++k)
         {
             output_joints.push_back(curr_joints.at(k));
         }

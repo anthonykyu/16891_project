@@ -3,26 +3,41 @@
 AStar::AStar(double timestep)
 {
   timestep_ = timestep;
-  path_time_ = -1;
+  path_time_ = 0;
+}
+
+bool AStar::computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
+                        std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
+                        double max_constraint_time)
+{
+  bool success = true;
+  path_time_ = 0;
+  for (int i = 0; i < waypoints.size()-1; ++i)
+  {
+    if (i == waypoints.size()-1) 
+      success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, true);
+    else
+      success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, false);
+  }
+  return success;
 }
 
 bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, 
 std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
-double max_constraint_time)
+double max_constraint_time, double start_time, bool is_last_waypoint)
 {
   // ROS_INFO("Running an episode of Astar search");
   open_list_.clear();
   closed_list_.clear();
-  parent_map_.clear();
+  // parent_map_.clear();
   g_.clear();
-  h_.clear();
 
   double max_time = computeHeuristics(goal) + max_constraint_time;
   // ROS_INFO("h size: %ld", h_.size());
   // ROS_INFO("max time: %f", max_time);
   // ROS_INFO("Computed heuristics");
-  open_list_.insert(std::make_tuple(h_[start->getId()], start->getId(), 0), start);
-  g_.insert({std::make_tuple(start->getId(), 0), 0});
+  open_list_.insert(std::make_tuple(h_[start->getId()], start->getId(), start_time), start);
+  g_.insert({std::make_tuple(start->getId(), start_time), 0});
   while (open_list_.size() > 0)
   {
     // ROS_INFO("Inside the while loop");
@@ -35,7 +50,7 @@ double max_constraint_time)
     // ROS_INFO("Inside the while loop: after pop");
     double current_time = std::get<2>(v.first);
     // ROS_INFO("current time %f", current_time);
-    if (v.second->getId() == goal->getId() && current_time > max_constraint_time)
+    if (v.second->getId() == goal->getId() && (current_time > max_constraint_time || !is_last_waypoint))
     {
       // ROS_INFO("Yayyyyyy found the goal");
       path_time_ = current_time;
@@ -169,6 +184,7 @@ std::vector<std::shared_ptr<Vertex>> AStar::getPRMPath(std::shared_ptr<Vertex> s
 double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
 {
   // ROS_INFO("Computing heuristics");
+  h_.clear();
   OpenList<std::tuple<double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int>>> open_list_h;
   std::unordered_set<std::shared_ptr<Vertex>> closed_list_h;
   std::unordered_set<std::shared_ptr<Edge>> closed_edge_list;

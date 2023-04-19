@@ -36,8 +36,7 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
     
     std::string robot_name;
     int dof;
-    std::vector<double> start_pos;
-    std::vector<double> goal_pos;
+    std::vector<std::vector<double>> waypoints;
     std::string robot_description_name;
     std::string robot_description;
     std::string base_link;
@@ -46,30 +45,28 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
     // create a stringstream of each line
     std::stringstream ss(line);
     getline(ss, robot_name, ',');
-    string dof_string;
-    getline(ss, dof_string, ',');
-    dof = stoi(dof_string);
-    for (int i = 0; i < dof; ++i) // parse the start positions
-    {
-      string str_val;
-      getline(ss, str_val, ',');
-      double val = stod(str_val);
-      start_pos.push_back(val);
-    }
-    for (int i = 0; i < dof; ++i) // parse the goal positions
-    {
-      string str_val;
-      getline(ss, str_val, ',');
-      double val = stod(str_val);
-      goal_pos.push_back(val);
-    }
     getline(ss, robot_description_name, ',');
     getline(ss, base_link, ',');
     getline(ss, tip_link, ',');
     n.getParam(robot_description_name, robot_description);
+    string dof_string;
+    getline(ss, dof_string, ',');
+    dof = stoi(dof_string);
+    while(ss.good())
+    {
+      std::vector<double> waypoint;
+      for (int i = 0; i < dof; ++i) // parse the start positions
+      {
+        string str_val;
+        getline(ss, str_val, ',');
+        double val = stod(str_val);
+        waypoint.push_back(val);
+      }
+      waypoints.push_back(waypoint);
+    }
 
     std::shared_ptr<Agent> a = std::make_shared<Agent>(robot_description, robot_description_name, base_link, tip_link,
-                                                      robot_name, timestep, start_pos, goal_pos);
+                                                      robot_name, timestep, waypoints);
     agents.push_back(a);
   }
 
