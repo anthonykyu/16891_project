@@ -9,7 +9,7 @@ public:
     //INFO: I am assuming that the start and goal vertices for each agent comes from the agent class
     PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
-        std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal);
+        std::vector<std::shared_ptr<Vertex>> waypoints);
     std::vector<std::shared_ptr<Vertex>> PRMgraph_;
     std::vector<std::shared_ptr<Vertex>> PRMpath_;
     // std::vector<std::shared_ptr<Vertex>> Astarpath_;
@@ -29,8 +29,9 @@ private:
     unsigned int component_;
     double expansion_factor_;
     int connectivity_;
-    std::shared_ptr<Vertex> start_;
-    std::shared_ptr<Vertex> goal_;
+    std::vector<std::shared_ptr<Vertex>> waypoints_;
+    // std::vector<std::shared_ptr<Vertex>> start_;
+    // std::vector<std::shared_ptr<Vertex>> goal_;
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
     std::vector<double> jnt_vel_lim_;
     std::vector<double> jnt_upper_lim_;

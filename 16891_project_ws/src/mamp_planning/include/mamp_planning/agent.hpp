@@ -18,7 +18,7 @@ class Agent
 public:
     Agent(const std::string &robot_description, const std::string &robot_description_name,
         const std::string &base_frame, const std::string &tip_frame, std::string &id,
-        double &timestep, std::vector<double> start, std::vector<double> goal);
+        double &timestep, std::vector<std::vector<double>> waypoints);
     Agent(std::shared_ptr<Agent> &a);
 
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();
@@ -27,8 +27,9 @@ public:
     std::vector<double> const &getJointVelLimit();
     std::vector<double> const &getUpperJointLimit();
     std::vector<double> const &getLowerJointLimit();
-    std::shared_ptr<Vertex> const &getStart();
-    std::shared_ptr<Vertex> const &getGoal();
+    std::vector<std::shared_ptr<Vertex>> const &getWaypoints();
+    // std::vector<std::shared_ptr<Vertex>> const &getStart();
+    // std::vector<std::shared_ptr<Vertex>> const &getGoal();
     urdf::Model const &getURDF();
     double const &getTimestep();
     std::shared_ptr<AStar> &getAStar();
@@ -51,8 +52,9 @@ private:
     std::vector<double> upper_joint_limit_;
     std::vector<double> lower_joint_limit_;
     std::vector<double> joint_vel_limit_;
-    std::shared_ptr<Vertex> start_;
-    std::shared_ptr<Vertex> goal_;
+    std::vector<std::shared_ptr<Vertex>> waypoints_;
+    // std::vector<std::shared_ptr<Vertex>> start_;
+    // std::vector<std::shared_ptr<Vertex>> goal_;
     std::shared_ptr<PRM> prm_;
     std::shared_ptr<AStar> astar_;
     double timestep_;
