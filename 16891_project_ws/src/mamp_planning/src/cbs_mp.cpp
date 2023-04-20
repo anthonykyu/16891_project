@@ -11,7 +11,88 @@ CBSMP::CBSMP()
 
 void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
 {
+
   mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
+
+  // Pass on each agent's combined ACM to the mamp helper
+  std::shared_ptr<collision_detection::AllowedCollisionMatrix> multi_robot_acm;
+  multi_robot_acm = std::make_shared<collision_detection::AllowedCollisionMatrix>(mamp_helper_->getPlanningScene()->getAllowedCollisionMatrix());
+  for (std::shared_ptr<Agent> a : agents)
+  {
+    // ROS_WARN("Size for this agent was %ld", a->getPRM()->getAcm()->getSize());
+    std::vector<std::string> entries;
+    a->getPRM()->getAcm()->getAllEntryNames(entries);
+    // for (std::string entry : entries)
+    // {
+    //   ROS_WARN("This was an entry: %s", entry.c_str());
+    // }
+
+
+    // The following is horribly inefficient but doing it because it only needs to be done once
+    for (auto entry1 : entries)
+    {
+      for (auto entry2 : entries)
+      {
+        collision_detection::AllowedCollision::Type entry_type = collision_detection::AllowedCollision::ALWAYS;
+        if (a->getPRM()->getAcm()->getAllowedCollision(entry1, entry2, entry_type))
+        {
+          // ROS_WARN("This was an entry1, entry2: %s %s", entry1.c_str(), entry2.c_str());
+          // ROS_WARN("yeah I'm in.");
+
+          // Adapt the ACM to have entries correctly for the different agents.
+          std::string entry1_rename;
+          std::string entry2_rename;
+
+          if (std::strcmp(entry1.c_str(), "base") != 0)
+          {
+
+            if (std::strcmp(entry1.substr(0,3).c_str(), "she") == 0)
+            {
+              // Assume the shelf can only hit an arm here
+              entry1_rename = entry1.substr(0,6) + a->getID().substr(4, 1); // THIS WILL BREAK IF WE HAVE DOUBLE DIGIT AGENTS
+            }
+            else
+            {
+              entry1_rename = a->getID().substr(0, 5) + entry1.substr(5); // THIS WILL BREAK IF WE HAVE DOUBLE DIGIT AGENTS
+            }
+
+          }
+          else {entry1_rename = entry1;}
+
+          if (std::strcmp(entry2.c_str(), "base") != 0)
+          {
+
+            if (std::strcmp(entry2.substr(0,3).c_str(), "she") == 0)
+            {
+              // Assume the shelf can only hit an arm here
+              entry2_rename = entry2.substr(0,6) + a->getID().substr(4, 1); // THIS WILL BREAK IF WE HAVE DOUBLE DIGIT AGENTS
+            }
+            else
+            {
+              entry2_rename = a->getID().substr(0, 5) + entry2.substr(5); // THIS WILL BREAK IF WE HAVE DOUBLE DIGIT AGENTS
+            }
+
+
+          }
+          else {entry2_rename = entry2;}
+
+
+          multi_robot_acm->setEntry(entry1_rename, entry2_rename, true);
+        }
+      }
+    }
+    std::vector<std::string> entries_check;
+    multi_robot_acm->getAllEntryNames(entries_check);
+    ROS_WARN("The complete multi robot ACM has this many entries: %d", entries_check.size());
+    for (auto entry : entries_check)
+    {
+      ROS_WARN("%s", entry.c_str());
+    }
+  }
+  mamp_helper_->setAcm(multi_robot_acm);
+
+  
+  
   // initialize all agents with planning scenes
   for (auto a : agents)
   {
@@ -20,6 +101,7 @@ void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string 
 
   for (auto a : agents_)
   {
+    // ROS_INFO("Joint check: %d", a.second->getJointVelLimit().size());
     a.second->getPRM()->buildPRM();
 
     ROS_INFO("PRM Size: %ld", a.second->getPRM()->PRMgraph_.size());
@@ -51,7 +133,11 @@ std::vector<std::shared_ptr<Agent>> CBSMP::getAgents()
 
 bool CBSMP::shouldResample(unsigned int N)
 {
+  // ROS_WARN("In the shouldResample");
   double p = 1.0 - pow(X_, alpha_ * N / S_);
+  // ROS_WARN("shouldResample will return: %f", ((double)rand()/(double)RAND_MAX));
+  // ROS_WARN("p is: %f", p);
+  // ROS_WARN("shouldResample will return: %d", (((double)rand()/(double)RAND_MAX) < p));
   return ((double)rand()/(double)RAND_MAX) < p;
 }
 
@@ -174,17 +260,18 @@ bool CBSMP::replanCBS()
   {
     iteration++;
     ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
-    
+    // ROS_WARN("Considering resample");
     if (shouldResample(N))
     {
+      // ROS_WARN("Doing the resample");
       // TODO: resample routine
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
-      #ifdef MP_EN
-        ROS_INFO("Using OMP");
-        omp_set_num_threads(MP_PROC_NUM);
-        #pragma omp parallel for
-      #endif
+      // #ifdef MP_EN
+      //   ROS_INFO("Using OMP");
+      //   omp_set_num_threads(MP_PROC_NUM);
+      //   #pragma omp parallel for
+      // #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
@@ -199,6 +286,7 @@ bool CBSMP::replanCBS()
     ++N;
 
     ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
+    ROS_INFO("Number of collisions: %ld", node->numCollisions());
     ROS_INFO("Cost of Node: %f", node->getCost());
     // printConstraints(node->getConstraints());
     // ++N;
@@ -211,23 +299,34 @@ bool CBSMP::replanCBS()
       agents_ = node->getAgents();
       return true;
     }
+    ROS_INFO("Made it here");
     Collision c = node->getNextCollision();
-    // ROS_INFO("Collision: Agent 1 - %s, Agent 2 - %s, IsVertex: %d, %d, time: %f", c.agent_id1.c_str(), c.agent_id2.c_str(), c.location1_is_vertex, c.location2_is_vertex, c.timestep);
+    ROS_INFO("Collision: Agent 1 - %s, Agent 2 - %s, IsVertex: %d, %d, time: %f", c.agent_id1.c_str(), c.agent_id2.c_str(), c.location1_is_vertex, c.location2_is_vertex, c.timestep);
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
     // printCollision(c);
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
-    #ifdef MP_EN
-        ROS_INFO("Using OMP");
-        omp_set_num_threads(MP_PROC_NUM);
-        #pragma omp parallel for
-    #endif
+
+    // #ifdef MP_EN
+    //     ROS_INFO("Using OMP");
+    //     omp_set_num_threads(MP_PROC_NUM);
+    //     #pragma omp parallel for
+    // #endif
+
+
     for (int i = 0; i < new_nodes.size(); ++i)
     {
+      // ROS_WARN("Until here iteration %d", i);
       new_nodes[i]->addConstraint(constraints[i]);
+
+      // ROS_WARN("How many constraints %ld", new_nodes[i]->getConstraints().size());
+      // ROS_WARN("max constraint time: %f", new_nodes[i]->getMaxConstraintTime());
+      // ROS_WARN("agent id: %s", constraints[i].agent_id.c_str());
+
       succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeSingleAgentPath(
       MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime());
+      // ROS_WARN("Will probably fail here");
       if (succ[i])
       {
         new_nodes[i]->getPaths().erase(constraints[i].agent_id);

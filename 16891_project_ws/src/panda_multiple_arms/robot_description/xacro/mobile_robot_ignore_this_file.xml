@@ -97,23 +97,5 @@
 
 
 
-
-
-
-
-  <xacro:property name="length" value="10.0" /> 
-  <xacro:property name="width" value="0.1" /> 
-  <xacro:property name="height" value="1" /> 
-
-  <link name="base_link">
-    <visual>
-      <geometry>
-        <cylinder length="0.6" radius="0.2"/>
-      </geometry>
-    </visual>
-  </link>
-
-
-
   
 </robot>

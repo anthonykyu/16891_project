@@ -14,6 +14,15 @@ MAMP_Helper::MAMP_Helper(const std::string &full_world_description, double times
     auto robot_model_loader_ = std::make_shared<robot_model_loader::RobotModelLoader>(full_world_description);
     auto kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
     planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
+    // multi_robot_acm_ = acm;
+    // agents_ = agents;
+
+    // Build multi_robot_acm - COME BACK TO THIS
+    // for (std::shared_ptr<Agent> agent : agents)
+    // {
+        // multi_robot_acm_
+    // }
+
     timestep_ = timestep;
 }
 
@@ -24,7 +33,8 @@ std::shared_ptr<planning_scene::PlanningScene> const &MAMP_Helper::getPlanningSc
 }
 
 
-bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
+bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
+                                        std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm,
                                         std::shared_ptr<Vertex> vertex, 
                                         std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = nullptr)
 {
@@ -32,6 +42,9 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
     // ROS_INFO("Start detectVertexCollision function");
     moveit::core::RobotState copied_state = planning_scene->getCurrentStateNonConst();
     // ROS_INFO("Before joint pos");
+    // ROS_INFO("copied_state number of variables: %ld", copied_state.getVariableCount());
+    // ROS_INFO("joint state number of variables: %ld", vertex->getJointPos().size());
+
     copied_state.setVariablePositions(vertex->getJointPos());
     // ROS_INFO("%ld", copied_state.getVariableCount());
     // ROS_INFO("size %ld", vertex->getJointPos().size());
@@ -57,7 +70,12 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
     //     ROS_INFO("From the vertex it should be %f", vertex->getJointPos()[i]);
     // }
 
-    planning_scene->checkSelfCollision(collision_request, collision_result, copied_state);
+
+    // Need to add in allowed collisions for arms.
+    // collision_detection::AllowedCollisionMatrix acm = planning_scene->getAllowedCollisionMatrix();
+    // ROS_WARN("In the vertex collision function, this was the size of the allowed collision matrix %d", acm->getSize());
+
+    planning_scene->checkSelfCollision(collision_request, collision_result, copied_state, *acm);
     // ROS_INFO("Done checking for vertex collisions");
     // If there IS a collision...
     if (collision_result.contact_count > 0){
@@ -135,6 +153,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
     // through their respective path (given input). At each timestep,
     // check for collisions and append collisions to the output vector.
 
+
     // Let's find the longest path first
     unsigned int longest_path_size = 0;
     std::vector<std::string> robot_names;
@@ -202,6 +221,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
             curr_vertices.push_back(curr_vertex);
         }
 
+
         // ROS_INFO("About to start the collision check");
 
         // Do the collision check with the multi-agent planning scene
@@ -210,7 +230,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = std::make_shared<std::vector<std::pair<std::string, std::string>>>();
         // ROS_INFO("About to start the collision check + 2");
         // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
-        bool test_val = detectVertexCollision(planning_scene_, check_vertex, list_of_collisions);
+        bool test_val = detectVertexCollision(planning_scene_, multi_robot_acm_, check_vertex, list_of_collisions);
         
         
         // ROS_INFO("Finished the collision check");
@@ -232,6 +252,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                     ROS_ERROR("Collision found with a non-agent (i.e. environment) which should not happen if low-level search worked correctly.");
                 }
                 
+
+
                 // Return the first collision we've found
                 Collision first_collision;
                 first_collision.timestep = t * timestep_;
@@ -261,6 +283,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                             first_collision.location2_vertex = curr_vertices[n];
                         }
                     }
+
                 }
                 // if (!first_collision.location1 || !first_collision.location2)
                 // {
@@ -287,6 +310,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
 
 // Use this function in PRM to detect whether an edge is valid; it will discretize the edge and check for collisions with the environment
 std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
+                                                                                 std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm,
                                                                                  std::shared_ptr<Edge> edge,
                                                                                  std::vector<double> &jnt_vel_lim,
                                                                                  double timestep)
@@ -316,7 +340,7 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
     for (std::shared_ptr<Vertex> discrete_vertex : discrete_steps)
     {
         // ROS_INFO("In edge collision forloop");
-        test_val = detectVertexCollision(planning_scene, discrete_vertex);
+        test_val = detectVertexCollision(planning_scene, acm, discrete_vertex);
         // ROS_INFO("test val is %d", test_val);
         // ROS_INFO("Ran detect vertex collision in the for loop");
 

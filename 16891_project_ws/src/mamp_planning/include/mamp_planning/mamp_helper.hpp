@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <cstring>
 #include "mamp_planning/edge.hpp"
+// #include "mamp_planning/agent.hpp"
 
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/planning_scene/planning_scene.h>
@@ -42,6 +43,7 @@ class MAMP_Helper
     
     std::shared_ptr<planning_scene::PlanningScene> const &getPlanningScene();// {return planning_scene_;}
     void setPlanningScene(std::shared_ptr<planning_scene::PlanningScene> new_scene) {planning_scene_ = new_scene;}
+    void setAcm(std::shared_ptr<collision_detection::AllowedCollisionMatrix> multi_robot_acm) {multi_robot_acm_ = multi_robot_acm;}
 
 
     // ********************** //
@@ -49,7 +51,8 @@ class MAMP_Helper
     // ********************** //
 
     // Use this function to detect if a vertex is colliding with the environment
-    static bool detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene, 
+    static bool detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
+                                      std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm,
                                       std::shared_ptr<Vertex> vertex, 
                                       std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions);
       // Uses the given planning scene and vertex to determine if the agent is colliding
@@ -82,6 +85,7 @@ class MAMP_Helper
     // Use this function in PRM to detect whether an edge is valid; it will discretize the edge and check for collisions with the environment
     // Return the furthest vertex that is collision free, going through the edge
     static std::pair<bool, std::shared_ptr<Vertex>> detectEdgeCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
+                                                                        std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm,
                                                                         std::shared_ptr<Edge> edge,
                                                                         std::vector<double> &jnt_vel_lim,
                                                                         double timestep);
@@ -117,7 +121,15 @@ class MAMP_Helper
       // separated into two nodes of a CT for CBS.
       Constraint c1;
       Constraint c2;
+
+      // Correct the IDs if the collisions are for an arm.
       c1.agent_id = collision.agent_id1;
+      if (std::strcmp(collision.agent_id1.substr(0,3).c_str(), "arm") == 0)
+      {
+        c1.agent_id = collision.agent_id1.substr(0,5); // THIS WILL BREAK IF THERE ARE MORE THAN 9 ARMS
+      }
+
+
       if (collision.location1_is_vertex)
       {
         c1.joint_pos_vertex = collision.location1_vertex;
@@ -130,7 +142,14 @@ class MAMP_Helper
       }
       c1.time_step = collision.timestep;
 
+      
+      // Correct the IDs if the collisions are for an arm.
       c2.agent_id = collision.agent_id2;
+      if (std::strcmp(collision.agent_id2.substr(0,3).c_str(), "arm") == 0)
+      {
+        c2.agent_id = collision.agent_id2.substr(0,5); // THIS WILL BREAK IF THERE ARE MORE THAN 9 ARMS
+      }
+
       if (collision.location2_is_vertex)
       {
         c2.joint_pos_vertex = collision.location2_vertex;
@@ -204,6 +223,7 @@ class MAMP_Helper
 
   private:
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
+    std::shared_ptr<collision_detection::AllowedCollisionMatrix> multi_robot_acm_;
     double timestep_;
 
 };

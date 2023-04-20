@@ -18,13 +18,43 @@ Agent::Agent(const std::string &robot_description, const std::string &robot_desc
   kinematic_model_ = std::make_shared<moveit::core::RobotModelPtr>(robot_model_loader_->getModel());
   planning_scene_ = std::make_shared<planning_scene::PlanningScene>(*kinematic_model_);
 
+  // acm_ = std::make_shared<collision_detection::AllowedCollisionMatrix>()
+  std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm_;
+  acm_ = std::make_shared<collision_detection::AllowedCollisionMatrix>(planning_scene_->getAllowedCollisionMatrix());
+
+
+  // collision_detection::AllowedCollisionMatrix acm = planning_scene_->getAllowedCollisionMatrixNonConst();
+  if (std::strcmp(id.substr(0,3).c_str(), "arm") == 0) // If we are dealing with an arm agent, add to the 
+  {
+    collision_detection::CollisionRequest collision_request;
+    collision_detection::CollisionResult collision_result;
+    collision_request.contacts = true;
+    collision_request.max_contacts = 1000;
+
+    planning_scene_->checkSelfCollision(collision_request, collision_result);
+    collision_detection::CollisionResult::ContactMap::const_iterator it2;
+
+    for (it2 = collision_result.contacts.begin(); it2 != collision_result.contacts.end(); ++it2)
+    {
+      // IF COLLIDING WITH BASE INCORRECTLY COME BACK TO THIS
+      // if (std::strcmp(it2->first.first.substr(0,3).c_str(), "arm") != 0 || std::strcmp(it2->first.second.substr(0,3).c_str(), "arm") != 0){
+        // continue;
+      // }
+      acm_->setEntry(it2->first.first, it2->first.second, true);
+    }
+
+    // ROS_WARN("Add this many allowed collisions %d", acm_->getSize());
+  }
+
+
+
   timestep_ = timestep;
   // path_cost_ = std::numeric_limits<double>::infinity();
   start_ = std::make_shared<Vertex>(start, 1);
   goal_ = std::make_shared<Vertex>(goal, 0);
   prm_ = std::make_shared<PRM>(planning_scene_, timestep_,
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
-                               start_, goal_);
+                               start_, goal_, acm_);
   astar_ = std::make_shared<AStar>(timestep_);
 }
 
@@ -56,6 +86,7 @@ bool Agent::computeSingleAgentPath(
 {
   // ROS_INFO("About to clear discretized path");
   discretized_path_.clear();
+
   // ROS_INFO("Cleared discretized path: %ld", discretized_path_.size());
   if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
   {
@@ -210,8 +241,11 @@ std::shared_ptr<moveit::core::RobotModelPtr> const &Agent::getKinematicModel()
 bool Agent::compute_joint_limits(const std::string &base_frame, const std::string &tip_frame)
 {
   // get joint maxs and mins
+  ROS_INFO("Base frame: %s", base_frame.c_str());
+  ROS_INFO("Tip frame: %s", tip_frame.c_str());
   std::shared_ptr<const urdf::Link> link = urdf_model_.getLink(tip_frame);
   std::shared_ptr<const urdf::Joint> joint;
+
   while (link && link->name != base_frame)
   {
     // std::cout << link->name << std::endl;

@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 
 
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_mobile_1">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="shelf_mobile_1">
 
-  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls_for_arms.xacro" />
   <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/mobile_robot.xacro" />
 
-  <xacro:walls_world/>
+  <xacro:walls_world_for_arms/>
   <xacro:mobile_robot name="mobile_1" dims="0.25" color="white"/>
   <link name="mobile_1_temp"/>
 

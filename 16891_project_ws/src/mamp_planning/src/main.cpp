@@ -54,6 +54,7 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
       getline(ss, str_val, ',');
       double val = stod(str_val);
       start_pos.push_back(val);
+      // ROS_WARN("start_joint Position is: %f", val);
     }
     for (int i = 0; i < dof; ++i) // parse the goal positions
     {
@@ -61,10 +62,11 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
       getline(ss, str_val, ',');
       double val = stod(str_val);
       goal_pos.push_back(val);
+      // ROS_WARN("goal_joint Position is: %f", val);
     }
-    getline(ss, robot_description_name, ',');
-    getline(ss, base_link, ',');
-    getline(ss, tip_link, ',');
+    getline(ss, robot_description_name, ','); // parse the single-agent world description
+    getline(ss, base_link, ','); // parse the world base_link
+    getline(ss, tip_link, ','); // parse the robot's tip link
     n.getParam(robot_description_name, robot_description);
 
     std::shared_ptr<Agent> a = std::make_shared<Agent>(robot_description, robot_description_name, base_link, tip_link,
@@ -96,7 +98,7 @@ int main(int argc, char **argv)
 
   // std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep, world_planning_scene);
   std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, agents_data_file, timestep, world_planning_scene);
-
+  ROS_WARN("Until here in main.cpp");
   planner_.initialize(agents, world_planning_scene, timestep);
   // ROS_INFO("Number of agents: %ld", agents.size());
   // ROS_INFO("Agent ID: %s", agents[0]->getID().c_str());
