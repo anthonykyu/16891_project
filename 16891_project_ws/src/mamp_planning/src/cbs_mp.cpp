@@ -7,7 +7,7 @@ CBSMP::CBSMP()
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
   X_ = 0.95;
-  mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
+  // mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
 void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
@@ -356,4 +356,3 @@ bool CBSMP::replanCBS()
   // No solution!!!
   return false;
 }
-
