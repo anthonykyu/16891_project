@@ -75,6 +75,12 @@ public:
   // pop - removes top element and returns it
   std::pair<Ttuple, std::shared_ptr<T>> pop();
 
+  // top - returns top element
+  std::pair<Ttuple, std::shared_ptr<T>> top();
+   // pop element - removes a specific element and returns it
+  std::pair<Ttuple, std::shared_ptr<T>> pop_element(std::shared_ptr<T> t);
+
+
   // checks to see if vertex is already in the open list, if so, replace it
   // use this function to also reorder the position of the vertex within the list
   bool insert(Ttuple t, std::shared_ptr<T> v);
@@ -119,6 +125,88 @@ std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop()
   check_list_.erase(s->first);
   return v;
 }
+
+// top - returns top element
+template <typename Ttuple, class T, typename hashT>
+std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::top()
+{
+  if (check_list_.size() == 0 || ordered_list_.size() == 0)
+  {
+    return std::pair<Ttuple, std::shared_ptr<T>>();
+  }
+  auto s = ordered_list_.begin();
+  std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+  return v;
+}
+
+//pop - removes a specific element and returns it
+// template <typename Ttuple, class T, typename hashT>
+// std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop_element(std::shared_ptr<T> element)
+// {
+//   if (check_list_.size() == 0 || ordered_list_.size() == 0)
+//   {
+//     return std::pair<Ttuple, std::shared_ptr<T>>();
+//   }
+//   // find the element 'element'  in the ordered list 
+//   if (contains(element))
+//   {
+//     auto s = check_list_.find(element);
+//     std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+//     ordered_list_.erase(s);
+//     check_list_.erase(s->first);
+//     return v;
+//   }
+
+
+
+  // if (ordered_list_.find(element) == ordered_list_.end())
+  // {
+  //   return std::pair<Ttuple, std::shared_ptr<T>>();
+  // }
+  // else 
+  // {
+  //   auto s = ordered_list_.find(element);
+  //   std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+  //   ordered_list_.erase(s);
+  //   check_list_.erase(s->first);
+  //   return v;
+  // }
+// }
+
+template <typename Ttuple, class T, typename hashT>
+std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop_element(std::shared_ptr<T> element)
+{
+  if (check_list_.size() == 0 || ordered_list_.size() == 0)
+  {
+    return std::pair<Ttuple, std::shared_ptr<T>>();
+  }
+
+  // loop over the ordered list and find the key corresponding to the input element
+  Ttuple key;
+  for (auto it = ordered_list_.begin(); it != ordered_list_.end(); ++it)
+  {
+    if ((it->second)->getId() == element->getId()) // compare the std::shared_ptr<T> values
+    {
+      key = it->first; // save the corresponding key
+      break;
+    }
+  }
+
+  // check if we found a valid key
+  if (key == Ttuple())
+  {
+    return std::pair<Ttuple, std::shared_ptr<T>>();
+  }
+  else 
+  {
+    // remove the key-value pair from the ordered list and check list
+    std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(key, ordered_list_[key]);
+    ordered_list_.erase(key);
+    check_list_.erase(key);
+    return v;
+  }
+}
+
 
 // checks to see if vertex is already in the open list, if so, replace it, if not, insert
 // use this function to also reorder the position of the vertex within the list

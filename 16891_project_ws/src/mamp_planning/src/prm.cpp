@@ -2,18 +2,19 @@
 
 PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
-        std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm)
+        std::vector<std::shared_ptr<Vertex>> waypoints, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm)
 {
-  radius_ = 3.0;
+  radius_ = 2;
   num_samples_ = 0;
   expansion_factor_= 0.1;
   connectivity_ = 8;
-  start_ = start;
-  goal_ = goal;
+  waypoints_ = waypoints;
+//   start_ = start;
+//   goal_ = goal;
   planning_scene_ = planning_scene;
   timestep_ = timestep;
   dof_ = jnt_upper_lim.size();
-  node_id_ = 2;
+  node_id_ = waypoints_.size();
   jnt_vel_lim_ = jnt_vel_lim;
   jnt_lower_lim_ = jnt_lower_lim;
   jnt_upper_lim_ = jnt_upper_lim;
@@ -22,10 +23,10 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
 
 }
 
-bool PRM::checkCollision(vector<double> joint_pos)
-{
-    return false;
-}
+// bool PRM::checkCollision(vector<double> joint_pos)
+// {
+//     return false;
+// }
 
 double PRM::getDistance(shared_ptr<Vertex> v1, shared_ptr<Vertex> v2)
 {
@@ -84,90 +85,90 @@ shared_ptr<Vertex> PRM::getRandomVertex()
     return q_rand;
 }
 
-shared_ptr<Vertex> PRM::getNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
-{
-    // create a new vertex
-    double distance = getDistance(q_near, q);
-    int num_steps = (int)(distance / r);
+// shared_ptr<Vertex> PRM::getNewVertex(shared_ptr<Vertex> q_near,shared_ptr<Vertex> q, int r)
+// {
+//     // create a new vertex
+//     double distance = getDistance(q_near, q);
+//     int num_steps = (int)(distance / r);
 
-    if (num_steps < 2)
-    {
-        shared_ptr<Vertex> q_new = make_shared<Vertex>(q->getJointPos(), q->getId());
-        return q_new;
-    }
+//     if (num_steps < 2)
+//     {
+//         shared_ptr<Vertex> q_new = make_shared<Vertex>(q->getJointPos(), q->getId());
+//         return q_new;
+//     }
 
-    auto unit_vector = q_near->getJointPos();
-    for (int i = 0; i < q->getJointPos().size(); ++i)
-    {
-        unit_vector[i] = (q->getJointPos()[i] - q_near->getJointPos()[i]) / distance;
-        unit_vector[i] = q_near->getJointPos()[i] + unit_vector[i] * epsilon_;
+//     auto unit_vector = q_near->getJointPos();
+//     for (int i = 0; i < q->getJointPos().size(); ++i)
+//     {
+//         unit_vector[i] = (q->getJointPos()[i] - q_near->getJointPos()[i]) / distance;
+//         unit_vector[i] = q_near->getJointPos()[i] + unit_vector[i] * epsilon_;
 
-    }
-    shared_ptr<Vertex> q_new = make_shared<Vertex>(unit_vector, node_id_++);
+//     }
+//     shared_ptr<Vertex> q_new = make_shared<Vertex>(unit_vector, node_id_++);
 
-    return q_new;
+//     return q_new;
 
-}
+// }
 
-shared_ptr<Vertex> PRM::getNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
-{
-    double min_distance = 1000000;
-    shared_ptr<Vertex> q_near;
-    for(int i = 0; i < nodes.size(); i++)
-    {
-        if (nodes[i]->getComponentId() != max_id)
-        {
-            continue;
-        }
+// shared_ptr<Vertex> PRM::getNearestVertex(shared_ptr<Vertex> q, vector<shared_ptr<Vertex>> nodes, int max_id)
+// {
+//     double min_distance = 1000000;
+//     shared_ptr<Vertex> q_near;
+//     for(int i = 0; i < nodes.size(); i++)
+//     {
+//         if (nodes[i]->getComponentId() != max_id)
+//         {
+//             continue;
+//         }
 
-        double distance = getDistance(q, nodes[i]);
-        if (distance < min_distance)
-        {
-            min_distance = distance;
-            q_near = nodes[i];
-        }
-    }
-    return q_near;
-}
+//         double distance = getDistance(q, nodes[i]);
+//         if (distance < min_distance)
+//         {
+//             min_distance = distance;
+//             q_near = nodes[i];
+//         }
+//     }
+//     return q_near;
+// }
 
-bool PRM::connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
-{
-    double distance = getDistance(q1, q2);
-    int num_steps = (int)(distance / epsilon_);
-    if (num_steps < 2)
-    {
-        return true;
-    }
+// bool PRM::connect(shared_ptr<Vertex> q1, shared_ptr<Vertex> q2)
+// {
+//     double distance = getDistance(q1, q2);
+//     int num_steps = (int)(distance / epsilon_);
+//     if (num_steps < 2)
+//     {
+//         return true;
+//     }
 
     
-    for (int i = 0; i < num_steps; ++i)
-    {
-        // creat a double vector with the same size as the joint position
-        vector<double> unit_vector;
-        for (int j = 0; j < q1->getJointPos().size(); ++j)
-        {
-            unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
-        }
+//     for (int i = 0; i < num_steps; ++i)
+//     {
+//         // creat a double vector with the same size as the joint position
+//         vector<double> unit_vector;
+//         for (int j = 0; j < q1->getJointPos().size(); ++j)
+//         {
+//             unit_vector[j] = q1->getJointPos()[j] + (q2->getJointPos()[j] - q1->getJointPos()[j]) * i / (num_steps-1);        
+//         }
 
-        // how do I check collision for these joint positionss in the world?        
-        if (!checkCollision(unit_vector)) 
-        {
-            return false;
-        }
-    }
-    return false;
-}
+//         // how do I check collision for these joint positionss in the world?        
+//         if (!checkCollision(unit_vector)) 
+//         {
+//             return false;
+//         }
+//     }
+//     return false;
+// }
 
-void PRM::getPath(vector<shared_ptr<Vertex>> nodes)
-{
-    shared_ptr<Vertex> q = goal_;
-    while (q->getId() != start_->getId())
-    {
-        PRMpath_.push_back(q);
-        q = q->getParent();
-    }
-    PRMpath_.push_back(start_);
-}
+// void PRM::getPath(vector<shared_ptr<Vertex>> nodes)
+// {
+//     shared_ptr<Vertex> q = goal_;
+//     while (q->getId() != start_->getId())
+//     {
+//         PRMpath_.push_back(q);
+//         q = q->getParent();
+//     }
+//     PRMpath_.push_back(start_);
+// }
 
 void PRM::expandPRM()
 {
@@ -292,17 +293,30 @@ void PRM::expandPRM()
 void PRM::buildPRM()
 {
     component_ = 0;
-    start_->setComponentId(component_++);
-    goal_->setComponentId(component_++);
-    PRMgraph_.push_back(start_);
-    PRMgraph_.push_back(goal_);
+    for (int i = 0; i < waypoints_.size(); ++i)
+    {
+        waypoints_[i]->setComponentId(component_++);
+        PRMgraph_.push_back(waypoints_[i]);
+    }
+    // start_->setComponentId(component_++);
+    // goal_->setComponentId(component_++);
+    // PRMgraph_.push_back(start_);
+    // PRMgraph_.push_back(goal_);
     // ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
     
     ROS_INFO("BuldPRM starts here");
-    for (int i = 0; start_->getComponentId() != goal_->getComponentId(); ++i, ++num_samples_)
+    bool not_connected = true;
+    for (int i = 0; not_connected; ++i, ++num_samples_)
     {
-        ROS_INFO("Component value: %d", component_);
-        ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
+        not_connected = false;
+        for (int j = 0; j < waypoints_.size()-1; ++j)
+        {
+            not_connected = not_connected || waypoints_[j]->getComponentId() != waypoints_[j+1]->getComponentId();
+        }
+        if (!not_connected)
+            break;
+        // ROS_INFO("Component value: %d", component_);
+        // ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
         shared_ptr<Vertex> q_rand = getRandomVertex();
         //NOTE: if the given configuration is valid, need to check with Hardik
         // if (CheckCollision(q_rand->getJointPos()))

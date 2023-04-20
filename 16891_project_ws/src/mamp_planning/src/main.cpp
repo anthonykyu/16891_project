@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <ctime>
 #include "mamp_planning/viz_tools.hpp"
 
 std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::string file_name, double timestep, std::string &world_description)
@@ -35,8 +36,7 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
     
     std::string robot_name;
     int dof;
-    std::vector<double> start_pos;
-    std::vector<double> goal_pos;
+    std::vector<std::vector<double>> waypoints;
     std::string robot_description_name;
     std::string robot_description;
     std::string base_link;
@@ -45,32 +45,28 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
     // create a stringstream of each line
     std::stringstream ss(line);
     getline(ss, robot_name, ',');
+    getline(ss, robot_description_name, ',');
+    getline(ss, base_link, ',');
+    getline(ss, tip_link, ',');
+    n.getParam(robot_description_name, robot_description);
     string dof_string;
     getline(ss, dof_string, ',');
     dof = stoi(dof_string);
-    for (int i = 0; i < dof; ++i) // parse the start positions
+    while(ss.good())
     {
-      string str_val;
-      getline(ss, str_val, ',');
-      double val = stod(str_val);
-      start_pos.push_back(val);
-      // ROS_WARN("start_joint Position is: %f", val);
+      std::vector<double> waypoint;
+      for (int i = 0; i < dof; ++i) // parse the start positions
+      {
+        string str_val;
+        getline(ss, str_val, ',');
+        double val = stod(str_val);
+        waypoint.push_back(val);
+      }
+      waypoints.push_back(waypoint);
     }
-    for (int i = 0; i < dof; ++i) // parse the goal positions
-    {
-      string str_val;
-      getline(ss, str_val, ',');
-      double val = stod(str_val);
-      goal_pos.push_back(val);
-      // ROS_WARN("goal_joint Position is: %f", val);
-    }
-    getline(ss, robot_description_name, ','); // parse the single-agent world description
-    getline(ss, base_link, ','); // parse the world base_link
-    getline(ss, tip_link, ','); // parse the robot's tip link
-    n.getParam(robot_description_name, robot_description);
 
     std::shared_ptr<Agent> a = std::make_shared<Agent>(robot_description, robot_description_name, base_link, tip_link,
-                                                      robot_name, timestep, start_pos, goal_pos);
+                                                      robot_name, timestep, waypoints);
     agents.push_back(a);
   }
 
@@ -81,7 +77,8 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mamp_planning_node");
-  srand(0);
+  // srand(0);
+  srand(time(0));
   ROS_INFO("Heyyy");
   double timestep = 0.1;
   // std::string world_planning_scene = "world_mobile_1";

@@ -24,9 +24,11 @@ public:
     std::vector<std::shared_ptr<Vertex>> const &getNeighborhood();
     std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> const &getEdges();
     std::shared_ptr<Edge> const &getPRMEdge();
+    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> const &getChangedEdges();
     // function to compare g and v values, -1 underconsistent, 0 consistent, 1 overconsistent
     // int checkConsistency();
-
+    // check if any edge has changed
+    bool checkEdgeChange(std::shared_ptr<Vertex> vertex);
     void changeValidity(bool validity);
     void setId(unsigned int id);
     // void setG(double g);
@@ -52,6 +54,7 @@ private:
     std::shared_ptr<Vertex> parent_vertex_;
     std::shared_ptr<Edge> prm_edge_;
     std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> edges_;
+    std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> changed_edges_;
     std::vector<std::shared_ptr<Vertex>> neighborhood_;
 };
 

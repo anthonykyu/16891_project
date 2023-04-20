@@ -36,7 +36,8 @@ std::shared_ptr<planning_scene::PlanningScene> const &MAMP_Helper::getPlanningSc
 bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::PlanningScene> planning_scene,
                                         std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm,
                                         std::shared_ptr<Vertex> vertex, 
-                                        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = nullptr)
+                                        std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions,
+                                        bool compute_contacts)
 {
     // Set the planning scene
     // ROS_INFO("Start detectVertexCollision function");
@@ -60,8 +61,16 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
     collision_detection::CollisionRequest collision_request;
     // ROS_INFO("Made a request for collision check");
 
-    collision_request.contacts = true; // We want to know where the contact happens
-    collision_request.max_contacts = 100;
+    if (compute_contacts)
+    {
+        collision_request.contacts = true; // We want to know where the contact happens
+        collision_request.max_contacts = 100;
+    }
+    else
+    {
+        collision_request.contacts = false; // We want to know where the contact happens
+    }
+    
     // Check for collisions
     collision_detection::CollisionResult collision_result;
     // ROS_INFO("Set collision request and result");
@@ -78,8 +87,9 @@ bool MAMP_Helper::detectVertexCollision(std::shared_ptr<planning_scene::Planning
     planning_scene->checkSelfCollision(collision_request, collision_result, copied_state, *acm);
     // ROS_INFO("Done checking for vertex collisions");
     // If there IS a collision...
-    if (collision_result.contact_count > 0){
-
+    if (collision_result.collision){
+        if (!compute_contacts)
+            return true;
         collision_detection::CollisionResult::ContactMap::const_iterator it;
         for (it = collision_result.contacts.begin(); it != collision_result.contacts.end(); ++it)
         {
@@ -118,7 +128,7 @@ std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<plannin
     // {
     //     ROS_INFO("%s", n.c_str());
     // }
-    int dof = names.size() / robot_names.size();
+    int dof;
     std::vector<double> output_joints;
     for (int i = 0; i < names.size(); i+=dof)
     {
@@ -131,10 +141,11 @@ std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<plannin
             }
         }
         std::vector<double> curr_joints = curr_vertices[idx]->getJointPos();
+        dof = curr_joints.size();
         // ROS_INFO("curr_joints size %ld", curr_joints.size());
 
         // Add the collected joints into the joint_positions
-        for (int k=0; k < curr_joints.size(); ++k)
+        for (int k=0; k < dof; ++k)
         {
             output_joints.push_back(curr_joints.at(k));
         }
@@ -147,7 +158,7 @@ std::vector<double> MAMP_Helper::convertVerticesToJoints(std::shared_ptr<plannin
 // This function is used in the CT node to detect agent-agent collisions
 // The input is an unordered map, with the key being the agent id, and the value is the agent discretized path
 // static std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<unsigned int, std::vector<std::shared_ptr<Vertex>>> &paths)
-std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths)
+std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &paths, size_t &num_collisions)
 {
     // Use the global planning scene to step each agent (planning group) 
     // through their respective path (given input). At each timestep,
@@ -190,6 +201,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
     // Let's cycle through that many timesteps on each path, and feed those into planning scene accordingly.
     // We use the MAMP_Helper's own planning scene for this check
     std::vector<Collision> collisions;
+    bool collision_detected = false;
+    num_collisions = 0;
     for (int t = 0; t < longest_path_size; ++t)
     {
         // ROS_INFO("Inside 2nd for loop");
@@ -230,7 +243,7 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         std::shared_ptr<std::vector<std::pair<std::string, std::string>>> list_of_collisions = std::make_shared<std::vector<std::pair<std::string, std::string>>>();
         // ROS_INFO("About to start the collision check + 2");
         // bool test_val = detectVertexCollision(getPlanningScene(), check_vertex, list_of_collisions);
-        bool test_val = detectVertexCollision(planning_scene_, multi_robot_acm_, check_vertex, list_of_collisions);
+        bool test_val = detectVertexCollision(planning_scene_, multi_robot_acm_, check_vertex, list_of_collisions, !collision_detected);
         
         
         // ROS_INFO("Finished the collision check");
@@ -239,6 +252,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
         std::string arm_string = "arm";
         
         if (test_val == true){
+            collision_detected = true;
+            ++num_collisions;
             // Go through and create collision objects 
             for (auto collision_pair : *list_of_collisions)
             {
@@ -291,8 +306,8 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                 // }
 
                 // TODO: Add some way to check that both location1 and location2 got filled up
-                // collisions.push_back(first_collision);
-                return std::vector<Collision>{first_collision};
+                collisions.push_back(first_collision);
+                // return std::vector<Collision>{first_collision};
             }
 
             // ROS_ERROR("detectAgentAgentCollision: Never should get here. It means you had collisions but didn't return a Collision object from this class");

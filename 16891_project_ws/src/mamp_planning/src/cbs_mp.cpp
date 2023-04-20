@@ -6,7 +6,8 @@ CBSMP::CBSMP()
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
-  X_ = 0.99;
+  X_ = 0.95;
+  // mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
 void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
@@ -241,6 +242,7 @@ void CBSMP::printCollision(Collision c)
 
 bool CBSMP::replanCBS()
 {
+  auto start = std::chrono::high_resolution_clock::now();
   unsigned int node_id = 0;
   unsigned int N = 0;
   std::shared_ptr<CTNode> root = std::make_shared<CTNode>(++node_id, agents_, mamp_helper_);
@@ -258,6 +260,14 @@ bool CBSMP::replanCBS()
   int iteration=0;
   while (open_list_.size() > 0)
   {
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    if (diff.count() > 1000)
+    {
+      ROS_INFO("Failed to find path");
+      return false;
+    }
+
     iteration++;
     ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
     // ROS_WARN("Considering resample");
@@ -267,11 +277,11 @@ bool CBSMP::replanCBS()
       // TODO: resample routine
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
-      // #ifdef MP_EN
-      //   ROS_INFO("Using OMP");
-      //   omp_set_num_threads(MP_PROC_NUM);
-      //   #pragma omp parallel for
-      // #endif
+      #ifdef MP_EN
+        // ROS_INFO("Using OMP");
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+      #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
@@ -288,6 +298,7 @@ bool CBSMP::replanCBS()
     ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
     ROS_INFO("Number of collisions: %ld", node->numCollisions());
     ROS_INFO("Cost of Node: %f", node->getCost());
+    ROS_INFO("Node Id: %d", node->getId());
     // printConstraints(node->getConstraints());
     // ++N;
     if (node->numCollisions() == 0)
@@ -296,7 +307,18 @@ bool CBSMP::replanCBS()
       // ROS_INFO("No collisions!!!");
       // ROS_INFO("Number of Constraints: %ld", node->getConstraints().size());
       // printPaths(node);
+      end = std::chrono::high_resolution_clock::now();
+      diff = end - start;
+      ROS_INFO("Runtime: %f", diff.count());
       agents_ = node->getAgents();
+      ROS_INFO("Path Cost of Node: %f", node->getCost());
+      size_t prm_size = 0;
+      for (auto a : agents_)
+      {
+        prm_size += a.second->getPRM()->PRMgraph_.size();
+      }
+      ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
+
       return true;
     }
     ROS_INFO("Made it here");
@@ -307,14 +329,11 @@ bool CBSMP::replanCBS()
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
-
-    // #ifdef MP_EN
-    //     ROS_INFO("Using OMP");
-    //     omp_set_num_threads(MP_PROC_NUM);
-    //     #pragma omp parallel for
-    // #endif
-
-
+    #ifdef MP_EN
+        // ROS_INFO("Using OMP");
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+    #endif
     for (int i = 0; i < new_nodes.size(); ++i)
     {
       // ROS_WARN("Until here iteration %d", i);
@@ -333,6 +352,9 @@ bool CBSMP::replanCBS()
         new_nodes[i]->getPaths().insert({constraints[i].agent_id, new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDiscretizedPath()});
         new_nodes[i]->detectCollisions();
         new_nodes[i]->computeCost();
+        // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+        // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
+        // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         open_list_.insert(new_nodes[i]->getComparisonTuple(), new_nodes[i]);
       }
     }
@@ -429,4 +451,3 @@ bool CBSMP::replanCBS()
   // No solution!!!
   return false;
 }
-

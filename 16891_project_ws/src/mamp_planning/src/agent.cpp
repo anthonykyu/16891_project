@@ -2,7 +2,7 @@
 
 Agent::Agent(const std::string &robot_description, const std::string &robot_description_name,
              const std::string &base_frame, const std::string &tip_frame, std::string &id,
-             double &timestep, std::vector<double> start, std::vector<double> goal)
+             double &timestep, std::vector<std::vector<double>> waypoints)
 {
   if (!urdf_model_.initString(robot_description))
   {
@@ -50,11 +50,14 @@ Agent::Agent(const std::string &robot_description, const std::string &robot_desc
 
   timestep_ = timestep;
   // path_cost_ = std::numeric_limits<double>::infinity();
-  start_ = std::make_shared<Vertex>(start, 1);
-  goal_ = std::make_shared<Vertex>(goal, 0);
+  for (int i = 0; i < waypoints.size(); ++i)
+  {
+    waypoints_.push_back(std::make_shared<Vertex>(waypoints[i], i));
+  }
+  
   prm_ = std::make_shared<PRM>(planning_scene_, timestep_,
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
-                               start_, goal_, acm_);
+                               waypoints_, acm_);
   astar_ = std::make_shared<AStar>(timestep_);
 }
 
@@ -65,8 +68,9 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   upper_joint_limit_ = a->getUpperJointLimit();
   lower_joint_limit_ = a->getLowerJointLimit();
   joint_vel_limit_ = a->getJointVelLimit();
-  start_ = a->getStart();
-  goal_ = a->getGoal();
+  // start_ = a->getStart();
+  // goal_ = a->getGoal();
+  waypoints_ = a->getWaypoints();
   prm_ = a->getPRM();
   timestep_ = a->getTimestep();
   prm_path_ = a->getPRMPath();
@@ -88,11 +92,12 @@ bool Agent::computeSingleAgentPath(
   discretized_path_.clear();
 
   // ROS_INFO("Cleared discretized path: %ld", discretized_path_.size());
-  if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
+  // if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
+  if (astar_->computeWaypointPaths(waypoints_, constraints, max_constraint_time))
   {
     // ROS_INFO("Computed PRM Path!");
 
-    prm_path_ = astar_->getPRMPath(start_, goal_);
+    prm_path_ = astar_->getPRMPath(waypoints_[0], waypoints_[waypoints_.size()-1]);
     // ROS_INFO("Got PRM Path!");
     for (int i = 0; i < prm_path_.size()-1; ++i)
     {
@@ -183,15 +188,20 @@ std::vector<double> const &Agent::getLowerJointLimit()
   return lower_joint_limit_;
 }
 
-std::shared_ptr<Vertex> const &Agent::getStart()
+std::vector<std::shared_ptr<Vertex>> const &Agent::getWaypoints()
 {
-  return start_;
+  return waypoints_;
 }
 
-std::shared_ptr<Vertex> const &Agent::getGoal()
-{
-  return goal_;
-}
+// std::vector<std::shared_ptr<Vertex>> const &Agent::getStart()
+// {
+//   return start_;
+// }
+
+// std::vector<std::shared_ptr<Vertex>> const &Agent::getGoal()
+// {
+//   return goal_;
+// }
 
 urdf::Model const &Agent::getURDF()
 {
