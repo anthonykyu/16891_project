@@ -31,7 +31,23 @@ struct Collision
   double timestep; // This timestep is the INDEX IN THE CURRENT DISCRETIZED PATH for both agents
   bool location1_is_vertex {false};
   bool location2_is_vertex {false};
+
+  bool operator==(const Collision& rhs)
+  {
+    bool is_equal = agent_id1 == rhs.agent_id1;
+    is_equal = is_equal && agent_id2 == rhs.agent_id2;
+    is_equal = is_equal && location1 == rhs.location1;
+    is_equal = is_equal && location1_vertex == rhs.location1_vertex;
+    is_equal = is_equal && location2 == rhs.location2;
+    is_equal = is_equal && location2_vertex == rhs.location2_vertex;
+    is_equal = is_equal && timestep == rhs.timestep;
+    is_equal = is_equal && location1_is_vertex == rhs.location1_is_vertex;
+    is_equal = is_equal && location2_is_vertex == rhs.location2_is_vertex;
+    return is_equal;
+  }
 };
+
+
 
 // helper function file for detect_collisions function
 class MAMP_Helper

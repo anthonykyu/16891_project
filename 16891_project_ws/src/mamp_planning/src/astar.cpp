@@ -14,7 +14,7 @@ bool AStar::computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
   path_time_ = 0;
   for (int i = 0; i < waypoints.size()-1; ++i)
   {
-    if (i == waypoints.size()-1) 
+    if (i == waypoints.size()-2) 
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, true);
     else
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, false);
@@ -242,7 +242,8 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
 }
 
 bool AStar::isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge, double current_time,
-std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints)
+std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
+bool debug)
 {
   auto constraint = constraints.second.find(edge);
   auto constrained_vertex = constraints.first.find(vertex);
@@ -253,10 +254,14 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
     bool edge_constrained = constraint != constraints.second.end();
     if (edge_constrained)
     {
+      if (debug)
+        ROS_WARN("Edge_E Constraint Size: %ld", constraint->second.size());
       for (auto c : constraint->second)
       {
-        edge_constrained = ((c.time_step >= (current_time - timestep_/2.0) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_/2.0)) ||
-                          (c.time_step <= -1.0*(current_time - timestep_/2.0) && c.time_step >= -1.0*(current_time + edge->getTraversalTime() + timestep_/2.0)));
+        if (debug)
+          ROS_WARN("c.time_step: %f, current_time: %f, edge->getTraversalTime: %f, Address: %p", c.time_step, current_time, edge->getTraversalTime(), c.joint_pos_edge.get());
+        edge_constrained = ((c.time_step >= (current_time - timestep_) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_)) ||
+                          (c.time_step <= -1.0*(current_time - timestep_) && c.time_step >= -1.0*(current_time + edge->getTraversalTime() + timestep_)));
         if (edge_constrained)
         {
           // if (c.is_vertex_constraint)
@@ -290,6 +295,8 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
     bool vertex_constrained = constrained_vertex != constraints.first.end();
     if (vertex_constrained)
     {
+      if (debug)
+        ROS_WARN("Edge_V Constraint Size: %ld", constrained_vertex->second.size());
       for (auto c : constrained_vertex->second)
       {
         // ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
@@ -305,6 +312,8 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
         // {
         //   ROS_INFO("%f, ", j);
         // }
+        if (debug)
+          ROS_WARN("c.time_step: %f, current_time: %f, edge->getTraversalTime: %f, Address: %p", c.time_step, current_time, edge->getTraversalTime(), c.joint_pos_vertex.get());
         vertex_constrained = (c.time_step >= (current_time + edge->getTraversalTime() - timestep_) && c.time_step <= (current_time + edge->getTraversalTime() + timestep_)) ||
                             (c.time_step <= -1.0*(current_time + edge->getTraversalTime() - timestep_) && c.time_step >= -1.0*(current_time + edge->getTraversalTime() + timestep_));
         // ROS_INFO("Vertex Constrained: %d", vertex_constrained);
@@ -385,8 +394,12 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
     bool vertex_constrained = constrained_vertex != constraints.first.end();
     if (vertex_constrained)
     {
+      if (debug)
+        ROS_WARN("Vertex_V Constraint Size: %ld", constrained_vertex->second.size());
       for (auto c : constrained_vertex->second)
       {
+        if (debug)
+          ROS_WARN("c.time_step: %f, current_time: %f, Address: %p", c.time_step, current_time, c.joint_pos_vertex.get());
         vertex_constrained = (c.time_step >= (current_time) && c.time_step <= (current_time + 2.0*timestep_)) ||
                             (c.time_step <= -1.0*(current_time) && c.time_step >= -1.0*(current_time + 2.0*timestep_));
         if (vertex_constrained)

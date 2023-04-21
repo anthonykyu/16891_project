@@ -53,6 +53,102 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   astar_ = std::make_shared<AStar>(timestep_);
 }
 
+bool Agent::checkPath(Constraint new_constraint, std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints)
+{
+  auto temp_prm_path = astar_->getPRMPath(waypoints_[0], waypoints_[waypoints_.size()-1]);
+  // ROS_INFO("Got PRM Path!");
+  double current_time = 0;
+  bool isConstrained = false;
+
+  auto v_constraints = constraints.first;
+  auto e_constraints = constraints.second;
+  ROS_INFO("Vertex Constraints");
+  for (auto x : v_constraints)
+  {
+    ROS_INFO("Address %p", x.first.get());
+  }
+  ROS_INFO("Edge Constraints");
+  for (auto x : e_constraints)
+  {
+    ROS_INFO("Address %p", x.first.get());
+  }
+
+  if (new_constraint.is_vertex_constraint)
+  {
+    if (constraints.first.find(new_constraint.joint_pos_vertex) == constraints.first.end())
+    {
+      ROS_INFO("New Vertex Constraint NOT FOUND!!!");
+    }
+    else
+    {
+      ROS_INFO("New Vertex Constraint FOUND!!!");
+      for (auto c : constraints.first.find(new_constraint.joint_pos_vertex)->second)
+      {
+        ROS_INFO("%f, %s, %p", c.time_step, c.agent_id.c_str(), c.joint_pos_vertex.get());
+      }
+    }
+  }
+  else
+  {
+    if (constraints.second.find(new_constraint.joint_pos_edge) == constraints.second.end())
+    {
+      ROS_INFO("New Edge Constraint NOT FOUND!!!");
+    }
+    else
+    {
+      ROS_INFO("New Edge Constraint FOUND!!!");
+      for (auto c : constraints.second.find(new_constraint.joint_pos_edge)->second)
+      {
+        ROS_INFO("%f, %s, %p", c.time_step, c.agent_id.c_str(), c.joint_pos_edge.get());
+      }
+    }
+  }
+
+  for (int i = 0; i < temp_prm_path.size()-1; ++i)
+  {
+    if (temp_prm_path[i]->getId() != temp_prm_path[i+1]->getId())
+    {
+      if (new_constraint.time_step <= current_time + prm_path_[i]->getEdges().find(prm_path_[i+1])->second->getTraversalTime() && new_constraint.time_step >= current_time)
+      {
+        ROS_ERROR("SHOULD TRIGGER, EDGE");
+      }
+
+      isConstrained = astar_->isConstrained(temp_prm_path[i+1], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, current_time, constraints, true);
+      if (isConstrained)
+      {
+        ROS_ERROR("IS CONSTRAINED AT TIME %f", current_time);
+        return false;
+      }
+      // std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
+      current_time += prm_path_[i]->getEdges().find(prm_path_[i+1])->second->getTraversalTime();
+    }
+    else
+    {
+      if (new_constraint.time_step <= current_time + timestep_ && new_constraint.time_step >= current_time)
+      {
+        ROS_ERROR("SHOULD TRIGGER, VERTEX");
+      }
+      isConstrained = astar_->isConstrained(temp_prm_path[i+1], nullptr, current_time, constraints, true);
+      if (isConstrained)
+      {
+        ROS_ERROR("IS CONSTRAINED AT TIME %f", current_time);
+        return false;
+      }
+      current_time += timestep_;
+    }
+  }
+  ROS_INFO("Discretized Path");
+  for (int i = std::max((int)(new_constraint.time_step/timestep_) - 20, 0); i < std::min((int)(new_constraint.time_step/timestep_) + 20, (int)discretized_path_.size()); ++i)
+  {
+    if (discretized_path_[i]->getPRMEdge() != nullptr)
+      ROS_INFO("%d, %f, %f" ,i, discretized_path_[i]->getJointPos()[0],discretized_path_[i]->getJointPos()[1]);
+    else
+      ROS_WARN("%d, %f, %f" ,i, discretized_path_[i]->getJointPos()[0],discretized_path_[i]->getJointPos()[1]);
+  }
+  return true;
+}
+
+
 bool Agent::computeSingleAgentPath(
   std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>,
   std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints, 
@@ -76,6 +172,8 @@ bool Agent::computeSingleAgentPath(
       // {
       //   // ROS_INFO("Joint Pos %d: %f versus %f", j, prm_path_[i]->getJointPos()[j], prm_path_[i+1]->getJointPos()[j]);
       // }
+      if (prm_path_[i]->getPRMEdge() != nullptr)
+        ROS_ERROR("THATS NOT SUPPOSED TO BE HERE");
       if (prm_path_[i]->getId() != prm_path_[i+1]->getId())
       {
         // ROS_INFO("Got into the if statement");

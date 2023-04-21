@@ -45,10 +45,11 @@ void CTNode::addConstraint(Constraint c)
   }
 }
 
-Collision &CTNode::getNextCollision()
+std::vector<Collision> &CTNode::getCollisions()
 {
-  if (collisions_.size() > 0)
-    return collisions_[0];
+  // if (collisions_.size() > 0)
+  //   return collisions_[0];
+  return collisions_;
 }
 
 void CTNode::computeCost()

@@ -41,6 +41,7 @@ public:
     std::vector<std::shared_ptr<Vertex>> getPRMPath();
     std::vector<std::shared_ptr<Vertex>> getDiscretizedPath();
     // double getPathCost();
+    bool checkPath(Constraint new_constraint, std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints);
     std::shared_ptr<robot_model_loader::RobotModelLoader> const &getRobotModelLoader();
     std::shared_ptr<moveit::core::RobotModelPtr> const &getKinematicModel();
     // collision_detection::AllowedCollisionMatrix const &getACM();

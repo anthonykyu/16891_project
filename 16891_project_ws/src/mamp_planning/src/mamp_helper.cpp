@@ -343,6 +343,7 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
             // }
             // last_vertex->setId(discrete_steps[discrete_steps.size()-1]->getId());
             edge->setDivisions(temp_divisions);
+            last_vertex->setPRMEdge(nullptr);
             return std::pair<bool, std::shared_ptr<Vertex>>(true, last_vertex);
         }
         else

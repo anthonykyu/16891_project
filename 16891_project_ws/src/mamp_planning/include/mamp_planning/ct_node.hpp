@@ -13,7 +13,7 @@ public:
     CTNode(unsigned int id, std::shared_ptr<CTNode> &n);
     //TODO: add constraints for each agent
     void addConstraint(Constraint c);
-    Collision &getNextCollision();
+    std::vector<Collision> &getCollisions();
     void computeCost();
     std::vector<Constraint> &getConstraints();
     std::unordered_map<std::string, std::vector<std::shared_ptr<Vertex>>> &getPaths();

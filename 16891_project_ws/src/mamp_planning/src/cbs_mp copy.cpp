@@ -182,6 +182,8 @@ bool CBSMP::replanCBS()
       return false;
     }
 
+    iteration++;
+    ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
     
     if (shouldResample(N))
     {
@@ -189,40 +191,30 @@ bool CBSMP::replanCBS()
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
       #ifdef MP_EN
+        // ROS_INFO("Using OMP");
         omp_set_num_threads(MP_PROC_NUM);
         #pragma omp parallel for
       #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
-        // a[i]->computeSingleAgentPath();
       }
-      open_list_.clear();
-      // iteration = 0;
-      N = 0;
-      node_id = 0;
-      root = std::make_shared<CTNode>(++node_id, agents_, mamp_helper_);
-      for (auto a : agents_)
-      {
-        root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
-      }
-      root->detectCollisions();
-      root->computeCost();
-      open_list_.insert(root->getComparisonTuple(), root);
+      // for (auto a : agents_)
+      // {
+      //   a.second->getPRM()->expandPRM();
+      // }
       ++S_;
     }
-    
-    ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration++);
     std::shared_ptr<CTNode> node = open_list_.pop().second;
     ++N;
 
-    ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
-    ROS_INFO("Number of collisions: %ld", node->numCollisions());
-    ROS_INFO("Cost of Node: %f", node->getCost());
-    ROS_INFO("Node Id: %d", node->getId());
+    // ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
+    // ROS_INFO("Number of collisions: %ld", node->numCollisions());
+    // ROS_INFO("Cost of Node: %f", node->getCost());
+    // ROS_INFO("Node Id: %d", node->getId());
     // printConstraints(node->getConstraints());
     // ++N;
-    if (node->numCollisions() == 0 || node->getCollisions().size() == 0)
+    if (node->numCollisions() == 0)
     {
       // TODO: publish path and return
       // ROS_INFO("No collisions!!!");
@@ -242,10 +234,10 @@ bool CBSMP::replanCBS()
 
       return true;
     }
-    Collision c = node->getCollisions()[0];
+    Collision c = node->getNextCollision();
     // ROS_INFO("Collision: Agent 1 - %s, Agent 2 - %s, IsVertex: %d, %d, time: %f", c.agent_id1.c_str(), c.agent_id2.c_str(), c.location1_is_vertex, c.location2_is_vertex, c.timestep);
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
-    printCollision(c);
+    // printCollision(c);
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
@@ -265,25 +257,9 @@ bool CBSMP::replanCBS()
         new_nodes[i]->getPaths().insert({constraints[i].agent_id, new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDiscretizedPath()});
         new_nodes[i]->detectCollisions();
         new_nodes[i]->computeCost();
-        ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
-        if (new_nodes[i]->getCollisions().size() > 0)
-        {
-          Collision new_c = new_nodes[i]->getCollisions()[0];
-          if (new_c == c)
-          {
-            ROS_WARN("SAME SHIT");
-            printConstraints(std::vector<Constraint> {constraints[i]});
-            // printConstraints(std::vector<Constraint> {new_nodes[i]->getConstraints()[new_nodes[i]->getConstraints().size()-1]});
-            printCollision(new_nodes[i]->getCollisions()[0]);
-            if (constraints[i].is_vertex_constraint)
-              ROS_WARN("New Vertex Constraint %p", constraints[i].joint_pos_vertex.get());
-            else
-              ROS_WARN("New Edge Constraint %p", constraints[i].joint_pos_edge.get());
-            new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->checkPath(constraints[i], MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id));
-          }
-        }
-        ROS_INFO("Cost: %f", new_nodes[i]->getCost());
-        ROS_INFO("Node Id: %d", new_nodes[i]->getId());
+        // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+        // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
+        // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         open_list_.insert(new_nodes[i]->getComparisonTuple(), new_nodes[i]);
       }
     }
