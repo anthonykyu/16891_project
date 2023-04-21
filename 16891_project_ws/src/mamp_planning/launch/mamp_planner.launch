@@ -19,8 +19,10 @@
 
 	<!-- Arms, arm-only-world -->
 	<param name="world_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_1.urdf" />
+	<param name="world_arm_1_test" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_1_test.urdf" />
 	<param name="world_arm_2" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_2.urdf" />
 	<param name="world_arm_3" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_3.urdf" />
+	<param name="world_arm_3_test" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_3_test.urdf" />
 	<param name="world_arm_4" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_4.urdf" />
 	<param name="world_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_6.urdf" />
 
