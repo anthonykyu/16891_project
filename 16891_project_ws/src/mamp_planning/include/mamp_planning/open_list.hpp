@@ -78,7 +78,7 @@ public:
   // top - returns top element
   std::pair<Ttuple, std::shared_ptr<T>> top();
    // pop element - removes a specific element and returns it
-  std::pair<Ttuple, std::shared_ptr<T>> pop_element(std::shared_ptr<T> t);
+  std::pair<Ttuple, std::shared_ptr<T>> remove(std::shared_ptr<T> t);
 
 
   // checks to see if vertex is already in the open list, if so, replace it
@@ -174,7 +174,7 @@ std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::top()
 // }
 
 template <typename Ttuple, class T, typename hashT>
-std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop_element(std::shared_ptr<T> element)
+std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::remove(std::shared_ptr<T> element)
 {
   if (check_list_.size() == 0 || ordered_list_.size() == 0)
   {
