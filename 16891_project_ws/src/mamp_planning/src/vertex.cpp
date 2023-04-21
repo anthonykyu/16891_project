@@ -153,12 +153,4 @@ std::shared_ptr<Edge> const &Vertex::getPRMEdge()
   return prm_edge_;
 }
 
-std::unordered_map<std::shared_ptr<Vertex>, std::shared_ptr<Edge>> const &Vertex::getChangedEdges()
-{
-  return changed_edges_;
-}
 
-bool Vertex::checkEdgeChange(std::shared_ptr<Vertex> vertex)
-{
-  return changed_edges_.find(vertex) != changed_edges_.end();
-}

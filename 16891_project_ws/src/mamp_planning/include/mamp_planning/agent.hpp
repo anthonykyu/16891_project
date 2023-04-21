@@ -9,6 +9,7 @@
 
 #include "mamp_planning/astar.hpp"
 #include "mamp_planning/prm.hpp"
+#include "mamp_planning/dstar_lite.hpp"
 #include <moveit/robot_model_loader/robot_model_loader.h>
 #include <moveit/planning_scene/planning_scene.h>
 #include <moveit/kinematic_constraints/utils.h>
@@ -57,6 +58,7 @@ private:
     // std::vector<std::shared_ptr<Vertex>> goal_;
     std::shared_ptr<PRM> prm_;
     std::shared_ptr<AStar> astar_;
+    std::shared_ptr<DStarLite> dstarlite_;
     double timestep_;
     std::vector<std::shared_ptr<Vertex>> prm_path_;
     std::vector<std::shared_ptr<Vertex>> discretized_path_;
