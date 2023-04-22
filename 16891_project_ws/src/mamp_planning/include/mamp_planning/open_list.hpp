@@ -221,7 +221,7 @@ bool OpenList<ComparisonTuple, IDTuple, T, hashT>::insert(ComparisonTuple ct, ID
   bool success = true;
   if (contains(idt))
   {
-    ordered_list_.erase(ct);
+    ordered_list_.erase(tuple_map_[idt]);
     tuple_map_.erase(idt);
     success = success && tuple_map_.insert({idt, ct}).second;
     success = success && ordered_list_.insert({ct, idt}).second;

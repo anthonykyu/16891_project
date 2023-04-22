@@ -170,7 +170,7 @@ bool CBSMP_DSTARLITE::replanCBS()
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   root->computeCost();
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
-  open_list_.insert(root->getComparisonTuple(), root);
+  open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
   int iteration=0;
   while (open_list_.size() > 0)
   {
@@ -191,14 +191,26 @@ bool CBSMP_DSTARLITE::replanCBS()
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
       #ifdef MP_EN
-        // ROS_INFO("Using OMP");
         omp_set_num_threads(MP_PROC_NUM);
         #pragma omp parallel for
       #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
+        // a[i]->computeSingleAgentPath();
       }
+      open_list_.clear();
+      // iteration = 0;
+      N = 0;
+      node_id = 0;
+      root = std::make_shared<CTNode>(++node_id, agents_, mamp_helper_);
+      for (auto a : agents_)
+      {
+        root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
+      }
+      root->detectCollisions();
+      root->computeCost();
+      open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
       ++S_;
     }
     std::shared_ptr<CTNode> node = open_list_.pop().second;

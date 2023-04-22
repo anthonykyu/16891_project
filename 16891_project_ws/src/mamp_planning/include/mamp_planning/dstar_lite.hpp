@@ -42,7 +42,7 @@ private:
 
     // the tuple contains: key, id, time
     // I want an open list that contains a tuple of key(tuple of 2), id and vertex and a hash function for the tuple
-    OpenList<std::tuple<double, double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, double, unsigned int>>> open_list_;
+    OpenList<std::tuple<double, double, unsigned int>, std::tuple<unsigned int>, Vertex, hash_tuple::hash<std::tuple<unsigned int>>> open_list_;
     std::unordered_map<unsigned int, std::shared_ptr<Vertex>>  closed_list_;
     std::unordered_map<unsigned int, double> g_;
     std::unordered_map<unsigned int, double> h_;

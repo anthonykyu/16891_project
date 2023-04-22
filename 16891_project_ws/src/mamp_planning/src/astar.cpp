@@ -14,7 +14,7 @@ bool AStar::computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
   path_time_ = 0;
   for (int i = 0; i < waypoints.size()-1; ++i)
   {
-    if (i == waypoints.size()-1) 
+    if (i == waypoints.size()-2) 
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, true);
     else
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, false);
@@ -199,13 +199,17 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
   while (open_list_h.size() != 0)
   {
     std::shared_ptr<Vertex> v = std::get<2>(open_list_h.pop());
+    // ROS_INFO("open list size: %ld", open_list_h.size());
+    // ROS_INFO("v is null? %d", v == nullptr);
     if (closed_list_h.insert(v).second)
     {
       // ROS_INFO("Inserted vertex into closed list, getting neighbors now" );
       // ROS_INFO("Number of neighbors: %ld", v->getEdges().size());
+      // v->getEdges();
       for (auto neighbor : v->getEdges())
       {
-        // ROS_INFO("closed list_h size %d", closed_list_h.size());
+        // ROS_INFO("Inserted vertex into closed list, getting neighbors now" );
+        // ROS_INFO("closed list_h size %ld", closed_list_h.size());
         // ROS_INFO("isValid value %d", isValid(neighbor.first, neighbor.second));
         if (closed_list_h.find(neighbor.first) == closed_list_h.end() &&
             isValid(neighbor.first, neighbor.second))  // Valid edge is not in the open list yet
@@ -225,22 +229,25 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
             {
               h_.erase(neighbor.first->getId());
               h_.insert({neighbor.first->getId(), new_h});
+              // ROS_INFO("Increasing open list 1");
               open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
             }
           }
           else // Seeing this neighbor for the first time
           {
-            // ROS_INFO("Increasing open list");
             double new_h = h_.find(v->getId())->second + neighbor.second->getTraversalTime();
             h_.insert({neighbor.first->getId(), new_h});
+            // ROS_INFO("Increasing open list");
             open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
           }
           // ROS_INFO("open list_h size %d", open_list_h.size());
           
         }
       }
+      // ROS_INFO("After for loop" );
     }
   }
+  // ROS_WARN("Done with heuristics");
   return max_time;
 }
 

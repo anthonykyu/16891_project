@@ -103,18 +103,18 @@ bool DStarLite::compareKeys(std::tuple<double, double> key1, std::tuple<double, 
 
 double DStarLite::computeHeuristics(std::shared_ptr<Vertex> start)
 {
-  OpenList<std::tuple<double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int>>> open_list_h;
+  OpenList<std::tuple<double, unsigned int>, std::tuple<unsigned int>, Vertex, hash_tuple::hash<std::tuple<unsigned int>>> open_list_h;
 
   std::unordered_set<std::shared_ptr<Vertex>> closed_list_h;
   std::unordered_set<std::shared_ptr<Edge>> closed_edge_list;
   double max_time = 0;
-  open_list_h.insert(std::make_tuple(0, start->getId()), start);
+  open_list_h.insert(std::make_tuple(0, start->getId()), std::make_tuple(start->getId()), start);
   // ROS_INFO("goal id %d", goal->getId());
   h_.insert({start->getId(), 0});
 
   while (open_list_h.size() != 0)
   {
-    std::shared_ptr<Vertex> v = open_list_h.pop().second;
+    std::shared_ptr<Vertex> v = std::get<2>(open_list_h.pop());
     if (closed_list_h.insert(v).second)
     {
       // ROS_INFO("Inserted vertex into closed list, getting neighbors now" );
@@ -141,7 +141,7 @@ double DStarLite::computeHeuristics(std::shared_ptr<Vertex> start)
             {
               h_.erase(neighbor.first->getId());
               h_.insert({neighbor.first->getId(), new_h});
-              open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), neighbor.first);
+              open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
             }
           }
           else // Seeing this neighbor for the first time
@@ -149,7 +149,7 @@ double DStarLite::computeHeuristics(std::shared_ptr<Vertex> start)
             // ROS_INFO("Increasing open list");
             double new_h = h_.find(v->getId())->second + getEdgeCost(neighbor.second);
             h_.insert({neighbor.first->getId(), new_h});
-            open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), neighbor.first);
+            open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
           }
           // ROS_INFO("open list_h size %d", open_list_h.size());
         }
@@ -180,7 +180,7 @@ void DStarLite::initialize()
   // set the rhs value of the goal to 0
   rhs_[goal_->getId()] = 0;
   // insert the goal into the open list
-  open_list_.insert(std::make_tuple(std::get<0>(calculateKey(goal_)), std::get<1>(calculateKey(goal_)), goal_->getId()), goal_);
+  open_list_.insert(std::make_tuple(std::get<0>(calculateKey(goal_)), std::get<1>(calculateKey(goal_)), goal_->getId()), std::make_tuple(goal_->getId()), goal_);
 }
 
 void DStarLite::updateVertex(std::shared_ptr<Vertex> u)
@@ -189,12 +189,12 @@ void DStarLite::updateVertex(std::shared_ptr<Vertex> u)
   if (g_[u->getId()] != rhs_[u->getId()])
   {
     // insert the vertex into the open list
-    open_list_.insert(std::make_tuple(std::get<0>(calculateKey(u)), std::get<1>(calculateKey(u)), u->getId()), u);
+    open_list_.insert(std::make_tuple(std::get<0>(calculateKey(u)), std::get<1>(calculateKey(u)), u->getId()), std::make_tuple(u->getId()), u);
   }
   else
   {
     // remove the vertex from the open list
-    open_list_.remove(u);
+    open_list_.remove(u->getId());
   }
 
   //   if (u->getId() != goal_->getId())
@@ -259,7 +259,7 @@ void DStarLite::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Ve
   // get the key of the vertex at the top of the open list
   auto u_top = open_list_.top();
   // get the key of u_top from the open list
-  std::tuple<double, double> k_old = std::make_tuple(std::get<0>(u_top.first), std::get<1>(u_top.first));
+  std::tuple<double, double> k_old = std::make_tuple(std::get<0>(std::get<0>(u_top)), std::get<1>(std::get<0>(u_top)));
   // while tjere is a vertex in the open list with a key less than the start vertex or the rhs value of the start vertex is not equal to the g value of the start vertex
   // double current_time = std::get<2>(u_top.first);
   double rhs_start = rhs_[start_->getId()];
@@ -267,16 +267,16 @@ void DStarLite::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Ve
   std::tuple<double, double> start_key = calculateKey(start);
   while (compareKeys(k_old, start_key) || rhs_start > g_start)
   {
-    std::tuple<double, double> k_new = calculateKey(u_top.second);
-    double g_old = g_[u_top.second->getId()];
-    std::shared_ptr<Vertex> u = open_list_.pop().second;
+    std::tuple<double, double> k_new = calculateKey(std::get<2>(u_top));
+    double g_old = g_[std::get<2>(u_top)->getId()];
+    std::shared_ptr<Vertex> u = std::get<2>(open_list_.pop());
     // double g_u = g_[u->getId()];
     double rhs_u = rhs_[u->getId()];
     if (compareKeys(k_old, k_new)) // k_old < k_new
       // erase vertex with old key
       // open_list_.erase(std::make_tuple(k_old, u.second->getId(), current_time));
       // insert the vertex with the new key into the open list
-      open_list_.insert(std::make_tuple(std::get<0>(k_new), std::get<1>(k_new), u->getId()), u);
+      open_list_.insert(std::make_tuple(std::get<0>(k_new), std::get<1>(k_new), u->getId()), std::make_tuple(u->getId()), u);
 
     else if (g_[u->getId()] > rhs_[u->getId()])
     {
@@ -284,7 +284,7 @@ void DStarLite::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Ve
       g_[u->getId()] = rhs_[u->getId()];
       // insert this into g_
       // erase the vertex from the open list
-      open_list_.remove(u);
+      open_list_.remove(u->getId());
       // for each predecessor of u which are all the nodes at the previous time step
       std::shared_ptr<Vertex> pred = u->getParent();
       if (u != goal)

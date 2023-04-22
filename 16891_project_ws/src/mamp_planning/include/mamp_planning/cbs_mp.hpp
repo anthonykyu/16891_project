@@ -32,7 +32,7 @@ class CBSMP
     double X_;
     double alpha_;
     std::unordered_map<std::string, std::shared_ptr<Agent>> agents_;
-    OpenList<std::tuple<double, size_t, unsigned int>, std::tuple<unsigned int>, CTNode, hash_tuple::hash<std::tuple<double, size_t, unsigned int>>> open_list_;
+    OpenList<std::tuple<double, size_t, unsigned int>, std::tuple<unsigned int>, CTNode, hash_tuple::hash<std::tuple<unsigned int>>> open_list_;
     std::shared_ptr<MAMP_Helper> mamp_helper_;
 };
 

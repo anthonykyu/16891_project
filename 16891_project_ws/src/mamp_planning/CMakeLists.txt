@@ -181,6 +181,7 @@ add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/prm.cpp
                                     src/viz_tools.cpp
                                     src/mamp_helper.cpp
+                                    src/dstar_lite.cpp
                                     )
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})

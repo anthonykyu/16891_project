@@ -84,7 +84,7 @@ void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string 
     }
     std::vector<std::string> entries_check;
     multi_robot_acm->getAllEntryNames(entries_check);
-    ROS_WARN("The complete multi robot ACM has this many entries: %d", entries_check.size());
+    ROS_WARN("The complete multi robot ACM has this many entries: %ld", entries_check.size());
     for (auto entry : entries_check)
     {
       ROS_WARN("%s", entry.c_str());
@@ -273,23 +273,30 @@ bool CBSMP::replanCBS()
     // ROS_WARN("Considering resample");
     if (shouldResample(N))
     {
-      // ROS_WARN("Doing the resample");
       // TODO: resample routine
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
       #ifdef MP_EN
-        // ROS_INFO("Using OMP");
         omp_set_num_threads(MP_PROC_NUM);
         #pragma omp parallel for
       #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
+        // a[i]->computeSingleAgentPath();
       }
-      // for (auto a : agents_)
-      // {
-      //   a.second->getPRM()->expandPRM();
-      // }
+      open_list_.clear();
+      // iteration = 0;
+      N = 0;
+      node_id = 0;
+      root = std::make_shared<CTNode>(++node_id, agents_, mamp_helper_);
+      for (auto a : agents_)
+      {
+        root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
+      }
+      root->detectCollisions();
+      root->computeCost();
+      open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
       ++S_;
     }
     std::shared_ptr<CTNode> node = std::get<2>(open_list_.pop());
@@ -352,9 +359,9 @@ bool CBSMP::replanCBS()
         new_nodes[i]->getPaths().insert({constraints[i].agent_id, new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDiscretizedPath()});
         new_nodes[i]->detectCollisions();
         new_nodes[i]->computeCost();
-        // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
-        // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
-        // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
+        ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+        ROS_INFO("Cost: %f", new_nodes[i]->getCost());
+        ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }

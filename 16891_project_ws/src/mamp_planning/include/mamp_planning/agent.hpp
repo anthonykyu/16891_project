@@ -7,6 +7,7 @@
 #include <urdf_model/model.h>
 #include <urdf/model.h>
 
+#include "mamp_planning/dstar_lite.hpp"
 #include "mamp_planning/astar.hpp"
 #include "mamp_planning/prm.hpp"
 #include <moveit/robot_model_loader/robot_model_loader.h>
@@ -57,6 +58,7 @@ private:
     // std::vector<std::shared_ptr<Vertex>> goal_;
     std::shared_ptr<PRM> prm_;
     std::shared_ptr<AStar> astar_;
+    // std::shared_ptr<DStarLite> dstar_lite_;
     double timestep_;
     std::vector<std::shared_ptr<Vertex>> prm_path_;
     std::vector<std::shared_ptr<Vertex>> discretized_path_;
