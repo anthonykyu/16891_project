@@ -29,7 +29,6 @@ Agent::Agent(const std::string &robot_description, const std::string &robot_desc
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
                                waypoints_);
   astar_ = std::make_shared<AStar>(timestep_);
-  dstarlite_ = std::make_shared<DStarLite>(prm_, timestep_);
 }
 
 Agent::Agent(std::shared_ptr<Agent> &a)
@@ -51,7 +50,6 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   kinematic_model_ = a->getKinematicModel();
   planning_scene_ = a->getPlanningScene();
   // acm_ = a->getACM();
-  dstarlite_ = std::make_shared<DStarLite>(prm_, timestep_);
   astar_ = std::make_shared<AStar>(timestep_);
 }
 

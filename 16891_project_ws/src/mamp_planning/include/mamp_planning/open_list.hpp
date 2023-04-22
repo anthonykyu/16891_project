@@ -66,92 +66,97 @@ namespace hash_tuple
   };
 }
 
-template <typename Ttuple, class T, typename hashT>
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
 class OpenList
 {
 public:
   OpenList();
 
   // pop - removes top element and returns it
-  std::pair<Ttuple, std::shared_ptr<T>> pop();
+  std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> pop();
 
   // top - returns top element
-  std::pair<Ttuple, std::shared_ptr<T>> top();
+  std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> top();
    // pop element - removes a specific element and returns it
-  std::pair<Ttuple, std::shared_ptr<T>> remove(std::shared_ptr<T> t);
+  // std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> remove(std::shared_ptr<T> t);
+
+  void remove(IDTuple t);
 
 
   // checks to see if vertex is already in the open list, if so, replace it
   // use this function to also reorder the position of the vertex within the list
-  bool insert(Ttuple t, std::shared_ptr<T> v);
+  bool insert(ComparisonTuple ct, IDTuple idt, std::shared_ptr<T> v);
 
   // contains - checks to see if vertex is in open list
-  bool contains(Ttuple t);
+  bool contains(IDTuple t);
 
   size_t size();
 
   void clear();
 
 private:
-  std::unordered_map<Ttuple, std::shared_ptr<T>, hashT> check_list_;
-  std::map<Ttuple, std::shared_ptr<T>> ordered_list_;
+  std::unordered_map<IDTuple, std::shared_ptr<T>, hashT> check_list_;
+  std::unordered_map<IDTuple, ComparisonTuple, hashT> tuple_map_;
+  std::map<ComparisonTuple, IDTuple> ordered_list_;
 };
 
 // #include "mamp_planning/open_list.hpp"
 
-template <typename Ttuple, class T, typename hashT>
-OpenList<Ttuple, T, hashT>::OpenList()
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+OpenList<ComparisonTuple, IDTuple, T, hashT>::OpenList()
 {
 }
 
-template <typename Ttuple, class T, typename hashT>
-void OpenList<Ttuple, T, hashT>::clear()
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+void OpenList<ComparisonTuple, IDTuple, T, hashT>::clear()
 {
   check_list_.clear();
   ordered_list_.clear();
+  tuple_map_.clear();
 }
 
 // pop - removes top element and returns it
-template <typename Ttuple, class T, typename hashT>
-std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop()
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> OpenList<ComparisonTuple, IDTuple, T, hashT>::pop()
 {
   if (check_list_.size() == 0 || ordered_list_.size() == 0)
   {
-    return std::pair<Ttuple, std::shared_ptr<T>>();
+    return std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>>();
   }
   auto s = ordered_list_.begin();
-  std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+  std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> v = std::make_tuple(s->first, s->second, check_list_[s->second]);
   ordered_list_.erase(s);
-  check_list_.erase(s->first);
+  check_list_.erase(s->second);
+  tuple_map_.erase(s->second);
   return v;
 }
 
 // top - returns top element
-template <typename Ttuple, class T, typename hashT>
-std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::top()
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> OpenList<ComparisonTuple, IDTuple, T, hashT>::top()
 {
   if (check_list_.size() == 0 || ordered_list_.size() == 0)
   {
-    return std::pair<Ttuple, std::shared_ptr<T>>();
+    return std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>>();
   }
   auto s = ordered_list_.begin();
-  std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+  std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> v = std::make_tuple(s->first, s->second, check_list_[s->second]);
   return v;
 }
 
 //pop - removes a specific element and returns it
-// template <typename Ttuple, class T, typename hashT>
-// std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::pop_element(std::shared_ptr<T> element)
+// template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+// std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>> OpenList<ComparisonTuple, typename IDTuple, T, hashT>::pop_element(std::shared_ptr<T> element)
 // {
 //   if (check_list_.size() == 0 || ordered_list_.size() == 0)
 //   {
-//     return std::pair<Ttuple, std::shared_ptr<T>>();
+//     return std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>>();
 //   }
 //   // find the element 'element'  in the ordered list 
 //   if (contains(element))
 //   {
 //     auto s = check_list_.find(element);
-//     std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+//     std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
 //     ordered_list_.erase(s);
 //     check_list_.erase(s->first);
 //     return v;
@@ -161,81 +166,95 @@ std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::top()
 
   // if (ordered_list_.find(element) == ordered_list_.end())
   // {
-  //   return std::pair<Ttuple, std::shared_ptr<T>>();
+  //   return std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>>();
   // }
   // else 
   // {
   //   auto s = ordered_list_.find(element);
-  //   std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
+  //   std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>> v = std::make_pair(s->first, s->second);
   //   ordered_list_.erase(s);
   //   check_list_.erase(s->first);
   //   return v;
   // }
 // }
 
-template <typename Ttuple, class T, typename hashT>
-std::pair<Ttuple, std::shared_ptr<T>> OpenList<Ttuple, T, hashT>::remove(std::shared_ptr<T> element)
-{
-  if (check_list_.size() == 0 || ordered_list_.size() == 0)
-  {
-    return std::pair<Ttuple, std::shared_ptr<T>>();
-  }
+// template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+// std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> OpenList<ComparisonTuple, IDTuple, T, hashT>::remove(IDTuple t)
+// {
+//   if (check_list_.size() == 0 || ordered_list_.size() == 0)
+//   {
+//     return std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>>();
+//   }
 
-  // loop over the ordered list and find the key corresponding to the input element
-  Ttuple key;
-  for (auto it = ordered_list_.begin(); it != ordered_list_.end(); ++it)
-  {
-    if ((it->second)->getId() == element->getId()) // compare the std::shared_ptr<T> values
-    {
-      key = it->first; // save the corresponding key
-      break;
-    }
-  }
+//   // loop over the ordered list and find the key corresponding to the input element
+//   ComparisonTuple, IDTuple key;
+//   for (auto it = ordered_list_.begin(); it != ordered_list_.end(); ++it)
+//   {
+//     if ((it->second)->getId() == element->getId()) // compare the std::shared_ptr<T> values
+//     {
+//       key = it->first; // save the corresponding key
+//       break;
+//     }
+//   }
 
-  // check if we found a valid key
-  if (key == Ttuple())
-  {
-    return std::pair<Ttuple, std::shared_ptr<T>>();
-  }
-  else 
-  {
-    // remove the key-value pair from the ordered list and check list
-    std::pair<Ttuple, std::shared_ptr<T>> v = std::make_pair(key, ordered_list_[key]);
-    ordered_list_.erase(key);
-    check_list_.erase(key);
-    return v;
-  }
-}
+//   // check if we found a valid key
+//   if (key == ComparisonTuple, typename IDTuple())
+//   {
+//     return std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>>();
+//   }
+//   else 
+//   {
+//     // remove the key-value pair from the ordered list and check list
+//     std::pair<ComparisonTuple, typename IDTuple, std::shared_ptr<T>> v = std::make_pair(key, ordered_list_[key]);
+//     ordered_list_.erase(key);
+//     check_list_.erase(key);
+//     return v;
+//   }
+// }
 
 
 // checks to see if vertex is already in the open list, if so, replace it, if not, insert
 // use this function to also reorder the position of the vertex within the list
-template <typename Ttuple, class T, typename hashT>
-bool OpenList<Ttuple, T, hashT>::insert(Ttuple t, std::shared_ptr<T> v)
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+bool OpenList<ComparisonTuple, IDTuple, T, hashT>::insert(ComparisonTuple ct, IDTuple idt, std::shared_ptr<T> v)
 {
   bool success = true;
-  if (contains(t))
+  if (contains(idt))
   {
-    ordered_list_.erase(t);
-    success = success && ordered_list_.insert({t, v}).second;
+    ordered_list_.erase(ct);
+    tuple_map_.erase(idt);
+    success = success && tuple_map_.insert({idt, ct}).second;
+    success = success && ordered_list_.insert({ct, idt}).second;
   }
   else
   {
-    success = success && check_list_.insert({t, v}).second;
-    success = success && ordered_list_.insert({t, v}).second;
+    success = success && tuple_map_.insert({idt, ct}).second;
+    success = success && check_list_.insert({idt, v}).second;
+    success = success && ordered_list_.insert({ct, idt}).second;
   }
   return success;
 }
 
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+void OpenList<ComparisonTuple, IDTuple, T, hashT>::remove(IDTuple t)
+{
+  if (contains(t))
+  {
+    check_list_.erase(t);
+    ordered_list_.erase(tuple_map_[t]);
+    tuple_map_.erase(t);
+  }
+}
+
 // contains - checks to see if vertex is in open list
-template <typename Ttuple, class T, typename hashT>
-bool OpenList<Ttuple, T, hashT>::contains(Ttuple t)
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+bool OpenList<ComparisonTuple, IDTuple, T, hashT>::contains(IDTuple t)
 {
   return check_list_.find(t) != check_list_.end();
 }
 
-template <typename Ttuple, class T, typename hashT>
-size_t OpenList<Ttuple, T, hashT>::size()
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+size_t OpenList<ComparisonTuple, IDTuple, T, hashT>::size()
 {
   return check_list_.size();
 }

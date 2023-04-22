@@ -170,7 +170,7 @@ bool CBSMP::replanCBS()
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   root->computeCost();
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
-  open_list_.insert(root->getComparisonTuple(), root);
+  open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
   int iteration=0;
   while (open_list_.size() > 0)
   {
@@ -205,7 +205,7 @@ bool CBSMP::replanCBS()
       // }
       ++S_;
     }
-    std::shared_ptr<CTNode> node = open_list_.pop().second;
+    std::shared_ptr<CTNode> node = std::get<2>(open_list_.pop());
     ++N;
 
     // ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
@@ -260,7 +260,7 @@ bool CBSMP::replanCBS()
         // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
         // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
         // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
-        open_list_.insert(new_nodes[i]->getComparisonTuple(), new_nodes[i]);
+        open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }
 

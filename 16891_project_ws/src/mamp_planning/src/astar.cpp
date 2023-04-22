@@ -36,42 +36,45 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
   // ROS_INFO("h size: %ld", h_.size());
   // ROS_INFO("max time: %f", max_time);
   // ROS_INFO("Computed heuristics");
-  open_list_.insert(std::make_tuple(h_[start->getId()], start->getId(), start_time), start);
+  open_list_.insert(std::make_tuple(h_[start->getId()], start->getId(), start_time), std::make_tuple(start->getId(), start_time), start);
   g_.insert({std::make_tuple(start->getId(), start_time), 0});
   while (open_list_.size() > 0)
   {
     // ROS_INFO("Inside the while loop");
 
     auto v = open_list_.pop();
-    double g = g_.find(std::make_tuple(v.second->getId(), std::get<2>(v.first)))->second;
-    double h = h_[v.second->getId()];
+    std::tuple<double, unsigned int, double> comparison_v = std::get<0>(v);
+    std::tuple<unsigned int, double> id_v = std::get<1>(v); 
+    std::shared_ptr<Vertex> vertex_v = std::get<2>(v); 
+    double g = g_.find(id_v)->second;
+    double h = h_[vertex_v->getId()];
     // ROS_INFO("g: %f, h: %f", g, h);
     // ROS_INFO("v id: %d, goal id: %d", v.second->getId(), goal->getId());
     // ROS_INFO("Inside the while loop: after pop");
-    double current_time = std::get<2>(v.first);
+    double current_time = std::get<1>(id_v);
     // ROS_INFO("current time %f", current_time);
-    if (v.second->getId() == goal->getId() && (current_time > max_constraint_time || !is_last_waypoint))
+    if (vertex_v->getId() == goal->getId() && (current_time > max_constraint_time || !is_last_waypoint))
     {
       // ROS_INFO("Yayyyyyy found the goal");
       path_time_ = current_time;
       return true;
     }
-    std::tuple<unsigned int, double> v_closed_tuple = std::make_tuple(v.second->getId(), current_time);
+    std::tuple<unsigned int, double> v_closed_tuple = std::make_tuple(vertex_v->getId(), current_time);
     // ROS_INFO("created v_closed tuple");
-    if (closed_list_.insert({v_closed_tuple, v.second}).second && current_time <= max_time)
+    if (closed_list_.insert({v_closed_tuple, vertex_v}).second && current_time <= max_time)
     {
       // ROS_INFO("Inserted closed list");
       // For staying in same spot
-      std::tuple<unsigned int, double> vn_closed_tuple = std::make_tuple(v.second->getId(), current_time + timestep_);
+      std::tuple<unsigned int, double> vn_closed_tuple = std::make_tuple(vertex_v->getId(), current_time + timestep_);
       // ROS_INFO("created vn closed tuple");
-      if (closed_list_.find(vn_closed_tuple) == closed_list_.end() && !isConstrained(v.second ,nullptr, current_time, constraints))
+      if (closed_list_.find(vn_closed_tuple) == closed_list_.end() && !isConstrained(vertex_v ,nullptr, current_time, constraints))
       {
         // ROS_INFO("Before new_g");
         // ROS_INFO("v closed value %f",v_closed_tuple->second);
         double new_g = g_.find(v_closed_tuple)->second + timestep_;
         // ROS_INFO("Stay in same spot: Got new g");
-        std::tuple<double, unsigned int, double> vn_open_tuple = std::make_tuple(new_g + h_.find(v.second->getId())->second,
-                                                                                v.second->getId(), 
+        std::tuple<double, unsigned int, double> vn_open_tuple = std::make_tuple(new_g + h_.find(vertex_v->getId())->second,
+                                                                                vertex_v->getId(), 
                                                                                 current_time + timestep_);
         // ROS_INFO("Stay in same spot: created vn open tuple");                                                                        
         if (g_.find(vn_closed_tuple) != g_.end())
@@ -82,24 +85,24 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
           {
             g_.erase(vn_closed_tuple);
             g_.insert({vn_closed_tuple, new_g});
-            open_list_.insert(vn_open_tuple, v.second);
-            parent_map_.erase(std::make_tuple(v.second, current_time + timestep_));
-            parent_map_.insert({std::make_tuple(v.second, current_time + timestep_), std::make_tuple(v.second, current_time)});
+            open_list_.insert(vn_open_tuple, vn_closed_tuple, vertex_v);
+            parent_map_.erase(std::make_tuple(vertex_v, current_time + timestep_));
+            parent_map_.insert({std::make_tuple(vertex_v, current_time + timestep_), std::make_tuple(vertex_v, current_time)});
           }
         }
         else
         {
           g_.insert({vn_closed_tuple, new_g});
-          open_list_.insert(vn_open_tuple, v.second);
-          parent_map_.erase(std::make_tuple(v.second, current_time + timestep_));
-          parent_map_.insert({std::make_tuple(v.second, current_time + timestep_), std::make_tuple(v.second, current_time)});
+          open_list_.insert(vn_open_tuple, vn_closed_tuple, vertex_v);
+          parent_map_.erase(std::make_tuple(vertex_v, current_time + timestep_));
+          parent_map_.insert({std::make_tuple(vertex_v, current_time + timestep_), std::make_tuple(vertex_v, current_time)});
         }
       }
 
 
       // ROS_INFO("Start looking at neighbors");
       // For all neighboring edges
-      for (auto neighbor : v.second->getEdges())
+      for (auto neighbor : vertex_v->getEdges())
       {
         // ROS_INFO("Traversal time %f", neighbor.second->getTraversalTime());
         std::tuple<unsigned int, double> n_closed_tuple = std::make_tuple(neighbor.first->getId(), current_time + neighbor.second->getTraversalTime());
@@ -134,21 +137,21 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
             {
               g_.erase(n_closed_tuple);
               g_.insert({n_closed_tuple, new_g});
-              open_list_.insert(n_open_tuple, neighbor.first);
+              open_list_.insert(n_open_tuple, n_closed_tuple, neighbor.first);
               // ROS_INFO("Neighbors: overwrote old g");
               parent_map_.erase(std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()));
               parent_map_.insert({std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()),
-                                  std::make_tuple(v.second, current_time)});
+                                  std::make_tuple(vertex_v, current_time)});
             }
           }
           else
           {
             g_.insert({n_closed_tuple, new_g});
-            open_list_.insert(n_open_tuple, neighbor.first);
+            open_list_.insert(n_open_tuple, n_closed_tuple, neighbor.first);
             // ROS_INFO("Neighbors: inserted new g");
             parent_map_.erase(std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()));
             parent_map_.insert({std::make_tuple(neighbor.first, current_time + neighbor.second->getTraversalTime()),
-                                std::make_tuple(v.second, current_time)});
+                                std::make_tuple(vertex_v, current_time)});
           }
         }
         // else
@@ -185,17 +188,17 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
 {
   // ROS_INFO("Computing heuristics");
   h_.clear();
-  OpenList<std::tuple<double, unsigned int>, Vertex, hash_tuple::hash<std::tuple<double, unsigned int>>> open_list_h;
+  OpenList<std::tuple<double, unsigned int>, std::tuple<unsigned int>, Vertex, hash_tuple::hash<std::tuple<unsigned int>>> open_list_h;
   std::unordered_set<std::shared_ptr<Vertex>> closed_list_h;
   std::unordered_set<std::shared_ptr<Edge>> closed_edge_list;
   double max_time = 0;
-  open_list_h.insert(std::make_tuple(0, goal->getId()), goal);
+  open_list_h.insert(std::make_tuple(0, goal->getId()), std::make_tuple(goal->getId()), goal);
   // ROS_INFO("goal id %d", goal->getId());
   h_.insert({goal->getId(), 0});
 
   while (open_list_h.size() != 0)
   {
-    std::shared_ptr<Vertex> v = open_list_h.pop().second;
+    std::shared_ptr<Vertex> v = std::get<2>(open_list_h.pop());
     if (closed_list_h.insert(v).second)
     {
       // ROS_INFO("Inserted vertex into closed list, getting neighbors now" );
@@ -222,7 +225,7 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
             {
               h_.erase(neighbor.first->getId());
               h_.insert({neighbor.first->getId(), new_h});
-              open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), neighbor.first);
+              open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
             }
           }
           else // Seeing this neighbor for the first time
@@ -230,7 +233,7 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
             // ROS_INFO("Increasing open list");
             double new_h = h_.find(v->getId())->second + neighbor.second->getTraversalTime();
             h_.insert({neighbor.first->getId(), new_h});
-            open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), neighbor.first);
+            open_list_h.insert(std::make_tuple(new_h, neighbor.first->getId()), std::make_tuple(neighbor.first->getId()), neighbor.first);
           }
           // ROS_INFO("open list_h size %d", open_list_h.size());
           

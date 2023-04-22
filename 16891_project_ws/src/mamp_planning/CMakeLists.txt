@@ -175,13 +175,9 @@ add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/agent.cpp
                                     src/astar.cpp
                                     src/cbs_mp.cpp
-                                    src/cbs_mp_dstarlite.cpp
                                     src/ct_node.cpp
                                     src/open_list.cpp
-                                    src/dstar_lite.cpp
                                     src/edge.cpp
-                                    src/pbs_dstar_mp.cpp
-                                    src/pbs_node.cpp
                                     src/prm.cpp
                                     src/viz_tools.cpp
                                     src/mamp_helper.cpp
