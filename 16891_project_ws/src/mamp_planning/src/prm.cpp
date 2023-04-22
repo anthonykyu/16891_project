@@ -2,7 +2,7 @@
 
 PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
-        std::vector<std::shared_ptr<Vertex>> waypoints)
+        std::vector<std::shared_ptr<Vertex>> waypoints, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm)
 {
   radius_ = 2;
   num_samples_ = 0;
@@ -18,6 +18,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
   jnt_vel_lim_ = jnt_vel_lim;
   jnt_lower_lim_ = jnt_lower_lim;
   jnt_upper_lim_ = jnt_upper_lim;
+  acm_ = acm;
 //   ROS_INFO("We have a new PRM!");
 
 }
@@ -68,14 +69,15 @@ shared_ptr<Vertex> PRM::getRandomVertex()
     //   printf("This is %f\n", q_rand_pos[i]);
     }
     shared_ptr<Vertex> q_rand = make_shared<Vertex>(q_rand_pos, node_id_++);
-    // printf("Now we have %ld\n", q_rand->getJointPos().size());
+    // ROS_INFO("GetRandomVertex dof_ is: %d", dof_);
+    // ROS_INFO("GetRandomVertex middle point here");
 
-    while(MAMP_Helper::detectVertexCollision(planning_scene_, q_rand, nullptr))
+    while(MAMP_Helper::detectVertexCollision(planning_scene_, acm_, q_rand, nullptr))
     {
         for (int i = 0; i < dof_; ++i)
         {
         q_rand_pos[i] = jnt_lower_lim_[i] + (((double)rand() / (double)RAND_MAX) * (jnt_upper_lim_[i] - jnt_lower_lim_[i])) ;
-        //   printf("This is %f\n", q_rand_pos[i]);
+        // printf("This is %f\n", q_rand_pos[i]);
         }
         q_rand->setJointPos(q_rand_pos);
     }
@@ -217,7 +219,7 @@ void PRM::expandPRM()
 
             shared_ptr<Edge> edge = make_shared<Edge>(q_near, q_rand);
             // ROS_INFO("Q_near has joints: %ld", q_near->getJointPos().size());
-            auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, edge, jnt_vel_lim_, timestep_);
+            auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, acm_, edge, jnt_vel_lim_, timestep_);
 
 
             // ROS_INFO("Executed Collision Check");
@@ -357,7 +359,7 @@ void PRM::buildPRM()
 
             shared_ptr<Edge> edge = make_shared<Edge>(q_near, q_rand);
             // ROS_INFO("Q_near has joints: %ld", q_near->getJointPos().size());
-            auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, edge, jnt_vel_lim_, timestep_);
+            auto coll = MAMP_Helper::detectEdgeCollision(planning_scene_, acm_, edge, jnt_vel_lim_, timestep_);
 
 
             // ROS_INFO("Executed Collision Check");

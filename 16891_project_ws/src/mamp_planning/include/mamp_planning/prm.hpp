@@ -9,13 +9,14 @@ public:
     //INFO: I am assuming that the start and goal vertices for each agent comes from the agent class
     PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double timestep, 
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
-        std::vector<std::shared_ptr<Vertex>> waypoints);
+        std::vector<std::shared_ptr<Vertex>> waypoints, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm);
     std::vector<std::shared_ptr<Vertex>> PRMgraph_;
     std::vector<std::shared_ptr<Vertex>> PRMpath_;
     // std::vector<std::shared_ptr<Vertex>> Astarpath_;
     void getPath(std::vector<std::shared_ptr<Vertex>> nodes);
     void buildPRM();
     void expandPRM();
+    std::shared_ptr<collision_detection::AllowedCollisionMatrix> getAcm() {return acm_;}
 
 
 
@@ -33,6 +34,7 @@ private:
     // std::vector<std::shared_ptr<Vertex>> start_;
     // std::vector<std::shared_ptr<Vertex>> goal_;
     std::shared_ptr<planning_scene::PlanningScene> planning_scene_;
+    std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm_;
     std::vector<double> jnt_vel_lim_;
     std::vector<double> jnt_upper_lim_;
     std::vector<double> jnt_lower_lim_;

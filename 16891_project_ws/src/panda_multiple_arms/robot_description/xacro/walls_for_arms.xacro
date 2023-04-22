@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 
 <!-- rosrun xacro xacro panda_multiple_arms.xacro -o panda_multiple_arms.urdf -->
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="walls">
-  <xacro:macro name="walls_world">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="walls_for_arms">
+  <xacro:macro name="walls_world_for_arms">
     <xacro:property name="length" value="10.0" /> 
     <xacro:property name="width" value="0.1" /> 
     <xacro:property name="height" value="1" /> 
@@ -116,9 +116,9 @@
 
 
     <!-- Shelf properties -->
-    <xacro:property name="shelf_length" value="1" /> 
-    <xacro:property name="shelf_width" value="2" /> 
-    <xacro:property name="shelf_height" value="0.3" /> 
+    <xacro:property name="shelf_length" value="0.5" /> 
+    <xacro:property name="shelf_width" value="0.5" /> 
+    <xacro:property name="shelf_height" value="0.2" /> 
 
     <!-- Setup the first shelf -->
     <link name="shelf_1">
@@ -150,7 +150,7 @@
         <geometry>
           <box size="${shelf_length} ${shelf_width} ${shelf_height}"/>
         </geometry>
-        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>
+        <origin rpy = "0 0 0" xyz="0 0 ${shelf_height/2}"/>0*radius}
       </visual>
 
       <collision>
@@ -339,5 +339,5 @@
 
 
   </xacro:macro>
-  <!-- <xacro:walls_world/> -->
+  <!-- <xacro:walls_world_for_arms/> -->
 </robot>

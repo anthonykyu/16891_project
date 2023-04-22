@@ -3,8 +3,8 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_mobile_9">
 
-  <xacro:include filename="$(find panda_multiple_arms)/robot_description/walls.xacro" />
-  <xacro:include filename="$(find panda_multiple_arms)/robot_description/mobile_robot.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/mobile_robot.xacro" />
 
   <xacro:walls_world/>
   <xacro:mobile_robot name="mobile_1" dims="0.25" color="blue"/>

@@ -95,7 +95,7 @@ int main(int argc, char **argv)
 
   // std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, "agents.txt", timestep, world_planning_scene);
   std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, agents_data_file, timestep, world_planning_scene);
-
+  ROS_WARN("Until here in main.cpp");
   planner_.initialize(agents, world_planning_scene, timestep);
   // ROS_INFO("Number of agents: %ld", agents.size());
   // ROS_INFO("Agent ID: %s", agents[0]->getID().c_str());

@@ -3,10 +3,11 @@
 
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_mobile_1">
 
-  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls_for_arms.xacro" />
   <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/mobile_robot.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/arm_robot.xacro" />
 
-  <xacro:walls_world/>
+  <xacro:walls_world_for_arms/>
   <xacro:mobile_robot name="mobile_1" dims="0.25" color="white"/>
   <link name="mobile_1_temp"/>
 
@@ -28,6 +29,10 @@
       <axis xyz="0 1 0"/>
       <origin rpy="0 0 0" xyz="0 0 0"/>
   </joint>
+
+  <!-- Arm 1 -->
+  <xacro:arg name="arm_id_1" default="arm_1" />
+  <xacro:arm_robot arm_id="$(arg arm_id_1)" connected_to="shelf_1" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
 
 </robot>
 

@@ -7,15 +7,37 @@
 	<param name="mobile_robot" command=" cat $(find panda_multiple_arms)/robot_description/mobile_robot.urdf" />
 	<param name="walls" command=" cat $(find panda_multiple_arms)/robot_description/walls.urdf" />
 
-	<!-- With shelves -->
+	<!-- Mobile, With shelves -->
 	<param name="world_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1.urdf" />
 	<param name="world_mobile_4" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_4.urdf" />
 	<param name="world_mobile_9" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_9.urdf" />
 
-	<!-- Without Shelves -->
+	<!-- Mobile, Without Shelves -->
 	<param name="world_no_shelves_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_1.urdf" />
 	<param name="world_no_shelves_mobile_4" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_4.urdf" />
 	<param name="world_no_shelves_mobile_9" command=" cat $(find panda_multiple_arms)/robot_description/world_no_shelves_mobile_9.urdf" />
+
+	<!-- Arms, arm-only-world -->
+	<param name="world_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_1.urdf" />
+	<param name="world_arm_1_test" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_1_test.urdf" />
+	<param name="world_arm_2" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_2.urdf" />
+	<param name="world_arm_3" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_3.urdf" />
+	<param name="world_arm_3_test" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_3_test.urdf" />
+	<param name="world_arm_4" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_4.urdf" />
+	<param name="world_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/world_arm_6.urdf" />
+
+
+	<!-- Arms with the smaller shelves -->
+	<param name="shelf_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/shelf_arm_1.urdf" />
+
+
+	<!-- Mobile with the smaller shelves -->
+	<param name="shelf_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/shelf_mobile_1.urdf" />
+
+	<!-- Mobile and Arms worlds -->
+	<param name="world_mobile_1_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1_arm_1.urdf" />
+	<param name="world_mobile_1_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1_arm_6.urdf" />
+
 
 	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>
 	
