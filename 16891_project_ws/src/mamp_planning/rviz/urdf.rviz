@@ -85,11 +85,11 @@ Visualization Manager:
           Value: true
         right_leg:
           Value: true
-      Marker Scale: 0.5
+      Marker Scale: 0.4
       Name: TF
       Show Arrows: false
       Show Axes: true
-      Show Names: true
+      Show Names: false
       Tree:
         base_link:
           right_leg:

@@ -1,0 +1,10 @@
+shelf_mobile_9
+mobile_1,shelf_mobile_1,world,mobile_1,2,   7.5,0.8,     0.8,5.0
+mobile_2,shelf_mobile_1,world,mobile_1,2,   2.5,0.8,     5.0,9.2
+mobile_3,shelf_mobile_1,world,mobile_1,2,   5.0,9.2,     0.8,7.5
+mobile_4,shelf_mobile_1,world,mobile_1,2,   0.8,7.5,     7.5,0.8
+mobile_5,shelf_mobile_1,world,mobile_1,2,   0.8,5.0,     2.5,9.2
+mobile_6,shelf_mobile_1,world,mobile_1,2,   2.5,9.2,     5.0,0.8
+mobile_7,shelf_mobile_1,world,mobile_1,2,   5.0,0.8,     0.8,2.5
+mobile_8,shelf_mobile_1,world,mobile_1,2,   0.8,2.5,     7.5,9.2
+mobile_9,shelf_mobile_1,world,mobile_1,2,   7.5,9.2,     2.5,0.8

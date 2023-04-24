@@ -65,6 +65,7 @@ void VizTools::run_simulation_single_agent(std::shared_ptr<Agent> agent, int sho
 
         new_joints.position.push_back(first_vertex->getJointPos()[j]);
     }
+    new_joints.header.stamp = ros::Time::now();
     pub.publish(new_joints);
 
 
@@ -94,7 +95,7 @@ void VizTools::run_simulation_single_agent(std::shared_ptr<Agent> agent, int sho
 
 
 
-void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> agents, int show_path_option, int display_rate)
+void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> agents, int show_path_option, int display_rate, double wait_time)
 {
     // show_path_option = 0 for showing the discretized path
     // show_path_option = 1 for showing the prm path 
@@ -107,7 +108,7 @@ void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> age
     ROS_INFO("Loading Visualization for all agents");
     ros::NodeHandle node_handle;
     ros::Rate loop_rate(display_rate);
-    ros::Publisher pub = node_handle.advertise<sensor_msgs::JointState>("joint_states", 5);
+    ros::Publisher pub = node_handle.advertise<sensor_msgs::JointState>("joint_states", 0);
     std::vector<std::vector<shared_ptr<Vertex>>> all_paths;
     int num_agents = agents.size();
 
@@ -146,24 +147,38 @@ void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> age
     // Setup the initial joints and joint names
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     sensor_msgs::JointState new_joints;
+    new_joints.header.seq = 1;
     for (int a=0; a<num_agents; ++a)
     {
         std::shared_ptr<Vertex> first_vertex = all_paths[a][0];    
         int num_joints = first_vertex->getJointPos().size();
         auto agent = agents[a];
-        ROS_INFO("Agent's name is: %s", agent->getID().c_str());
+        ROS_INFO("Preparing simulation for Agent: %s", agent->getID().c_str());
         for (int j=0; j< num_joints; ++j)
         {
             new_joints.name.push_back(agent->getID() + "_" + std::to_string(j+1));
 
-            ROS_INFO("We get %s", (agent->getID() + "_" + std::to_string(j+1)).c_str());
+            ROS_INFO("Joint %s", (agent->getID() + "_" + std::to_string(j+1)).c_str());
 
             new_joints.position.push_back(first_vertex->getJointPos()[j]);
         }
-        
-       
     }
-    pub.publish(new_joints);
+
+
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    // Ensure we hold at the first waypoint for a moment
+    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    int pub_first_state = 0;
+    while (ros::ok() && pub_first_state < wait_time*display_rate)
+    {
+        new_joints.header.stamp = ros::Time::now();
+        new_joints.header.seq++;
+        pub.publish(new_joints);
+        loop_rate.sleep();
+        pub_first_state ++;
+
+    }
 
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -180,6 +195,8 @@ void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> age
         ROS_INFO("~~~~~~~~~~~ Timestep: %d ~~~~~~~~~~", ts);
         
         new_joints.header.stamp = ros::Time::now();
+        new_joints.header.seq++;
+        
         int joints_idx = 0;
 
         for (int a=0; a<num_agents; ++a)
@@ -210,6 +227,7 @@ void VizTools::run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> age
         loop_rate.sleep();
     }
 
-    ROS_INFO("Completed Visualization");
+    ROS_INFO("--------------------- Completed Visualization ---------------------");
 
 }
+
