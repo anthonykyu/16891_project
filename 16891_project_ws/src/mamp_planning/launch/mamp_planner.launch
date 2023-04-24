@@ -29,14 +29,17 @@
 
 	<!-- Arms with the smaller shelves -->
 	<param name="shelf_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/shelf_arm_1.urdf" />
+	<param name="shelf_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/shelf_arm_6.urdf" />
 
 
 	<!-- Mobile with the smaller shelves -->
 	<param name="shelf_mobile_1" command=" cat $(find panda_multiple_arms)/robot_description/shelf_mobile_1.urdf" />
+	<param name="shelf_mobile_4" command=" cat $(find panda_multiple_arms)/robot_description/shelf_mobile_4.urdf" />
 
 	<!-- Mobile and Arms worlds -->
 	<param name="world_mobile_1_arm_1" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1_arm_1.urdf" />
 	<param name="world_mobile_1_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_1_arm_6.urdf" />
+	<param name="world_mobile_4_arm_6" command=" cat $(find panda_multiple_arms)/robot_description/world_mobile_4_arm_6.urdf" />
 
 
 	<node pkg="mamp_planning" type="mamp_planning_node" name="mamp_planning_node" output="screen"/>

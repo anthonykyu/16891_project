@@ -169,73 +169,80 @@ void CBSMP::printConstraints(std::vector<Constraint> constraints)
     if (c.is_vertex_constraint)
     {
       ROS_INFO("Vertex Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
-      for (double j : c.joint_pos_vertex->getJointPos())
-      {
-        ROS_INFO("%f, ", j);
-      }
+      // for (double j : c.joint_pos_vertex->getJointPos())
+      // {
+      //   ROS_INFO("%f, ", j);
+      // }
     }
     else
     {
       ROS_INFO("Edge Constraint: Agent: %s, Time: %f", c.agent_id.c_str(), c.time_step);
-      auto joint_positions = *(c.joint_pos_edge->getVertexPositions());
-      for (auto vec : joint_positions)
-      {
-        ROS_INFO("Vertex: ");
-        for (double j : vec)
-        {
-          ROS_INFO("%f, ", j);
-        }
-      }
+      // auto joint_positions = *(c.joint_pos_edge->getVertexPositions());
+      // for (auto vec : joint_positions)
+      // {
+      //   ROS_INFO("Vertex: ");
+      //   for (double j : vec)
+      //   {
+      //     ROS_INFO("%f, ", j);
+      //   }
+      // }
     }
   }
 }
 
 void CBSMP::printCollision(Collision c)
 {
-  ROS_INFO("Collision:");
+  // ROS_INFO("Collision:");
   ROS_INFO("Agent 1: %s, time: %f", c.agent_id1.c_str(), c.timestep);
+  ROS_INFO("Agent 2: %s, time: %f", c.agent_id2.c_str(), c.timestep);
+
+
+  // ROS_INFO("Check for nullptr agent 1, 1 if true: %d", c.location1 == nullptr);
+  // ROS_INFO("Check for nullptr agent 2, 1 if true: %d", c.location2 == nullptr);
   if (c.location1_is_vertex)
   {
     ROS_INFO("Location 1 is Vertex:");
-    for (double j : c.location1_vertex->getJointPos())
-    {
-      ROS_INFO("%f, ", j);
-    }
+    // for (double j : c.location1_vertex->getJointPos())
+    // {
+    //   ROS_INFO("%f, ", j);
+    // }
   }
   else
   {
     ROS_INFO("Location 1 is Edge:");
-    auto joint_positions = *(c.location1->getVertexPositions());
-    for (auto vec : joint_positions)
-    {
-      ROS_INFO("Vertex of Edge: ");
-      for (double j : vec)
-      {
-        ROS_INFO("%f, ", j);
-      }
-    }
+    // // ROS_INFO("c.location1 ", c.location1->);
+    // auto joint_positions = (c.location1->getVertexPositions());
+    // for (auto vec : *joint_positions)
+    // {
+    //   ROS_INFO("Vertex of Edge: ");
+    //   for (double j : vec)
+    //   {
+    //     ROS_INFO("%f, ", j);
+    //   }
+    // }
   }
-  ROS_INFO("Agent 2: %s, time: %f", c.agent_id2.c_str(), c.timestep);
+
+  // ROS_INFO("Agent 2: %s, time: %f", c.agent_id2.c_str(), c.timestep);
   if (c.location2_is_vertex)
   {
     ROS_INFO("Location 2 is Vertex:");
-    for (double j : c.location2_vertex->getJointPos())
-    {
-      ROS_INFO("%f, ", j);
-    }
+    // for (double j : c.location2_vertex->getJointPos())
+    // {
+    //   ROS_INFO("%f, ", j);
+    // }
   }
   else
   {
     ROS_INFO("Location 2 is Edge:");
-    auto joint_positions = *(c.location2->getVertexPositions());
-    for (auto vec : joint_positions)
-    {
-      ROS_INFO("Vertex of Edge: ");
-      for (double j : vec)
-      {
-        ROS_INFO("%f, ", j);
-      }
-    }
+    // auto joint_positions = *(c.location2->getVertexPositions());
+    // for (auto vec : joint_positions)
+    // {
+    //   ROS_INFO("Vertex of Edge: ");
+    //   for (double j : vec)
+    //   {
+    //     ROS_INFO("%f, ", j);
+    //   }
+    // }
   }
 }
 
@@ -344,12 +351,22 @@ bool CBSMP::replanCBS()
     //     omp_set_num_threads(MP_PROC_NUM);
     //     #pragma omp parallel for
     // #endif
+
+    ROS_WARN("Making children to resolve collision");
+    ROS_INFO("Collision being resolved is:");
+    printCollision(c);
     for (int i = 0; i < new_nodes.size(); ++i)
     {
-      // ROS_WARN("Until here iteration %d", i);
+      ROS_WARN("~~~~~ Child #%d ~~~~~", i);
+      // ROS_INFO("Collisions before going solving for a new path %ld", new_nodes[i]->numCollisions());
+      // ROS_INFO("Constraints before going solving for a new path %ld", new_nodes[i]->getConstraints().size());
+      // printConstraints(new_nodes[i]->getConstraints());
+      ROS_INFO("New constraint being added: ");
+      printConstraints(std::vector<Constraint> {constraints[i]});
+      ROS_INFO("Now let's add a constraint and try to replan");
       new_nodes[i]->addConstraint(constraints[i]);
 
-      // ROS_WARN("How many constraints %ld", new_nodes[i]->getConstraints().size());
+      // ROS_WARN("Going to make children which solve the constraints %d", i);
       // ROS_WARN("max constraint time: %f", new_nodes[i]->getMaxConstraintTime());
       // ROS_WARN("agent id: %s", constraints[i].agent_id.c_str());
       auto start_solve = std::chrono::high_resolution_clock::now();
@@ -365,10 +382,16 @@ bool CBSMP::replanCBS()
         new_nodes[i]->getPaths().insert({constraints[i].agent_id, new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDiscretizedPath()});
         new_nodes[i]->detectCollisions();
         new_nodes[i]->computeCost();
-        ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+        ROS_INFO("~~ After making a new plan ~~");
+        ROS_INFO("New Number of collisions: %ld", new_nodes[i]->numCollisions());
+        if (new_nodes[i]->numCollisions() > 0){
+          ROS_INFO("The first collision is:");
+          printCollision(new_nodes[i]->getNextCollision());
+        }
         ROS_INFO("Cost: %f", new_nodes[i]->getCost());
         ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         // printCollision(new_nodes[i]->getNextCollision());
+        // printConstraints(new_nodes[i]->getConstraints());
         open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }

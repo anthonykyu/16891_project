@@ -4,10 +4,6 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
         std::vector<std::shared_ptr<Vertex>> waypoints, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm)
 {
-  radius_ = 3;
-  num_samples_ = 0;
-  expansion_factor_= 0.1;
-  connectivity_ = 8;
   waypoints_ = waypoints;
 //   start_ = start;
 //   goal_ = goal;
@@ -21,6 +17,11 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
   acm_ = acm;
 //   ROS_INFO("We have a new PRM!");
 
+  radius_ = dof_;
+  num_samples_ = 0;
+//   expansion_factor_= 0.1;
+  expansion_factor_= 0.2 * dof_;
+  connectivity_ = 8;
 }
 
 // bool PRM::checkCollision(vector<double> joint_pos)
@@ -289,6 +290,7 @@ void PRM::expandPRM()
         
     }
     num_samples_ += i;
+    ROS_WARN("PRM expanded from this to this: %d --> %d", num_samples_-i, num_samples_);
 }
 
 void PRM::buildPRM()
@@ -307,15 +309,36 @@ void PRM::buildPRM()
     
     ROS_INFO("BuldPRM starts here");
     bool not_connected = true;
-    for (int i = 0; not_connected; ++i, ++num_samples_)
+    // for (int i = 0; not_connected; ++i, ++num_samples_)
+    for (int i = 0; (not_connected || i<((int)(1.0*dof_))); ++i, ++num_samples_)
     {
-        not_connected = false;
-        for (int j = 0; j < waypoints_.size()-1; ++j)
+        // not_connected = false;
+        
+        // For a little bit more efficiency stop doing this check once not needed
+        if (not_connected)
         {
-            not_connected = not_connected || waypoints_[j]->getComponentId() != waypoints_[j+1]->getComponentId();
+            int waypoints_connected = 1;
+            for (int j = 0; j < waypoints_.size()-1; ++j)
+            {
+                // not_connected = not_connected || waypoints_[j]->getComponentId() != waypoints_[j+1]->getComponentId();
+                if (waypoints_[j]->getComponentId() == waypoints_[j+1]->getComponentId())
+                {
+                    // ROS_INFO("Connected to a waypoint between %d and %d.", j, j+1);
+                    waypoints_connected++;
+                    // ROS_INFO("Waypoints found and total %d and %ld.", waypoints_connected, waypoints_.size());
+
+                }
+            }
+            // if (!not_connected)
+                // break;
+            if (waypoints_connected == waypoints_.size()){
+                ROS_INFO("Found connection between the start and goal");
+                not_connected = false;
+            }
         }
-        if (!not_connected)
-            break;
+
+
+
         // ROS_INFO("Component value: %d", component_);
         // ROS_INFO("Start and Goal Comp ID: %d, %d", start_->getComponentId(), goal_->getComponentId());
         shared_ptr<Vertex> q_rand = getRandomVertex();

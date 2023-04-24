@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_mobile_1">
+
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls_for_arms.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/mobile_robot.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/arm_robot.xacro" />
+
+  <xacro:walls_world_for_arms/>
+
+  <!-- Arm 1 -->
+  <xacro:arg name="arm_id_1" default="arm_1" />
+  <xacro:arm_robot arm_id="$(arg arm_id_1)" connected_to="shelf_1" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <xacro:arg name="arm_id_2" default="arm_2" />
+  <xacro:arm_robot arm_id="$(arg arm_id_2)" connected_to="shelf_2" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <xacro:arg name="arm_id_3" default="arm_3" />
+  <xacro:arm_robot arm_id="$(arg arm_id_3)" connected_to="shelf_3" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <xacro:arg name="arm_id_4" default="arm_4" />
+  <xacro:arm_robot arm_id="$(arg arm_id_4)" connected_to="shelf_4" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <xacro:arg name="arm_id_5" default="arm_5" />
+  <xacro:arm_robot arm_id="$(arg arm_id_5)" connected_to="shelf_5" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <xacro:arg name="arm_id_6" default="arm_6" />
+  <xacro:arm_robot arm_id="$(arg arm_id_6)" connected_to="shelf_6" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+</robot>
+

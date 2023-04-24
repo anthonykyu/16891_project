@@ -134,11 +134,14 @@ bool Agent::computeSingleAgentPath(
   // ROS_INFO("About to clear discretized path");
   discretized_path_.clear();
 
+
+
   // ROS_INFO("Cleared discretized path: %ld", discretized_path_.size());
   // if (astar_->computePRMPath(start_, goal_, constraints, max_constraint_time))
   if (astar_->computeWaypointPaths(waypoints_, constraints, max_constraint_time))
   {
     // ROS_INFO("Computed PRM Path!");
+
 
     prm_path_ = astar_->getPRMPath(waypoints_[0], waypoints_[waypoints_.size()-1]);
     // ROS_INFO("Got PRM Path!");

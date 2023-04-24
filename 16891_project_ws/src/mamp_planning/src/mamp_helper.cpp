@@ -275,21 +275,74 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                 first_collision.agent_id1 = collision_pair.first;
                 first_collision.agent_id2 = collision_pair.second;
                 
+                // ROS_WARN("Making the first collision we've found");
+
                 // Retrive the edge of that vertex at this timestep.
                 for (int n=0; n < robot_names.size(); ++n)
                 {
-                    // if (robot_names[n] == collision_pair.first)
-                    if (std::strcmp(robot_names[n].c_str(), collision_pair.first.c_str()) == 0)
+
+                    // These must be set differently depending on if we're dealing with mobile agents or arm agents.
+                    bool check_condition_1;
+                    bool check_condition_2;
+
+                    // First we set check_condition_1
+                    if (std::strcmp(collision_pair.first.substr(0,3).c_str(), "arm") == 0)
                     {
+                        check_condition_1 = (std::strcmp(robot_names[n].c_str(), collision_pair.first.substr(0,5).c_str()) == 0);
+                        // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.first.substr(0,5).c_str());
+
+                    }
+                    else if (std::strcmp(collision_pair.first.substr(0,3).c_str(), "mob") == 0)
+                    {
+                        check_condition_1 = (std::strcmp(robot_names[n].c_str(), collision_pair.first.c_str()) == 0);
+                        // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.first.c_str());
+                    }
+                    else
+                    {
+                        ROS_ERROR("Should not be here, means have we collision with something that's not an arm or a mobile agent.");    
+                    }
+
+
+                    // Now we set check_condition_2
+                    if (std::strcmp(collision_pair.second.substr(0,3).c_str(), "arm") == 0)
+                    {
+                        check_condition_2 = (std::strcmp(robot_names[n].c_str(), collision_pair.second.substr(0,5).c_str()) == 0);
+                        // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.second.substr(0,5).c_str());
+
+                    }
+                    else if (std::strcmp(collision_pair.second.substr(0,3).c_str(), "mob") == 0)
+                    {
+                        check_condition_2 = (std::strcmp(robot_names[n].c_str(), collision_pair.second.c_str()) == 0);
+                        // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.second.c_str());
+                    }
+                    else
+                    {
+                        ROS_ERROR("Should not be here, means have we collision with something that's not an arm or a mobile agent.");    
+                    }
+                    
+
+                    // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.first.c_str());
+                    // ROS_WARN("Comparing agents: %s <---> %s", robot_names[n].c_str(), collision_pair.first.substr(0,5).c_str());
+                    // if (robot_names[n] == collision_pair.first)
+                    if (check_condition_1)
+                    // if (std::strcmp(robot_names[n].c_str(), collision_pair.first.subtr().c_str()) == 0) // THIS WILL BREAK WITH DOUBLE DIGIT NUMBER OF AGENTS
+                    {
+                        // ROS_WARN("Found the first agent");
                         first_collision.location1 = curr_vertices[n]->getPRMEdge();
+                        // if (first_collision.location1 == nullptr)
+                        // {
+                            // ROS_WARN("Came back from getPRMEdge as a nullptr!!!!");
+                        // }
                         if (first_collision.location1 == nullptr)
                         {
+                            // ROS_WARN("Making it a vertex then");
                             first_collision.location1_is_vertex = true;
                             first_collision.location1_vertex = curr_vertices[n];
                         }
                     }
                     // else if (robot_names[n] == collision_pair.second)
-                    else if (std::strcmp(robot_names[n].c_str(), collision_pair.second.c_str()) == 0)
+                    // else if (std::strcmp(robot_names[n].c_str(), collision_pair.second.c_str()) == 0)
+                    else if (check_condition_2)
                     {
                         first_collision.location2 = curr_vertices[n]->getPRMEdge();
                         if (first_collision.location2 == nullptr)
@@ -300,10 +353,10 @@ std::vector<Collision> MAMP_Helper::detectAgentAgentCollisions(std::unordered_ma
                     }
 
                 }
-                // if (!first_collision.location1 || !first_collision.location2)
-                // {
-                //     ROS_ERROR("NULL PRM EDGE!!!");
-                // }
+                if ((!first_collision.location1 && !first_collision.location1_is_vertex) || (!first_collision.location2 && !first_collision.location2_is_vertex))
+                {
+                    ROS_ERROR("NULL PRM EDGE!!!");
+                }
 
                 // TODO: Add some way to check that both location1 and location2 got filled up
                 collisions.push_back(first_collision);
