@@ -1,16 +1,16 @@
-#include "mamp_planning/cbs_mp.hpp"
+#include "mamp_planning/cbs_mp_dstar_lite_st.hpp"
 
-CBSMP::CBSMP()
+CBSMPDStarLiteST::CBSMPDStarLiteST()
 {
   initialized_ = false;
   S_ = 1;
-  timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
+  timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMPDStarLiteST::timerCallback, this);
   alpha_ = 0.05;
   X_ = 0.95;
   // mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
-void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
+void CBSMPDStarLiteST::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string &world_planning_scene, double timestep)
 {
 
   mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
@@ -105,14 +105,14 @@ void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string 
     // ROS_INFO("Joint check: %d", a.second->getJointVelLimit().size());
     a.second->getPRM()->buildPRM();
 
-    ROS_INFO("PRM Size: %ld", a.second->getPRM()->PRMgraph_.size());
-    a.second->computeSingleAgentPath();
+    ROS_INFO("Agent %s PRM Size: %ld", a.first.c_str(), a.second->getPRM()->PRMgraph_.size());
+    a.second->computeIncrementalSingleAgentPath();
   }
   replanCBS();
   initialized_ = true;
 }
 
-void CBSMP::timerCallback(const ros::TimerEvent &)
+void CBSMPDStarLiteST::timerCallback(const ros::TimerEvent &)
 {
   if (!initialized_)
   {
@@ -122,7 +122,7 @@ void CBSMP::timerCallback(const ros::TimerEvent &)
   ROS_INFO("In Timer!");
 }
 
-std::vector<std::shared_ptr<Agent>> CBSMP::getAgents()
+std::vector<std::shared_ptr<Agent>> CBSMPDStarLiteST::getAgents()
 {
   std::vector<std::shared_ptr<Agent>> agents;
   for (auto a : agents_)
@@ -132,17 +132,13 @@ std::vector<std::shared_ptr<Agent>> CBSMP::getAgents()
   return agents;
 }
 
-bool CBSMP::shouldResample(unsigned int N)
+bool CBSMPDStarLiteST::shouldResample(unsigned int N)
 {
-  // ROS_WARN("In the shouldResample");
   double p = 1.0 - pow(X_, alpha_ * N / S_);
-  // ROS_WARN("shouldResample will return: %f", ((double)rand()/(double)RAND_MAX));
-  // ROS_WARN("p is: %f", p);
-  // ROS_WARN("shouldResample will return: %d", (((double)rand()/(double)RAND_MAX) < p));
   return ((double)rand()/(double)RAND_MAX) < p;
 }
 
-void CBSMP::printPaths(std::shared_ptr<CTNode> node)
+void CBSMPDStarLiteST::printPaths(std::shared_ptr<CTNode> node)
 {
   ROS_INFO("Number of paths: %ld", node->getPaths().size());
   for (auto p : node->getPaths())
@@ -162,7 +158,7 @@ void CBSMP::printPaths(std::shared_ptr<CTNode> node)
   }
 }
 
-void CBSMP::printConstraints(std::vector<Constraint> constraints)
+void CBSMPDStarLiteST::printConstraints(std::vector<Constraint> constraints)
 {
   for (auto c : constraints)
   {
@@ -190,7 +186,7 @@ void CBSMP::printConstraints(std::vector<Constraint> constraints)
   }
 }
 
-void CBSMP::printCollision(Collision c)
+void CBSMPDStarLiteST::printCollision(Collision c)
 {
   ROS_INFO("Collision:");
   ROS_INFO("Agent 1: %s, time: %f", c.agent_id1.c_str(), c.timestep);
@@ -240,7 +236,7 @@ void CBSMP::printCollision(Collision c)
 }
 
 
-bool CBSMP::replanCBS()
+bool CBSMPDStarLiteST::replanCBS()
 {
   auto start = std::chrono::high_resolution_clock::now();
   unsigned int node_id = 0;
@@ -251,11 +247,8 @@ bool CBSMP::replanCBS()
     root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
   }
 
-  // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   root->detectCollisions();
-  // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   root->computeCost();
-  // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
   int iteration=0;
   double avg = 0;
@@ -278,14 +271,14 @@ bool CBSMP::replanCBS()
       // TODO: resample routine
       ROS_INFO("Resampling now!!!");
       auto a = getAgents();
-      // #ifdef MP_EN
-      //   omp_set_num_threads(MP_PROC_NUM);
-      //   #pragma omp parallel for
-      // #endif
+      #ifdef MP_EN
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+      #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
-        // a[i]->computeSingleAgentPath();
+        a[i]->computeIncrementalSingleAgentPath();
       }
       open_list_.clear();
       // iteration = 0;
@@ -331,34 +324,28 @@ bool CBSMP::replanCBS()
 
       return true;
     }
-    // ROS_INFO("Made it here");
     Collision c = node->getNextCollision();
     // ROS_INFO("Collision: Agent 1 - %s, Agent 2 - %s, IsVertex: %d, %d, time: %f", c.agent_id1.c_str(), c.agent_id2.c_str(), c.location1_is_vertex, c.location2_is_vertex, c.timestep);
     std::vector<Constraint> constraints = MAMP_Helper::resolveCollision(c);
-    // printCollision(c);
+    printCollision(c);
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
-    // #ifdef MP_EN
-    //     // ROS_INFO("Using OMP");
-    //     omp_set_num_threads(MP_PROC_NUM);
-    //     #pragma omp parallel for
-    // #endif
+    #ifdef MP_EN
+        // ROS_INFO("Using OMP");
+        omp_set_num_threads(MP_PROC_NUM);
+        #pragma omp parallel for
+    #endif
     for (int i = 0; i < new_nodes.size(); ++i)
     {
-      // ROS_WARN("Until here iteration %d", i);
       new_nodes[i]->addConstraint(constraints[i]);
-
-      // ROS_WARN("How many constraints %ld", new_nodes[i]->getConstraints().size());
-      // ROS_WARN("max constraint time: %f", new_nodes[i]->getMaxConstraintTime());
-      // ROS_WARN("agent id: %s", constraints[i].agent_id.c_str());
       auto start_solve = std::chrono::high_resolution_clock::now();
-      succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeSingleAgentPath(
-      MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime());
+      succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeIncrementalSingleAgentPath(
+      MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime(), std::vector<Constraint> {constraints[i]});
       auto end_solve = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff_solve = end_solve - start_solve;
       avg = ((avg * count) + diff_solve.count()) / (count + 1);
-      // ROS_WARN("Will probably fail here");
+      ++count;
       if (succ[i])
       {
         new_nodes[i]->getPaths().erase(constraints[i].agent_id);
@@ -372,95 +359,6 @@ bool CBSMP::replanCBS()
         open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }
-
-    // std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++node_id, node);
-    // std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++node_id, node);
-    // ROS_INFO("constraints[0].agent_id.c_str(): %s", constraints[0].agent_id.c_str());
-    // ROS_INFO("constraints[0].time_step: %f", constraints[0].time_step);
-    // ROS_INFO("constraints[0].joint_pos_edge->getTraversalTime(): %f", constraints[0].joint_pos_edge->getTraversalTime());
-    // ROS_INFO("Constraint 0: %s, %f, %f", constraints[0].agent_id.c_str(), constraints[0].time_step, constraints[0].joint_pos_edge->getTraversalTime());
-    // ROS_INFO("constraints[1].agent_id.c_str(): %s", constraints[1].agent_id.c_str());
-    // ROS_INFO("constraints[1].time_step: %f", constraints[1].time_step);
-    // ROS_INFO("constraints[1].joint_pos_edge->getTraversalTime(): %f", constraints[1].joint_pos_edge->getTraversalTime());
-    // ROS_INFO("Constraint 1: %s, %f, %f", constraints[1].agent_id.c_str(), constraints[1].time_step, constraints[1].joint_pos_edge->getTraversalTime());
-    // printConstraints(n1->getConstraints());
-    // n1->addConstraint(constraints[0]);
-    // ROS_INFO("Full constraint list for n1");
-    // printConstraints(n1->getConstraints());
-    // n2->addConstraint(constraints[1]);
-    // TODO: Get n1 and n2 to recompute paths for specific agents affected
-    // ROS_INFO("n1's Agent path length: %ld", n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath().size());
-    // for (size_t i = 35; i < 38; ++i)
-    // {
-    //   auto v = n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()[i];
-    //   ROS_INFO("Vertex %ld %d", i, v->getPRMEdge() != nullptr);
-    //   for (double j : v->getJointPos())
-    //   {
-    //     ROS_INFO("%f,", j);
-    //   }
-    // }
-    // for (size_t i = 0; i < 15; ++i)
-    // {
-    //   auto v = n1->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()[i];
-    //   ROS_INFO("Vertex %ld", i);
-    //   for (double j : v->getJointPos())
-    //   {
-    //     ROS_INFO("%f,", j);
-    //   }
-    // }
-    // bool succ1 = n1->getAgents().find(constraints[0].agent_id)->second->computeSingleAgentPath(
-    //   MAMP_Helper::getConstraintsForAgent(n1->getConstraints(), constraints[0].agent_id), n1->getMaxConstraintTime());
-    
-    // bool succ2 = n2->getAgents().find(constraints[1].agent_id)->second->computeSingleAgentPath(
-    //   MAMP_Helper::getConstraintsForAgent(n2->getConstraints(), constraints[1].agent_id), n2->getMaxConstraintTime());
-    
-    // insert n1 and n2 into open list of cbs
-    // if (succ1)
-    // {
-    //   n1->getPaths().erase(constraints[0].agent_id);
-    //   n1->getPaths().insert({constraints[0].agent_id, n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()});
-    //   // ROS_INFO("n1's Agent path length after update: %ld", n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath().size());
-    //   // for (size_t i = 35; i < 38; ++i)
-    //   // {
-    //   //   auto v = n1->getAgents().find(constraints[0].agent_id)->second->getDiscretizedPath()[i];
-    //   //   ROS_INFO("Vertex %ld %d", i, v->getPRMEdge() != nullptr);
-    //   //   for (double j : v->getJointPos())
-    //   //   {
-    //   //     ROS_INFO("%f,", j);
-    //   //   }
-    //   // }
-    //   // for (size_t i = 0; i < 15; ++i)
-    //   // {
-    //   //   auto v = n1->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()[i];
-    //   //   ROS_INFO("Vertex %ld", i);
-    //   //   for (double j : v->getJointPos())
-    //   //   {
-    //   //     ROS_INFO("%f,", j);
-    //   //   }
-    //   // }
-    //   n1->detectCollisions();
-    //   // ROS_INFO("Next collision at %f between %s %s", n1->getNextCollision().timestep, n1->getNextCollision().agent_id1.c_str(), n1->getNextCollision().agent_id2.c_str());
-    //   n1->computeCost();
-    //   ROS_INFO("Cost of n1: %f", n1->getCost());
-    //   open_list_.insert(n1->getComparisonTuple(), n1);
-    // }
-    // // else
-    // // {
-    // //   ROS_ERROR("Failed to solve AStar for n1");
-    // // }
-    // if (succ2)
-    // {
-    //   n2->getPaths().erase(constraints[1].agent_id);
-    //   n2->getPaths().insert({constraints[1].agent_id, n2->getAgents().find(constraints[1].agent_id)->second->getDiscretizedPath()});
-    //   n2->detectCollisions();
-    //   n2->computeCost();
-    //   ROS_INFO("Cost of n2: %f", n2->getCost());
-    //   open_list_.insert(n2->getComparisonTuple(), n2);
-    // }
-    // else
-    // {
-    //   ROS_ERROR("Failed to solve AStar for n2");
-    // }
   }
   // No solution!!!
   return false;

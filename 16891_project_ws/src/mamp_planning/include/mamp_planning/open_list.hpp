@@ -71,6 +71,7 @@ class OpenList
 {
 public:
   OpenList();
+  OpenList(const OpenList &l);
 
   // pop - removes top element and returns it
   std::tuple<ComparisonTuple, IDTuple, std::shared_ptr<T>> pop();
@@ -94,6 +95,10 @@ public:
 
   void clear();
 
+  // std::unordered_map<IDTuple, std::shared_ptr<T>, hashT> getCheckList();
+  // std::unordered_map<IDTuple, ComparisonTuple, hashT> getTupleMap();
+  // std::map<ComparisonTuple, IDTuple> getOrderedList();
+
 private:
   std::unordered_map<IDTuple, std::shared_ptr<T>, hashT> check_list_;
   std::unordered_map<IDTuple, ComparisonTuple, hashT> tuple_map_;
@@ -106,6 +111,36 @@ template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
 OpenList<ComparisonTuple, IDTuple, T, hashT>::OpenList()
 {
 }
+
+template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+OpenList<ComparisonTuple, IDTuple, T, hashT>::OpenList(const OpenList &l)
+{
+  // printf("Check1.1");
+  this->check_list_ = l.check_list_;
+  // printf("Check1.2");
+  this->tuple_map_ = l.tuple_map_;
+  // printf("Check1.3");
+  this->ordered_list_ = l.ordered_list_;
+  // printf("Check1.4");
+}
+
+// template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+// std::unordered_map<IDTuple, std::shared_ptr<T>, hashT> OpenList<ComparisonTuple, IDTuple, T, hashT>::getCheckList()
+// {
+//   return check_list_;
+// }
+
+// template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+// std::unordered_map<IDTuple, ComparisonTuple, hashT> OpenList<ComparisonTuple, IDTuple, T, hashT>::getTupleMap()
+// {
+//   return tuple_map_;
+// }
+
+// template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
+// std::map<ComparisonTuple, IDTuple> OpenList<ComparisonTuple, IDTuple, T, hashT>::getOrderedList()
+// {
+//   return ordered_list_;
+// }
 
 template <typename ComparisonTuple, typename IDTuple, class T, typename hashT>
 void OpenList<ComparisonTuple, IDTuple, T, hashT>::clear()

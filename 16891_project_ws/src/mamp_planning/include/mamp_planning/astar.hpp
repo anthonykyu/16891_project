@@ -5,16 +5,11 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <algorithm>
+#include <cmath>
 
 class AStar
 {
 public:
-    std::shared_ptr<Vertex> start_;
-    std::shared_ptr<Vertex> goal_;
-    // std::shared_ptr<Agent> agent_;
-    std::vector<Constraint> constraints_;
-    std::vector<std::shared_ptr<Vertex>> Astarpath_;
-    
     AStar(double timestep);
     // AStar(std::shared_ptr<PRM> &prm);
     bool computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
@@ -50,4 +45,5 @@ private:
     bool isValid(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge);
     bool isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge, double current_time,
                         std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints);
+    double round(double in);
 };

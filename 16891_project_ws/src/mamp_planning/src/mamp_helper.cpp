@@ -350,7 +350,7 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
     // {
     //     ROS_INFO("Iteration %d:\t Joint 0 Position:%f", i, discrete_steps[i]->getJointPos()[0]);
     // }
-    int temp_divisions = 1;
+    // int temp_divisions = 1;
 
     for (std::shared_ptr<Vertex> discrete_vertex : discrete_steps)
     {
@@ -366,14 +366,19 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
             //     ROS_ERROR("q_near has collided?????");
             // }
             // last_vertex->setId(discrete_steps[discrete_steps.size()-1]->getId());
-            edge->setDivisions(temp_divisions);
+            // if (temp_divisions == 1)
+            // {
+            //     ROS_ERROR("TEMP DIV IS 1");
+            // }
+            // ROS_ERROR("Edge had collision! IDs: %d, %d", edge->ordered_vertices_[0]->getId(), edge->ordered_vertices_[1]->getId());
+            // edge->setDivisions(temp_divisions);
             last_vertex->setPRMEdge(nullptr);
             return std::pair<bool, std::shared_ptr<Vertex>>(true, last_vertex);
         }
         else
         {
             last_vertex = discrete_vertex;
-            temp_divisions++;
+            // temp_divisions++;
         }
     }
     // ROS_INFO("Exiting detectEdgeCollision");ROS_INFO("Start detectEdgeCollision");
@@ -420,6 +425,16 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
 
     // Generate number of divisions. Use the largest number of divisions
     double divisions = ceil(largest_division);
+    // if (edge->getTraversalTime() != 0 && edge->getTraversalTime() != timestep * divisions)
+    // {
+    //     ROS_ERROR("CHANGING EDGE TRAV TIME, IDs: %d, %d, OldT: %f, NewT: %f", edge->ordered_vertices_[0]->getId(), edge->ordered_vertices_[1]->getId(), edge->getTraversalTime(), timestep * divisions);
+    //     ROS_ERROR("Old Divisions: %f, New Divisions: %f, Timestep: %f", edge->getDivisions(), divisions, timestep);
+    // }
+    // if ((edge->ordered_vertices_[0]->getId() == 1 && edge->ordered_vertices_[1]->getId() == 73) || (edge->ordered_vertices_[0]->getId() == 73 && edge->ordered_vertices_[1]->getId() == 1))
+    // {
+    //     ROS_INFO("Vertex 1: %f, %f", vertices->at(0).at(0), vertices->at(0).at(1));
+    //     ROS_INFO("Vertex 73: %f, %f", vertices->at(1).at(0), vertices->at(1).at(1));
+    // }
     edge->setTraversalTime(timestep * divisions);
     edge->setDivisions(divisions);
 

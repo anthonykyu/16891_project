@@ -4,7 +4,7 @@ PRM::PRM(std::shared_ptr<planning_scene::PlanningScene> planning_scene, double t
         std::vector<double> &jnt_vel_lim, std::vector<double> &jnt_upper_lim, std::vector<double> &jnt_lower_lim,
         std::vector<std::shared_ptr<Vertex>> waypoints, std::shared_ptr<collision_detection::AllowedCollisionMatrix> acm)
 {
-  radius_ = 2;
+  radius_ = 3;
   num_samples_ = 0;
   expansion_factor_= 0.1;
   connectivity_ = 8;
@@ -248,8 +248,9 @@ void PRM::expandPRM()
                     shared_ptr<Edge> collision_free_edge = make_shared<Edge>(q_near, coll.second);
                     // ROS_INFO("edge divisions %f", edge.getDivisions());
 
-                    collision_free_edge->setDivisions(edge->getDivisions());
-                    collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
+                    // collision_free_edge->setDivisions(edge->getDivisions());
+                    // collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
+                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_);
                     // ROS_INFO("Traversal Time for REWRITTEN edge: %f \t %f", collision_free_edge->getDivisions(), collision_free_edge->getTraversalTime());
                     coll.second->addEdge(q_near, collision_free_edge);
                     q_near->addEdge(coll.second, collision_free_edge);
@@ -388,8 +389,9 @@ void PRM::buildPRM()
                     shared_ptr<Edge> collision_free_edge = make_shared<Edge>(q_near, coll.second);
                     // ROS_INFO("edge divisions %f", edge.getDivisions());
 
-                    collision_free_edge->setDivisions(edge->getDivisions());
-                    collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
+                    // collision_free_edge->setDivisions(edge->getDivisions());
+                    // collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
+                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_);
                     // ROS_INFO("Traversal Time for REWRITTEN edge: %f \t %f", collision_free_edge->getDivisions(), collision_free_edge->getTraversalTime());
                     coll.second->addEdge(q_near, collision_free_edge);
                     q_near->addEdge(coll.second, collision_free_edge);

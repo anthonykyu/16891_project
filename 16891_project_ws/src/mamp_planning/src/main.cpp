@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include "ros/package.h"
 #include "mamp_planning/cbs_mp.hpp"
-#include "mamp_planning/pbs_dstar_mp.hpp"
+#include "mamp_planning/cbs_mp_dstar_lite_st.hpp"
 #include "mamp_planning/agent.hpp"
 #include <iostream>
 #include <fstream>
@@ -88,7 +88,8 @@ int main(int argc, char **argv)
   // std::string world_planning_scene = "world_no_shelves_mobile_4";
   // std::string world_planning_scene = "world_no_shelves_mobile_9";
 
-  CBSMP planner_;
+  // CBSMP planner_;
+  CBSMPDStarLiteST planner_;
   std::string world_planning_scene;
   std::string agents_data_file;
   planner_.n_.getParam("test", agents_data_file);

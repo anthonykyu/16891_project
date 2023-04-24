@@ -59,6 +59,8 @@ Agent::Agent(const std::string &robot_description, const std::string &robot_desc
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
                                waypoints_, acm_);
   astar_ = std::make_shared<AStar>(timestep_);
+  dstar_lite_ = std::make_shared<DStarLiteST>(timestep_);
+  dstar_lite_->initialize(waypoints_[0], waypoints_[waypoints_.size()-1]);
 }
 
 Agent::Agent(std::shared_ptr<Agent> &a)
@@ -81,6 +83,47 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   planning_scene_ = a->getPlanningScene();
   // acm_ = a->getACM();
   astar_ = std::make_shared<AStar>(timestep_);
+  dstar_lite_ = std::make_shared<DStarLiteST>(a->getDStar());
+}
+
+std::shared_ptr<DStarLiteST> &Agent::getDStar()
+{
+  return dstar_lite_;
+}
+
+bool Agent::computeIncrementalSingleAgentPath(std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
+  std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints,
+  double max_constraint_time, std::vector<Constraint> new_constraints)
+{
+  discretized_path_.clear();
+  if (new_constraints.size() == 0)
+  {
+    dstar_lite_->initialize(waypoints_[0], waypoints_[waypoints_.size()-1]);
+  }
+  // ROS_INFO("starting to compute PRM path");
+  if (dstar_lite_->computePRMPath(waypoints_[0], waypoints_[waypoints_.size()-1], constraints, max_constraint_time, new_constraints))
+  {
+    // ROS_INFO("finished computing path");
+
+    prm_path_ = dstar_lite_->getPRMPath(waypoints_[0], waypoints_[waypoints_.size()-1], constraints);
+    // ROS_INFO("getting computing path");
+    for (int i = 0; i < prm_path_.size()-1; ++i)
+    {
+      discretized_path_.push_back(prm_path_[i]);
+      if (prm_path_[i]->getId() != prm_path_[i+1]->getId())
+      {
+        std::vector<std::shared_ptr<Vertex>> dv = MAMP_Helper::discretizeEdgeDirected(prm_path_[i], prm_path_[i]->getEdges().find(prm_path_[i+1])->second, joint_vel_limit_, timestep_);
+        for (auto v : dv)
+        {
+          discretized_path_.push_back(v);
+        }
+      }
+    }
+    discretized_path_.push_back(prm_path_[prm_path_.size()-1]);
+    return true;
+  }
+
+  return false;
 }
 
 bool Agent::computeSingleAgentPath(

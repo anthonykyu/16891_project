@@ -14,6 +14,8 @@ Edge::Edge(std::shared_ptr<Vertex> v1, std::shared_ptr<Vertex> v2)
   }
   cost_ = sqrt(cost_);
   valid_ = true;
+  traversal_time_ = 0;
+  divisions_ = 0;
 }
 
 bool const &Edge::isValid()
