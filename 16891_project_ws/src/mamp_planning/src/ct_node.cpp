@@ -79,6 +79,19 @@ std::tuple<double, size_t, unsigned int> CTNode::getComparisonTuple()
 void CTNode::detectCollisions()
 {
   collisions_ = mamp_helper_->detectAgentAgentCollisions(paths_, num_collisions_);
+  if (collisions_.size() > 0)
+  {
+    if ((collisions_[0].location1 == nullptr && !collisions_[0].location1_is_vertex))
+    {
+      ROS_ERROR("The collision location1 is a null_ptr edge");
+    }
+    if ((collisions_[0].location2 == nullptr && !collisions_[0].location2_is_vertex))
+    {
+      ROS_ERROR("The collision location2 is a null_ptr edge");
+
+    }
+
+  }
 }
 
 size_t CTNode::numCollisions()

@@ -15,10 +15,15 @@ bool AStar::computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
   for (int i = 0; i < waypoints.size()-1; ++i)
   {
     if (i == waypoints.size()-2) 
+    {
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, true);
+    }
     else
+    {
       success = computePRMPath(waypoints[i], waypoints[i+1], constraints, max_constraint_time, path_time_, false);
+    }
   }
+
   return success;
 }
 
@@ -251,18 +256,21 @@ double AStar::computeHeuristics(std::shared_ptr<Vertex> goal)
   return max_time;
 }
 
-bool AStar::isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge, double current_time,
-std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints)
+bool AStar::isConstrained(std::shared_ptr<Vertex> vertex, 
+                          std::shared_ptr<Edge> edge, 
+                          double current_time,
+                          std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
+                                    std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>   > &constraints)
 {
-  auto constraint = constraints.second.find(edge);
-  auto constrained_vertex1 = constraints.first.find(vertex);
+  auto constraint = constraints.second.find(edge); // Search for current edge in constraints
+  auto constrained_vertex1 = constraints.first.find(vertex); // Search for current vertex through constraints
 
   if (edge)
   {
-    bool edge_constrained = constraint != constraints.second.end();
+    bool edge_constrained = (constraint != constraints.second.end()); // true if this edge IS in the constraints
     if (edge_constrained)
     {
-      for (auto c : constraint->second)
+      for (auto c : constraint->second) // go through the constraints 
       {
         edge_constrained = ((round(c.time_step) >= round(current_time) && round(c.time_step) <= round(current_time + edge->getTraversalTime())) ||
                             (round(c.time_step) <= -1.0 * round(current_time) && round(c.time_step) >= -1.0 * round(current_time + edge->getTraversalTime())));
@@ -274,10 +282,11 @@ std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
       }
     }
 
-    bool vertex_constrained1 = constrained_vertex1 != constraints.first.end();
+     
+    bool vertex_constrained1 = constrained_vertex1 != constraints.first.end(); // true if this vertex IS in the constraints
     if (vertex_constrained1)
     {
-      for (auto c : constrained_vertex1->second)
+      for (auto c : constrained_vertex1->second) // go through all the constraints
       {
         vertex_constrained1 = (c.time_step >= (current_time + edge->getTraversalTime() - (timestep_ / 2.0)) && c.time_step <= (current_time + edge->getTraversalTime() + (timestep_ / 2.0))) ||
                              (c.time_step <= -1.0 * (current_time + edge->getTraversalTime() - timestep_ / 2.0) && c.time_step >= -1.0 * (current_time + edge->getTraversalTime() + timestep_ / 2.0));

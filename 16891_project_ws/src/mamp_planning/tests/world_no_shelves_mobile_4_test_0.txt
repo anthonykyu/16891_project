@@ -1,0 +1,5 @@
+world_no_shelves_mobile_4
+mobile_1,world_no_shelves_mobile_1,world,mobile_1,2,2.5,0.8,5.0,9.2
+mobile_2,world_no_shelves_mobile_1,world,mobile_1,2,5.0,9.2,0.8,7.5
+mobile_3,world_no_shelves_mobile_1,world,mobile_1,2,0.8,7.5,7.5,0.8
+mobile_4,world_no_shelves_mobile_1,world,mobile_1,2,7.5,0.8,0.8,5.0
