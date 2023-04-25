@@ -114,9 +114,13 @@ int main(int argc, char **argv)
 
   VizTools viz(planner_.get_mamp_helper()->getPlanningScene());
 
+
   // viz.run_simulation_single_agent(agents[0]);
   // viz.run_simulation_single_agent(agents[0], 1, 2);
+  // viz.go_to_start_positions(planner_.getAgents(),0);
+
   viz.run_simulation_all_agents(planner_.getAgents(), 1, 2);
+  ROS_INFO("Done with first visualization, now doing second");
   viz.run_simulation_all_agents(planner_.getAgents(), 0);
 
   ros::spin();

@@ -53,18 +53,18 @@
       </xacro:if>
     </link>
     <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-    <link name="${prefix}${name}_sc">
+    <!-- <link name="${prefix}${name}_sc">
       <xacro:unless value="${gazebo}">
         <xacro:insert_block name="self_collision_geometries" />
       </xacro:unless>
-    </link>
+    </link> -->
     <!-- fixed joint between both sub-links -->
-    <joint name="${prefix}${name}_sc_joint" type="fixed">
+    <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
       <origin rpy="${rpy}" />
       <parent link="${prefix}${name}" />
       <child link="${prefix}${name}_sc" />
     </joint>
-    
+     -->
     <!-- Trying to remove the sc joints -->
     <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
       <!-- <origin rpy="${rpy}" /> -->

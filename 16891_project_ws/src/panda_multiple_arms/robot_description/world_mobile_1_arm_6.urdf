@@ -488,32 +488,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link0"/>
-    <child link="arm_1_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_1_link1">
     <visual>
@@ -528,32 +520,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link1"/>
-    <child link="arm_1_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_1_link0"/>
@@ -577,32 +561,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link2"/>
-    <child link="arm_1_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_1_link1"/>
@@ -626,32 +602,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link3"/>
-    <child link="arm_1_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_1_link2"/>
@@ -675,32 +643,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link4"/>
-    <child link="arm_1_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_1_link3"/>
@@ -724,50 +684,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link5"/>
-    <child link="arm_1_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_1_link4"/>
@@ -791,32 +725,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_1_link6"/>
-    <child link="arm_1_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_1_link5"/>
@@ -840,50 +766,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_1_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_1_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_1_link7"/>
-    <child link="arm_1_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_1_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_1_link6"/>
@@ -918,32 +818,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link0"/>
-    <child link="arm_2_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_2_link1">
     <visual>
@@ -958,32 +850,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link1"/>
-    <child link="arm_2_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_2_link0"/>
@@ -1007,32 +891,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link2"/>
-    <child link="arm_2_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_2_link1"/>
@@ -1056,32 +932,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link3"/>
-    <child link="arm_2_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_2_link2"/>
@@ -1105,32 +973,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link4"/>
-    <child link="arm_2_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_2_link3"/>
@@ -1154,50 +1014,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link5"/>
-    <child link="arm_2_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_2_link4"/>
@@ -1221,32 +1055,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_2_link6"/>
-    <child link="arm_2_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_2_link5"/>
@@ -1270,50 +1096,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_2_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_2_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_2_link7"/>
-    <child link="arm_2_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_2_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_2_link6"/>
@@ -1348,32 +1148,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link0"/>
-    <child link="arm_3_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_3_link1">
     <visual>
@@ -1388,32 +1180,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link1"/>
-    <child link="arm_3_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_3_link0"/>
@@ -1437,32 +1221,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link2"/>
-    <child link="arm_3_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_3_link1"/>
@@ -1486,32 +1262,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link3"/>
-    <child link="arm_3_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_3_link2"/>
@@ -1535,32 +1303,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link4"/>
-    <child link="arm_3_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_3_link3"/>
@@ -1584,50 +1344,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link5"/>
-    <child link="arm_3_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_3_link4"/>
@@ -1651,32 +1385,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_3_link6"/>
-    <child link="arm_3_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_3_link5"/>
@@ -1700,50 +1426,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_3_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_3_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_3_link7"/>
-    <child link="arm_3_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_3_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_3_link6"/>
@@ -1778,32 +1478,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link0"/>
-    <child link="arm_4_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_4_link1">
     <visual>
@@ -1818,32 +1510,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link1"/>
-    <child link="arm_4_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_4_link0"/>
@@ -1867,32 +1551,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link2"/>
-    <child link="arm_4_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_4_link1"/>
@@ -1916,32 +1592,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link3"/>
-    <child link="arm_4_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_4_link2"/>
@@ -1965,32 +1633,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link4"/>
-    <child link="arm_4_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_4_link3"/>
@@ -2014,50 +1674,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link5"/>
-    <child link="arm_4_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_4_link4"/>
@@ -2081,32 +1715,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_4_link6"/>
-    <child link="arm_4_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_4_link5"/>
@@ -2130,50 +1756,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_4_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_4_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_4_link7"/>
-    <child link="arm_4_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_4_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_4_link6"/>
@@ -2208,32 +1808,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link0"/>
-    <child link="arm_5_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_5_link1">
     <visual>
@@ -2248,32 +1840,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link1"/>
-    <child link="arm_5_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_5_link0"/>
@@ -2297,32 +1881,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link2"/>
-    <child link="arm_5_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_5_link1"/>
@@ -2346,32 +1922,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link3"/>
-    <child link="arm_5_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_5_link2"/>
@@ -2395,32 +1963,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link4"/>
-    <child link="arm_5_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_5_link3"/>
@@ -2444,50 +2004,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link5"/>
-    <child link="arm_5_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_5_link4"/>
@@ -2511,32 +2045,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_5_link6"/>
-    <child link="arm_5_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_5_link5"/>
@@ -2560,50 +2086,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_5_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_5_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_5_link7"/>
-    <child link="arm_5_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_5_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_5_link6"/>
@@ -2638,32 +2138,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link0_sc">
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="-0.075 0 0.06"/>
-      <geometry>
-        <cylinder length="0.03" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.06 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="-0.09 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link0_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link0"/>
-    <child link="arm_6_link0_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="arm_6_link1">
     <visual>
@@ -2678,32 +2170,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link1_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.1915"/>
-      <geometry>
-        <cylinder length="0.283" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.05000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.33299999999999996"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link1_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link1"/>
-    <child link="arm_6_link1_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_1" type="revolute">
     <origin rpy="0 0 0" xyz="0 0 0.333"/>
     <parent link="arm_6_link0"/>
@@ -2727,32 +2211,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link2_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link2_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link2"/>
-    <child link="arm_6_link2_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_2" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_6_link1"/>
@@ -2776,32 +2252,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link3_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.145"/>
-      <geometry>
-        <cylinder length="0.15" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06999999999999999"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21999999999999997"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link3_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link3"/>
-    <child link="arm_6_link3_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_3" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 -0.316 0"/>
     <parent link="arm_6_link2"/>
@@ -2825,32 +2293,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link4_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0"/>
-      <geometry>
-        <cylinder length="0.12" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.06"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link4_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link4"/>
-    <child link="arm_6_link4_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_4" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.0825 0 0"/>
     <parent link="arm_6_link3"/>
@@ -2874,50 +2334,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link5_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.26"/>
-      <geometry>
-        <cylinder length="0.1" radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.21000000000000002"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.31"/>
-      <geometry>
-        <sphere radius="0.09"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 0 0.08" xyz="0 0.08 -0.13"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.06"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0.08 -0.2"/>
-      <geometry>
-        <sphere radius="0.055"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link5_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link5"/>
-    <child link="arm_6_link5_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_5" type="revolute">
     <origin rpy="-1.5707963267948966 0 0" xyz="-0.0825 0.384 0"/>
     <parent link="arm_6_link4"/>
@@ -2941,32 +2375,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link6_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 -0.03"/>
-      <geometry>
-        <cylinder length="0.08" radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.010000000000000002"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.07"/>
-      <geometry>
-        <sphere radius="0.08"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link6_sc_joint" type="fixed">
-    <origin rpy="0 0 0"/>
-    <parent link="arm_6_link6"/>
-    <child link="arm_6_link6_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_6" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0 0 0"/>
     <parent link="arm_6_link5"/>
@@ -2990,50 +2416,24 @@
     </collision>
   </link>
   <!-- sub-link defining coarse geometries of real robot's internal self-collision -->
-  <link name="arm_6_link7_sc">
-    <collision>
-      <origin rpy="0 0 0" xyz="0 0 0.01"/>
-      <geometry>
-        <cylinder length="0.14" radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 0.08"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0 0 -0.060000000000000005"/>
-      <geometry>
-        <sphere radius="0.07"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin rpy="0 1.5707963267948966 0" xyz="0.06 0 0.082"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.065 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-    <collision>
-      <origin xyz="0.055 0 0.082"/>
-      <geometry>
-        <sphere radius="0.06"/>
-      </geometry>
-    </collision>
-  </link>
+  <!-- <link name="${prefix}${name}_sc">
+      <xacro:unless value="${gazebo}">
+        <xacro:insert_block name="self_collision_geometries" />
+      </xacro:unless>
+    </link> -->
   <!-- fixed joint between both sub-links -->
-  <joint name="arm_6_link7_sc_joint" type="fixed">
-    <origin rpy="0 0 0.7853981633974483"/>
-    <parent link="arm_6_link7"/>
-    <child link="arm_6_link7_sc"/>
-  </joint>
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed">
+      <origin rpy="${rpy}" />
+      <parent link="${prefix}${name}" />
+      <child link="${prefix}${name}_sc" />
+    </joint>
+     -->
+  <!-- Trying to remove the sc joints -->
+  <!-- <joint name="${prefix}${name}_sc_joint" type="fixed"> -->
+  <!-- <origin rpy="${rpy}" /> -->
+  <!-- <parent link="${prefix}${name}" /> -->
+  <!-- <child link="${prefix}${name}_sc" /> -->
+  <!-- </joint> -->
   <joint name="arm_6_7" type="revolute">
     <origin rpy="1.5707963267948966 0 0" xyz="0.088 0 0"/>
     <parent link="arm_6_link6"/>

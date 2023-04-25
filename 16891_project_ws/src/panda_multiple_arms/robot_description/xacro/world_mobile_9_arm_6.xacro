@@ -1,0 +1,219 @@
+<?xml version="1.0" ?>
+
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="world_mobile_1">
+
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/walls_for_arms.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/mobile_robot.xacro" />
+  <xacro:include filename="$(find panda_multiple_arms)/robot_description/xacro/arm_robot.xacro" />
+
+  <xacro:walls_world_for_arms/>
+    <xacro:mobile_robot name="mobile_1" dims="0.25" color="blue"/>
+  <link name="mobile_1_temp"/>
+  
+  <xacro:mobile_robot name="mobile_2" dims="0.25" color="blue"/>
+  <link name="mobile_2_temp"/>
+
+  <xacro:mobile_robot name="mobile_3" dims="0.25" color="blue"/>
+  <link name="mobile_3_temp"/>
+
+  <xacro:mobile_robot name="mobile_4" dims="0.25" color="blue"/>
+  <link name="mobile_4_temp"/>
+
+  <xacro:mobile_robot name="mobile_5" dims="0.25" color="blue"/>
+  <link name="mobile_5_temp"/>
+
+  <xacro:mobile_robot name="mobile_6" dims="0.25" color="blue"/>
+  <link name="mobile_6_temp"/>
+
+  <xacro:mobile_robot name="mobile_7" dims="0.25" color="blue"/>
+  <link name="mobile_7_temp"/>
+
+  <xacro:mobile_robot name="mobile_8" dims="0.25" color="blue"/>
+  <link name="mobile_8_temp"/>
+
+  <xacro:mobile_robot name="mobile_9" dims="0.25" color="blue"/>
+  <link name="mobile_9_temp"/>
+
+  <!-- Mobile Robot 1 -->
+  <joint name="mobile_1_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_1_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_1_2" type="prismatic">
+      <parent link="mobile_1_temp"/>
+      <child link="mobile_1"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+
+  <!-- Mobile Robot 2 -->
+  <joint name="mobile_2_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_2_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_2_2" type="prismatic">
+      <parent link="mobile_2_temp"/>
+      <child link="mobile_2"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+
+  <!-- Mobile Robot 3 -->
+  <joint name="mobile_3_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_3_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_3_2" type="prismatic">
+      <parent link="mobile_3_temp"/>
+      <child link="mobile_3"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Mobile Robot 4 -->
+  <joint name="mobile_4_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_4_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_4_2" type="prismatic">
+      <parent link="mobile_4_temp"/>
+      <child link="mobile_4"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Mobile Robot 5 -->
+  <joint name="mobile_5_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_5_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_5_2" type="prismatic">
+      <parent link="mobile_5_temp"/>
+      <child link="mobile_5"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+    <!-- Mobile Robot 6 -->
+  <joint name="mobile_6_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_6_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_6_2" type="prismatic">
+      <parent link="mobile_6_temp"/>
+      <child link="mobile_6"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+    <!-- Mobile Robot 7 -->
+  <joint name="mobile_7_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_7_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_7_2" type="prismatic">
+      <parent link="mobile_7_temp"/>
+      <child link="mobile_7"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+    <!-- Mobile Robot 8 -->
+  <joint name="mobile_8_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_8_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_8_2" type="prismatic">
+      <parent link="mobile_8_temp"/>
+      <child link="mobile_8"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+
+    <!-- Mobile Robot 9 -->
+  <joint name="mobile_9_1" type="prismatic">
+      <parent link="world"/>
+      <child link="mobile_9_temp"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="1 0 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <joint name="mobile_9_2" type="prismatic">
+      <parent link="mobile_9_temp"/>
+      <child link="mobile_9"/>
+      <limit effort="1000.0" lower="0" upper="10" velocity="1"/>
+      <axis xyz="0 1 0"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <!-- Arm 1 -->
+  <xacro:arg name="arm_id_1" default="arm_1" />
+  <xacro:arm_robot arm_id="$(arg arm_id_1)" connected_to="shelf_1" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <!-- Arm 2 -->
+  <xacro:arg name="arm_id_2" default="arm_2" />
+  <xacro:arm_robot arm_id="$(arg arm_id_2)" connected_to="shelf_2" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <!-- Arm 3 -->
+  <xacro:arg name="arm_id_3" default="arm_3" />
+  <xacro:arm_robot arm_id="$(arg arm_id_3)" connected_to="shelf_3" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <!-- Arm 4 -->
+  <xacro:arg name="arm_id_4" default="arm_4" />
+  <xacro:arm_robot arm_id="$(arg arm_id_4)" connected_to="shelf_4" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <!-- Arm 5 -->
+  <xacro:arg name="arm_id_5" default="arm_5" />
+  <xacro:arm_robot arm_id="$(arg arm_id_5)" connected_to="shelf_5" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+  <!-- Arm 6 -->
+  <xacro:arg name="arm_id_6" default="arm_6" />
+  <xacro:arm_robot arm_id="$(arg arm_id_6)" connected_to="shelf_6" xyz="0 0 0.2" rpy="0 0 0" gazebo="false" safety_distance="0.03" joint_limits="${xacro.load_yaml('$(find franka_description)/robots/panda/joint_limits.yaml')}"/>
+
+</robot>
+

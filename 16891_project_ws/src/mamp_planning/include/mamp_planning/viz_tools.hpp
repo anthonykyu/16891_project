@@ -15,9 +15,8 @@ public:
     void run_simulation_single_agent(std::shared_ptr<Agent> agent, int show_path_option=0, int display_rate=10);
 
     // void run_simulation_all_agents(const std::vector<std::shared_ptr<Vertex>> &path);
-    void run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> agents, int show_path_option=0, int display_rate=10);
+    void run_simulation_all_agents(std::vector<std::shared_ptr<Agent>> agents, int show_path_option=0, int display_rate=10, double wait_time = 1);
     
-
     // run_simulation 
     // void VizTools::run_simulation(std::shared_ptr<planning_scene::PlanningScene> planning_scene, const std::vector<Vertex> vertex_path)
 
