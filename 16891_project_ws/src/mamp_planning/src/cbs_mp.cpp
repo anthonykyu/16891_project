@@ -270,7 +270,6 @@ void CBSMP::printStats(std::shared_ptr<CTNode> node)
   }
   file.close();
   ROS_INFO("Average Solve Time: %f", avg);
-  agents_ = node->getAgents();
   ROS_INFO("Path Cost of Node: %f", node->getCost());
   size_t prm_size = 0;
   for (auto a : agents_)
@@ -300,8 +299,6 @@ bool CBSMP::replanCBS()
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
   int iteration=0;
-  double avg = 0;
-  unsigned int count = 0;
   while (open_list_.size() > 0)
   {
     auto end = std::chrono::high_resolution_clock::now();
@@ -366,6 +363,7 @@ bool CBSMP::replanCBS()
       end = std::chrono::high_resolution_clock::now();
       diff = end - start;
       total_runtime_ = diff.count();
+      agents_ = node->getAgents();
       printStats(node);
       return true;
     }
