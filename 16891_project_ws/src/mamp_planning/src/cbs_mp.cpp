@@ -6,7 +6,7 @@ CBSMP::CBSMP()
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMP::timerCallback, this);
   alpha_ = 0.05;
-  X_ = 0.95;
+  X_ = 0.99;
   // mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
@@ -108,6 +108,9 @@ void CBSMP::initialize(std::vector<std::shared_ptr<Agent>> &agents, std::string 
     ROS_INFO("PRM Size: %ld", a.second->getPRM()->PRMgraph_.size());
     a.second->computeSingleAgentPath();
   }
+  alpha_ = alpha_ / agents_.size();
+
+
   replanCBS();
   initialized_ = true;
 }
@@ -246,6 +249,38 @@ void CBSMP::printCollision(Collision c)
   }
 }
 
+void CBSMP::printStats(std::shared_ptr<CTNode> node)
+{
+  ROS_INFO("Runtime: %f", total_runtime_);
+  std::vector<double> avg_runtimes_;
+  double avg = 0;
+  for (int i = 0; i < runtimes_.size(); i+=2)
+  {
+    avg += runtimes_[i];
+    avg += runtimes_[i+1];
+    avg_runtimes_.push_back((runtimes_[i] + runtimes_[i+1]) / 2.0);
+  }
+  avg = avg / runtimes_.size();
+  // std::ofstream file;
+  // file.open ("cbsmp_results.csv");
+  // file << "This is the first cell in the first column.\n";
+  // file << "a,b,c,\n";
+  // file << "c,s,v,\n";
+  // file << "1,2,3.456\n";
+  // file << "semi;colon";
+  // file.close();
+  ROS_INFO("Average Solve Time: %f", avg);
+  agents_ = node->getAgents();
+  ROS_INFO("Path Cost of Node: %f", node->getCost());
+  size_t prm_size = 0;
+  for (auto a : agents_)
+  {
+    prm_size += a.second->getPRM()->PRMgraph_.size();
+  }
+  ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
+
+}
+
 
 bool CBSMP::replanCBS()
 {
@@ -307,6 +342,11 @@ bool CBSMP::replanCBS()
       root->computeCost();
       open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
       ++S_;
+      resampled_.push_back(1);
+    }
+    else
+    {
+      resampled_.push_back(0);
     }
     std::shared_ptr<CTNode> node = std::get<2>(open_list_.pop());
     ++N;
@@ -325,17 +365,8 @@ bool CBSMP::replanCBS()
       // printPaths(node);
       end = std::chrono::high_resolution_clock::now();
       diff = end - start;
-      ROS_INFO("Runtime: %f", diff.count());
-      ROS_INFO("Average Solve Time: %f", avg);
-      agents_ = node->getAgents();
-      ROS_INFO("Path Cost of Node: %f", node->getCost());
-      size_t prm_size = 0;
-      for (auto a : agents_)
-      {
-        prm_size += a.second->getPRM()->PRMgraph_.size();
-      }
-      ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
-
+      total_runtime_ = diff.count();
+      printStats(node);
       return true;
     }
     // ROS_INFO("Made it here");
@@ -374,7 +405,7 @@ bool CBSMP::replanCBS()
       MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime());
       auto end_solve = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff_solve = end_solve - start_solve;
-      avg = ((avg * count) + diff_solve.count()) / (count + 1);
+      runtimes_.push_back(diff_solve.count());
       // ROS_WARN("Will probably fail here");
       if (succ[i])
       {

@@ -94,10 +94,8 @@ std::tuple<double, double> DStarLiteST::calculateKey(std::tuple<unsigned int, do
 {
   double k1 = std::min(getG(vertex), getRHS(vertex)) + h_[std::get<0>(vertex)];
   double k2 = std::min(getG(vertex), getRHS(vertex));
-  if (k1 != std::numeric_limits<double>::infinity())
-    k1 = round(k1);
-  if (k2 != std::numeric_limits<double>::infinity())
-    k2 = round(k2);
+  k1 = round(k1);
+  k2 = round(k2);
   return std::make_tuple(k1, k2);
 }
 
@@ -224,7 +222,7 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
         updateVertex(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime())), succ.first, goal);
       }
       // Staying in same spot edge
-      if (getRHS(std::make_tuple(c.joint_pos_vertex->getId(), round(c.time_step + timestep_))) == round(timestep_ + getG(std::make_tuple(c.joint_pos_vertex->getId(), round(c.time_step)))))
+      if (round(getRHS(std::make_tuple(c.joint_pos_vertex->getId(), round(c.time_step + timestep_)))) == round(timestep_ + getG(std::make_tuple(c.joint_pos_vertex->getId(), round(c.time_step)))))
       {
         // Line 46, for all predecessors (backwards)
         double min_rhs = std::numeric_limits<double>::infinity();
@@ -246,7 +244,7 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
     {
       // Edge constraint
       double c_old = c.joint_pos_edge->getTraversalTime();
-      for (double current_time = c.time_step - c.joint_pos_edge->getTraversalTime(); current_time <= c.time_step; current_time += timestep_)
+      for (double current_time = c.time_step - c.joint_pos_edge->getTraversalTime(); round(current_time) <= round(c.time_step); current_time += timestep_)
       {
         // ROS_INFO("current time edge: %f, timestep: %f, trav time: %f", current_time, c.time_step, c.joint_pos_edge->getTraversalTime());
         for (int i = 0; i < 2; ++i)
@@ -534,9 +532,9 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
   //   ROS_INFO("hash: %ld", hash_tuple::hash<std::tuple<unsigned int, double>>{}(g_value.first));
   // }
   // ROS_INFO("GOAL RHS: %f, G: %f", getRHS(std::make_tuple(goal->getId(), round(path_time_))), getG(std::make_tuple(goal->getId(), round(path_time_))));
+  // bool same = false;
   while (v->getId() != start->getId() || round(time) != 0)
   {
-    // ROS_INFO("v ID: %d, start ID: %d, time: %f", v->getId(), start->getId(), time);
     std::shared_ptr<Vertex> s = v;
     double pred_time = time;
     double f = std::numeric_limits<double>::infinity();
@@ -578,6 +576,10 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
     //   std::reverse(prm_path.begin(), prm_path.end());
     //   return prm_path;
     // }
+    // if (!same)
+    //   ROS_INFO("v ID: %d, start ID: %d, time: %f", v->getId(), start->getId(), time);
+    // if (v->getId() == s->getId())
+    //   same = true;
     v = s;
     time = pred_time;
     prm_path.push_back(v);
@@ -664,8 +666,8 @@ bool DStarLiteST::isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<
     {
       for (auto c : constraint->second)
       {
-        edge_constrained = ((round(c.time_step) >= round(current_time) && round(c.time_step) <= round(current_time + edge->getTraversalTime())) ||
-                            (round(c.time_step) <= -1.0 * round(current_time) && round(c.time_step) >= -1.0 * round(current_time + edge->getTraversalTime())));
+        edge_constrained = ((c.time_step >= (current_time - (timestep_ / 2.0)) && c.time_step <= (current_time + edge->getTraversalTime() + (timestep_ / 2.0))) ||
+                            (c.time_step <= -1.0 * (current_time - (timestep_ / 2.0)) && c.time_step >= -1.0 * (current_time + edge->getTraversalTime() + (timestep_ / 2.0))));
         if (edge_constrained)
         {
           // ROS_INFO("IS EDGE CONSTRAINED");
@@ -735,5 +737,7 @@ bool DStarLiteST::isValid(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> 
 
 double DStarLiteST::round(double in)
 {
-  return static_cast<int>(std::round(in / timestep_)) * timestep_;
+  if (in != std::numeric_limits<double>::infinity())
+    return static_cast<int>(std::round(in / timestep_)) * timestep_;
+  return in;
 }

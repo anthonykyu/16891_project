@@ -5,6 +5,8 @@
 #include <chrono>
 #include "mamp_planning/agent.hpp"
 #include "mamp_planning/ct_node.hpp"
+#include <iostream>
+#include <fstream>
 
 #define PLANNER_RATE 10
 
@@ -24,6 +26,7 @@ class CBSMP
     void printPaths(std::shared_ptr<CTNode> node);
     void printConstraints(std::vector<Constraint> node);
     void printCollision(Collision c);
+    void printStats(std::shared_ptr<CTNode> node);
 
     ros::Timer timer_;
 
@@ -34,5 +37,8 @@ class CBSMP
     std::unordered_map<std::string, std::shared_ptr<Agent>> agents_;
     OpenList<std::tuple<double, size_t, unsigned int>, std::tuple<unsigned int>, CTNode, hash_tuple::hash<std::tuple<unsigned int>>> open_list_;
     std::shared_ptr<MAMP_Helper> mamp_helper_;
+    std::vector<double> runtimes_;
+    double total_runtime_;
+    std::vector<int> resampled_;
 };
 

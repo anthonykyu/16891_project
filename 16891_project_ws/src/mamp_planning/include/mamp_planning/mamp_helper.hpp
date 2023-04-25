@@ -100,7 +100,7 @@ class MAMP_Helper
 
 
     // Use this function to discretize an edge into smaller vertices based on the max velocity limit and timestep
-    static std::vector<std::shared_ptr<Vertex>> discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep);
+    static std::vector<std::shared_ptr<Vertex>> discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep, bool return_discretization = true);
     // {
       // This function breaks down a given edge into a list of vertices to check for collisions
       // The discretization is based off of the max joint velocity and timestep given as inputs

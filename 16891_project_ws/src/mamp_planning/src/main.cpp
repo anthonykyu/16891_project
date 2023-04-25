@@ -77,7 +77,7 @@ std::vector<std::shared_ptr<Agent>> parseAgentFile(ros::NodeHandle &n, std::stri
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mamp_planning_node");
-  srand(1);
+  srand(0);
   // srand(time(0));
   ROS_INFO("Heyyy");
   double timestep = 0.1;
@@ -88,8 +88,8 @@ int main(int argc, char **argv)
   // std::string world_planning_scene = "world_no_shelves_mobile_4";
   // std::string world_planning_scene = "world_no_shelves_mobile_9";
 
-  // CBSMP planner_;
-  CBSMPDStarLiteST planner_;
+  CBSMP planner_;
+  // CBSMPDStarLiteST planner_;
   std::string world_planning_scene;
   std::string agents_data_file;
   planner_.n_.getParam("test", agents_data_file);

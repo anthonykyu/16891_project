@@ -251,7 +251,7 @@ void PRM::expandPRM()
 
                     // collision_free_edge->setDivisions(edge->getDivisions());
                     // collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
-                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_);
+                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_, false);
                     // ROS_INFO("Traversal Time for REWRITTEN edge: %f \t %f", collision_free_edge->getDivisions(), collision_free_edge->getTraversalTime());
                     coll.second->addEdge(q_near, collision_free_edge);
                     q_near->addEdge(coll.second, collision_free_edge);
@@ -414,7 +414,7 @@ void PRM::buildPRM()
 
                     // collision_free_edge->setDivisions(edge->getDivisions());
                     // collision_free_edge->setTraversalTime(collision_free_edge->getDivisions() * timestep_);
-                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_);
+                    MAMP_Helper::discretizeEdge(collision_free_edge, jnt_vel_lim_, timestep_, false);
                     // ROS_INFO("Traversal Time for REWRITTEN edge: %f \t %f", collision_free_edge->getDivisions(), collision_free_edge->getTraversalTime());
                     coll.second->addEdge(q_near, collision_free_edge);
                     q_near->addEdge(coll.second, collision_free_edge);

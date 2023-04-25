@@ -6,7 +6,7 @@ CBSMPDStarLiteST::CBSMPDStarLiteST()
   S_ = 1;
   timer_ = n_.createTimer(ros::Duration(1.0 / PLANNER_RATE), &CBSMPDStarLiteST::timerCallback, this);
   alpha_ = 0.05;
-  X_ = 0.95;
+  X_ = 0.99;
   // mamp_helper_ = std::make_shared<MAMP_Helper>(world_planning_scene, timestep);
 }
 
@@ -108,6 +108,8 @@ void CBSMPDStarLiteST::initialize(std::vector<std::shared_ptr<Agent>> &agents, s
     ROS_INFO("Agent %s PRM Size: %ld", a.first.c_str(), a.second->getPRM()->PRMgraph_.size());
     a.second->computeIncrementalSingleAgentPath();
   }
+  alpha_ = alpha_ / agents_.size();
+
   replanCBS();
   initialized_ = true;
 }

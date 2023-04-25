@@ -441,7 +441,7 @@ std::pair<bool, std::shared_ptr<Vertex>> MAMP_Helper::detectEdgeCollision(std::s
 
 
 // Use this function to discretize an edge into smaller vertices based on the max velocity limit and timestep
-std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep)
+std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr<Edge> edge, std::vector<double> &jnt_vel_lim, double timestep, bool return_discretization)
 {
 
     // ROS_INFO("DiscretizeEdge START");
@@ -494,27 +494,30 @@ std::vector<std::shared_ptr<Vertex>> MAMP_Helper::discretizeEdge(std::shared_ptr
     // Create a set of new vertices (including start and end) that can be checked for collisions
     std::vector<std::shared_ptr<Vertex>> output;
 
-    // Add the first vertex
-    output.push_back(edge->ordered_vertices_[0]);
-    
-
-    for (int i=1; i < (int) (divisions); ++i)
+    if (return_discretization)
     {
-        // Build the intermediate set of joints
-        std::vector<double> new_joints(num_joints);
-        for (int j=0; j < num_joints; j++)
+        // Add the first vertex
+        output.push_back(edge->ordered_vertices_[0]);
+        
+
+        for (int i=1; i < (int) (divisions); ++i)
         {
-            new_joints[j] = vertices->at(0).at(j) + (i * (diff.at(j) / divisions));
+            // Build the intermediate set of joints
+            std::vector<double> new_joints(num_joints);
+            for (int j=0; j < num_joints; j++)
+            {
+                new_joints[j] = vertices->at(0).at(j) + (i * (diff.at(j) / divisions));
+            }
+
+            std::shared_ptr<Vertex> new_vertex (new Vertex(new_joints, 0));
+            new_vertex->setPRMEdge(edge);
+            output.push_back(new_vertex);
         }
 
-        std::shared_ptr<Vertex> new_vertex (new Vertex(new_joints, 0));
-        new_vertex->setPRMEdge(edge);
-        output.push_back(new_vertex);
+        // Add the last vertex
+        output.push_back(edge->ordered_vertices_[1]);
     }
-
-    // Add the last vertex
-    output.push_back(edge->ordered_vertices_[1]);
-
+    
     // output[0]->setPRMEdge(edge);
     // output[output.size()-1]->setPRMEdge(edge);
 
