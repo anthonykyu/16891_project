@@ -261,14 +261,14 @@ void CBSMP::printStats(std::shared_ptr<CTNode> node)
     avg_runtimes_.push_back((runtimes_[i] + runtimes_[i+1]) / 2.0);
   }
   avg = avg / runtimes_.size();
-  // std::ofstream file;
+  ofstream file;
+  file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_results.csv");
   // file.open ("cbsmp_results.csv");
-  // file << "This is the first cell in the first column.\n";
-  // file << "a,b,c,\n";
-  // file << "c,s,v,\n";
-  // file << "1,2,3.456\n";
-  // file << "semi;colon";
-  // file.close();
+  for (int i = 0; i < avg_runtimes_.size(); ++i)
+  {
+    file << i << "," << avg_runtimes_[i] << "," << resampled_[i] << std::endl;
+  }
+  file.close();
   ROS_INFO("Average Solve Time: %f", avg);
   agents_ = node->getAgents();
   ROS_INFO("Path Cost of Node: %f", node->getCost());

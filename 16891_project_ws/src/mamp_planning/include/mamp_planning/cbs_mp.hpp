@@ -7,6 +7,7 @@
 #include "mamp_planning/ct_node.hpp"
 #include <iostream>
 #include <fstream>
+#include "ros/package.h"
 
 #define PLANNER_RATE 10
 
