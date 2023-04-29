@@ -255,17 +255,6 @@ void CBSMPDStarLiteST::printStats(std::shared_ptr<CTNode> node)
   }
   avg = avg / runtimes_.size();
   avg_expansions = avg_expansions / num_expansions_.size();
-  ofstream file;
-  file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_dstarlite_results.csv");
-  // file.open ("cbsmp_results.csv");
-  for (int i = 0; i < avg_runtimes_.size(); ++i)
-  {
-    if (resampled_[i] == 1)
-      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << "," << resampled_[i] << std::endl;
-    else
-      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << std::endl;
-  }
-  file.close();
   ROS_INFO("Average Solve Time: %f", avg);
   ROS_INFO("Average Number of Expansions: %f", avg_expansions);
   ROS_INFO("Path Cost of Node: %f", node->getCost());
@@ -276,6 +265,22 @@ void CBSMPDStarLiteST::printStats(std::shared_ptr<CTNode> node)
   }
   ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
 
+  ofstream file;
+  ofstream file2;
+  file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_dstarlite_results.csv");
+  // file.open ("cbsmp_results.csv");
+  for (int i = 0; i < avg_runtimes_.size(); ++i)
+  {
+    if (resampled_[i] == 1)
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << "," << resampled_[i] << std::endl;
+    else
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << std::endl;
+  }
+  file.close();
+
+  file2.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_dstarlite_stats.csv", std::ios::out | std::ios::app);
+  file2 << total_runtime_ << "," << avg << "," << avg_expansions << "," << node->getCost() << "," << prm_size << std::endl;
+  file2.close();
 }
 
 bool CBSMPDStarLiteST::replanCBS()

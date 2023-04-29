@@ -89,7 +89,7 @@ int main(int argc, char **argv)
   // 1682395425 1st best 0.99 X 2*dof radius
 
   //1682694510 0.1 alpha
-  // srand(1682393657);
+  // srand(1682776069);
   srand(seed_used);
   ROS_INFO("Heyyy");
   double timestep = 0.1;
@@ -100,8 +100,8 @@ int main(int argc, char **argv)
   // std::string world_planning_scene = "world_no_shelves_mobile_4";
   // std::string world_planning_scene = "world_no_shelves_mobile_9";
 
-  // CBSMP planner_;
-  CBSMPDStarLiteST planner_;
+  CBSMP planner_;
+  // CBSMPDStarLiteST planner_;
   std::string world_planning_scene;
   std::string agents_data_file;
   planner_.n_.getParam("test", agents_data_file);

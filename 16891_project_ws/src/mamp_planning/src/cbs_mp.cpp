@@ -267,6 +267,16 @@ void CBSMP::printStats(std::shared_ptr<CTNode> node)
   }
   avg = avg / runtimes_.size();
   avg_expansions = avg_expansions / num_expansions_.size();
+  ROS_INFO("Average Solve Time: %f", avg);
+  ROS_INFO("Average Number of Expansions: %f", avg_expansions);
+  ROS_INFO("Path Cost of Node: %f", node->getCost());
+  size_t prm_size = 0;
+  for (auto a : agents_)
+  {
+    prm_size += a.second->getPRM()->PRMgraph_.size();
+  }
+  ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
+
   ofstream file;
   file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_results.csv");
   // file.open ("cbsmp_results.csv");
@@ -278,16 +288,11 @@ void CBSMP::printStats(std::shared_ptr<CTNode> node)
       file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << std::endl;
   }
   file.close();
-  ROS_INFO("Average Solve Time: %f", avg);
-  ROS_INFO("Average Number of Expansions: %f", avg_expansions);
-  ROS_INFO("Path Cost of Node: %f", node->getCost());
-  size_t prm_size = 0;
-  for (auto a : agents_)
-  {
-    prm_size += a.second->getPRM()->PRMgraph_.size();
-  }
-  ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
 
+  ofstream file2;
+  file2.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_stats.csv", std::ios::out | std::ios::app);
+  file2 << total_runtime_ << "," << avg << "," << avg_expansions << "," << node->getCost() << "," << prm_size << std::endl;
+  file2.close();
 }
 
 
@@ -393,15 +398,15 @@ bool CBSMP::replanCBS()
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
+
+    // ROS_WARN("Making children to resolve collision");
+    // ROS_INFO("Collision being resolved is:");
+    // printCollision(c);
     // #ifdef MP_EN
     //     // ROS_INFO("Using OMP");
     //     omp_set_num_threads(MP_PROC_NUM);
     //     #pragma omp parallel for
     // #endif
-
-    // ROS_WARN("Making children to resolve collision");
-    // ROS_INFO("Collision being resolved is:");
-    // printCollision(c);
     for (int i = 0; i < new_nodes.size(); ++i)
     {
       // ROS_WARN("~~~~~ Child #%d ~~~~~", i);
