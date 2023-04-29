@@ -184,6 +184,7 @@ add_executable(${PROJECT_NAME}_node src/main.cpp
                                     src/dstar_lite.cpp
                                     src/dstar_lite_st.cpp
                                     src/cbs_mp_dstar_lite_st.cpp
+                                    src/lpastar.cpp
                                     )
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 # add_dependencies(${PROJECT_NAME}_node ${catkin_EXPORTED_TARGETS})

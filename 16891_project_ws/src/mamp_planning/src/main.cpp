@@ -78,7 +78,19 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "mamp_planning_node");
   // srand(0);
-  srand(time(0));
+  unsigned int seed_used = time(0);
+  // 1682390771
+  //1682392818
+  // 1682393347 2nd best so far
+  //1682393639
+  // 1682393657 1st best 0.95 X
+
+  // 1682394998 1st best 0.99 X
+  // 1682395425 1st best 0.99 X 2*dof radius
+
+  //1682694510 0.1 alpha
+  // srand(1682393657);
+  srand(seed_used);
   ROS_INFO("Heyyy");
   double timestep = 0.1;
   // std::string world_planning_scene = "world_mobile_1";
@@ -88,8 +100,8 @@ int main(int argc, char **argv)
   // std::string world_planning_scene = "world_no_shelves_mobile_4";
   // std::string world_planning_scene = "world_no_shelves_mobile_9";
 
-  CBSMP planner_;
-  // CBSMPDStarLiteST planner_;
+  // CBSMP planner_;
+  CBSMPDStarLiteST planner_;
   std::string world_planning_scene;
   std::string agents_data_file;
   planner_.n_.getParam("test", agents_data_file);
@@ -98,6 +110,7 @@ int main(int argc, char **argv)
   std::vector<std::shared_ptr<Agent>> agents = parseAgentFile(planner_.n_, agents_data_file, timestep, world_planning_scene);
   // ROS_WARN("Until here in main.cpp");
   planner_.initialize(agents, world_planning_scene, timestep);
+  ROS_INFO("SEED USED: %d", seed_used);
   // ROS_INFO("Number of agents: %ld", agents.size());
   // ROS_INFO("Agent ID: %s", agents[0]->getID().c_str());
   // ROS_INFO("Agent Start: %f, %f", agents[0]->getStart()->getJointPos()[0], agents[0]->getStart()->getJointPos()[1]);

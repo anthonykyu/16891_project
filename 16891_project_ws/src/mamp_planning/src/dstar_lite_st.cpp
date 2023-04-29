@@ -122,7 +122,7 @@ void DStarLiteST::initialize(std::shared_ptr<Vertex> start, std::shared_ptr<Vert
 
 void DStarLiteST::updateVertex(std::tuple<unsigned int, double> vertex, std::shared_ptr<Vertex> vertex_ptr, std::shared_ptr<Vertex> goal)
 {
-  if (getG(vertex) != getRHS(vertex))
+  if (round(getG(vertex)) != round(getRHS(vertex)))
   {
     // insert the vertex into the open list
     // ROS_INFO("key: %f, %f, id: %d, time: %f", std::get<0>(calculateKey(vertex)), std::get<1>(calculateKey(vertex)), vertex_ptr->getId(), std::get<1>(vertex));
@@ -131,7 +131,7 @@ void DStarLiteST::updateVertex(std::tuple<unsigned int, double> vertex, std::sha
       expanded_goal_times_.erase(round(std::get<1>(vertex)));
     // key_map_[vertex] = key;
   }
-  else if (getG(vertex) == getRHS(vertex))
+  else if (round(getG(vertex)) == round(getRHS(vertex)))
   {
     // remove the vertex from the open list
     // ROS_INFO("REMOVED: %d, t: %f", std::get<0>(vertex), std::get<1>(vertex));
@@ -157,17 +157,17 @@ void DStarLiteST::updateVertex(std::tuple<unsigned int, double> vertex, std::sha
 //   return success;
 // }
 
-void DStarLiteST::clearExpandedGoals(std::shared_ptr<Vertex> goal)
-{
-  for (double time: expanded_goal_times_)
-  {
-    std::tuple<unsigned int, double> goal_tuple = std::make_tuple(goal->getId(), round(time));
-    setG(goal_tuple, std::numeric_limits<double>::infinity());
-    setRHS(goal_tuple, std::numeric_limits<double>::infinity());
-    // updateVertex(goal_tuple, goal, goal);
-  }
-  expanded_goal_times_.clear();
-}
+// void DStarLiteST::clearExpandedGoals(std::shared_ptr<Vertex> goal)
+// {
+//   for (double time: expanded_goal_times_)
+//   {
+//     std::tuple<unsigned int, double> goal_tuple = std::make_tuple(goal->getId(), round(time));
+//     setG(goal_tuple, std::numeric_limits<double>::infinity());
+//     setRHS(goal_tuple, std::numeric_limits<double>::infinity());
+//     // updateVertex(goal_tuple, goal, goal);
+//   }
+//   expanded_goal_times_.clear();
+// }
 
 bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal,
                                         std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints, 
@@ -177,7 +177,7 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
   // ROS_INFO("Start open_list_.size(): %ld", open_list_.size());
   // if (new_constraints.size() > 0)
   //   clearExpandedGoals(goal);
-
+  num_expansions_ = 0;
   for (Constraint c : new_constraints)
   {
     if (c.is_vertex_constraint)
@@ -204,17 +204,17 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
           {
             if (round(c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime()) >= 0 &&
                 !isConstrained(succ.first, pred.second, c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime(), constraints) &&
-                min_rhs > pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime()))))
+                round(min_rhs) > round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime())))))
             {
-              min_rhs = pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime())));
+              min_rhs = round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime()))));
               // ROS_INFO("Got MinRHS from Pred ID %d at time %f to RHS: %f", pred.first->getId(), c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime(), min_rhs);
               // ROS_INFO("Constrained: %d", isConstrained(succ.first, pred.second, c.time_step + succ.second->getTraversalTime() - pred.second->getTraversalTime(), constraints));
             }
           }
           if (!isConstrained(succ.first, nullptr, c.time_step + succ.second->getTraversalTime() - timestep_, constraints) &&
-              min_rhs > timestep_ + getG(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime() - timestep_))))
+              round(min_rhs) > round(timestep_ + getG(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime() - timestep_)))))
           {
-            min_rhs = timestep_ + getG(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime() - timestep_)));
+            min_rhs = round(timestep_ + getG(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime() - timestep_))));
           }
           // ROS_INFO("Setting Successor ID %d at time %f to RHS: %f", succ.first->getId(), c.time_step + succ.second->getTraversalTime(), min_rhs);
           setRHS(std::make_tuple(succ.first->getId(), round(c.time_step + succ.second->getTraversalTime())), min_rhs);
@@ -230,9 +230,9 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
         {
           if (round(c.time_step + timestep_ - pred.second->getTraversalTime()) >= 0 &&
               !isConstrained(c.joint_pos_vertex, pred.second, c.time_step + timestep_ - pred.second->getTraversalTime(), constraints) &&
-              min_rhs > pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + timestep_ - pred.second->getTraversalTime()))))
+              round(min_rhs) > round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + timestep_ - pred.second->getTraversalTime())))))
           {
-            min_rhs = pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + timestep_ - pred.second->getTraversalTime())));
+            min_rhs = round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(c.time_step + timestep_ - pred.second->getTraversalTime()))));
           }
         }
         // ROS_INFO("Setting Successor ID %d at time %f to RHS: %f", c.joint_pos_vertex->getId(), round(c.time_step + timestep_), min_rhs);
@@ -261,17 +261,17 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
             j = 1;
             k = 0;
           }
-          if (getRHS(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime()))) ==
-              c_old + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[k]->getId(), round(current_time))))
+          if (round(getRHS(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime())))) ==
+              round(c_old + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[k]->getId(), round(current_time)))))
           {
             double min_rhs = std::numeric_limits<double>::infinity();
             for (auto pred : c.joint_pos_edge->ordered_vertices_[j]->getEdges())
             {
               if (round(current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime()) >= 0 &&
                   !isConstrained(c.joint_pos_edge->ordered_vertices_[j], pred.second, current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime(), constraints) &&
-                  min_rhs > pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime()))))
+                  round(min_rhs) > round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime())))))
               {
-                min_rhs = pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime())));
+                min_rhs = round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime()))));
               }
               // else if (isConstrained(c.joint_pos_edge->ordered_vertices_[j], pred.second, current_time + c.joint_pos_edge->getTraversalTime() - pred.second->getTraversalTime(), constraints))
               // {
@@ -279,9 +279,9 @@ bool DStarLiteST::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<
               // }
             }
             if (!isConstrained(c.joint_pos_edge->ordered_vertices_[j], nullptr, current_time + c.joint_pos_edge->getTraversalTime() - timestep_, constraints) &&
-                min_rhs > timestep_ + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - timestep_))))
+                round(min_rhs) > round(timestep_ + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - timestep_)))))
             {
-              min_rhs = timestep_ + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - timestep_)));
+              min_rhs = round(timestep_ + getG(std::make_tuple(c.joint_pos_edge->ordered_vertices_[j]->getId(), round(current_time + c.joint_pos_edge->getTraversalTime() - timestep_))));
             }
             // else if (isConstrained(c.joint_pos_edge->ordered_vertices_[j], nullptr, current_time + c.joint_pos_edge->getTraversalTime() - timestep_, constraints))
             // {
@@ -322,7 +322,7 @@ bool DStarLiteST::shortestPathSearchCondition(std::shared_ptr<Vertex> start, std
     std::tuple<unsigned int, double> goal_tuple = std::make_tuple(goal->getId(), goal_time);
       // ROS_INFO("top key: %f, %f", std::get<0>(top_key), std::get<1>(top_key));
       // ROS_INFO("goal key: %f, %f", std::get<0>(calculateKey(goal_tuple)), std::get<1>(calculateKey(goal_tuple)));
-    if (key >= calculateKey(goal_tuple) && getRHS(goal_tuple) <= getG(goal_tuple) && goal_time > max_constraint_time)
+    if (key >= calculateKey(goal_tuple) && round(getRHS(goal_tuple)) <= round(getG(goal_tuple)) && round(goal_time) >= round(max_constraint_time))
     {
       
       // ROS_INFO("top key greater than goal key: %d", key >= calculateKey(goal_tuple));
@@ -350,9 +350,10 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
   double max_time = round(max_constraint_time + max_roadmap_traversal_time_);
   while(shortestPathSearchCondition(start, goal, constraints, max_constraint_time))
   {
+    ++num_expansions_;
     // ROS_INFO("Updating");
     auto top = open_list_.top();
-    std::tuple<double, double> k_old = std::make_tuple(std::get<0>(std::get<0>(top)), std::get<1>(std::get<0>(top)));
+    std::tuple<double, double> k_old = std::make_tuple(round(std::get<0>(std::get<0>(top))), std::get<1>(std::get<0>(top)));
 
     std::tuple<unsigned int, double> u_tuple = std::get<1>(top);
     if (round(std::get<1>(u_tuple)) > max_time)
@@ -371,9 +372,9 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
       // if (u->getId() == goal->getId())
       //   expanded_goal_times_.erase(u_time);
     }
-    else if (getG(u_tuple) > getRHS(u_tuple))
+    else if (round(getG(u_tuple)) > round(getRHS(u_tuple)))
     {
-      setG(u_tuple, getRHS(u_tuple));
+      setG(u_tuple, round(getRHS(u_tuple)));
       // ROS_INFO("Expand key");
       // open_list_.remove(u_tuple);
       updateVertex(u_tuple, u, goal);
@@ -395,9 +396,9 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
         {
           std::tuple<unsigned int, double> succ_tuple = std::make_tuple(succ.first->getId(), round(u_time + succ.second->getTraversalTime()));
           if (!isConstrained(succ.first, succ.second, u_time, constraints) &&
-          getRHS(succ_tuple) > succ.second->getTraversalTime() + getG(u_tuple))
+          round(getRHS(succ_tuple)) > round(succ.second->getTraversalTime() + getG(u_tuple)))
           {
-            setRHS(succ_tuple, succ.second->getTraversalTime() + getG(u_tuple));
+            setRHS(succ_tuple, round(succ.second->getTraversalTime() + getG(u_tuple)));
           }
           updateVertex(succ_tuple, succ.first, goal);
           // if (succ.first->getId() == goal->getId())
@@ -410,9 +411,9 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
       {
         std::tuple<unsigned int, double> succ_tuple = std::make_tuple(u->getId(), round(u_time + timestep_));
         if (!isConstrained(u, nullptr, u_time, constraints) &&
-        getRHS(succ_tuple) > timestep_ + getG(u_tuple))
+        round(getRHS(succ_tuple)) > round(timestep_ + getG(u_tuple)))
         {
-          setRHS(succ_tuple, timestep_ + getG(u_tuple));
+          setRHS(succ_tuple, round(timestep_ + getG(u_tuple)));
         }
         updateVertex(succ_tuple, u, goal);
       }
@@ -430,7 +431,7 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
         if (round(u_time + succ.second->getTraversalTime()) <= max_time)
         {
           std::tuple<unsigned int, double> succ_tuple = std::make_tuple(succ.first->getId(), round(u_time + succ.second->getTraversalTime()));
-          if (getRHS(succ_tuple) == succ.second->getTraversalTime() + g_old)
+          if (round(getRHS(succ_tuple)) == round(succ.second->getTraversalTime() + g_old))
           {
             // Line 46, for all predecessors (backwards)
             double min_rhs = std::numeric_limits<double>::infinity();
@@ -439,16 +440,16 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
               std::tuple<unsigned int, double> pred_tuple = std::make_tuple(pred.first->getId(), round(u_time + succ.second->getTraversalTime() - pred.second->getTraversalTime()));
               if (round(u_time + succ.second->getTraversalTime() - pred.second->getTraversalTime()) >= 0 &&
                   !isConstrained(succ.first, pred.second, u_time + succ.second->getTraversalTime() - pred.second->getTraversalTime(), constraints) &&
-                  min_rhs > pred.second->getTraversalTime() + getG(pred_tuple))
+                  round(min_rhs) > round(pred.second->getTraversalTime() + getG(pred_tuple)))
               {
-                min_rhs = pred.second->getTraversalTime() + getG(pred_tuple);
+                min_rhs = round(pred.second->getTraversalTime() + getG(pred_tuple));
               }
             }
             std::tuple<unsigned int, double> pred_tuple = std::make_tuple(succ.first->getId(), round(u_time + succ.second->getTraversalTime() - timestep_));
             if (!isConstrained(succ.first, nullptr, u_time + succ.second->getTraversalTime() - timestep_, constraints) &&
-                min_rhs > timestep_ + getG(pred_tuple))
+                round(min_rhs) > round(timestep_ + getG(pred_tuple)))
             {
-              min_rhs = timestep_ + getG(pred_tuple);
+              min_rhs = round(timestep_ + getG(pred_tuple));
             }
             setRHS(succ_tuple, min_rhs);
           }
@@ -456,10 +457,10 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
         }
       }
       // Staying in same spot successor
-      if (round(u_time + timestep_) < max_time)
+      if (round(u_time + timestep_) <= max_time)
       {
         std::tuple<unsigned int, double> succ_tuple = std::make_tuple(u->getId(), round(u_time + timestep_));
-        if (getRHS(succ_tuple) == timestep_ + g_old)
+        if (round(getRHS(succ_tuple)) == round(timestep_ + g_old))
         {
           // Line 46, for all predecessors (backwards)
           double min_rhs = std::numeric_limits<double>::infinity();
@@ -468,16 +469,16 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
             std::tuple<unsigned int, double> pred_tuple = std::make_tuple(pred.first->getId(), round(u_time + timestep_ - pred.second->getTraversalTime()));
             if (round(u_time + timestep_ - pred.second->getTraversalTime()) >= 0 &&
                 !isConstrained(u, pred.second, u_time + timestep_ - pred.second->getTraversalTime(), constraints) &&
-                min_rhs > pred.second->getTraversalTime() + getG(pred_tuple))
+                round(min_rhs) > round(pred.second->getTraversalTime() + getG(pred_tuple)))
             {
-              min_rhs = pred.second->getTraversalTime() + getG(pred_tuple);
+              min_rhs = round(pred.second->getTraversalTime() + getG(pred_tuple));
             }
           }
           std::tuple<unsigned int, double> pred_tuple = std::make_tuple(u->getId(), u_time);
           if (!isConstrained(u, nullptr, u_time, constraints) &&
-              min_rhs > timestep_ + getG(pred_tuple))
+              round(min_rhs) > round(timestep_ + getG(pred_tuple)))
           {
-            min_rhs = timestep_ + getG(pred_tuple);
+            min_rhs = round(timestep_ + getG(pred_tuple));
           }
           setRHS(succ_tuple, min_rhs);
         }
@@ -485,7 +486,7 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
       }
       
       // same spot, same time, u
-      if (getRHS(u_tuple) == g_old && u->getId() != start->getId() && u_time != 0)
+      if (round(getRHS(u_tuple)) == round(g_old) && u->getId() != start->getId() && u_time != 0)
       {
         double min_rhs = std::numeric_limits<double>::infinity();
         for (auto pred : u->getEdges())
@@ -493,23 +494,24 @@ bool DStarLiteST::computeShortestPath(std::shared_ptr<Vertex> start, std::shared
           std::tuple<unsigned int, double> pred_tuple = std::make_tuple(pred.first->getId(), round(u_time - pred.second->getTraversalTime()));
           if (round(u_time - pred.second->getTraversalTime()) >= 0 &&
               !isConstrained(u, pred.second, u_time - pred.second->getTraversalTime(), constraints) &&
-              min_rhs > pred.second->getTraversalTime() + getG(pred_tuple))
+              round(min_rhs) > round(pred.second->getTraversalTime() + getG(pred_tuple)))
           {
-            min_rhs = pred.second->getTraversalTime() + getG(pred_tuple);
+            min_rhs = round(pred.second->getTraversalTime() + getG(pred_tuple));
           }
         }
         std::tuple<unsigned int, double> pred_tuple = std::make_tuple(u->getId(), round(u_time - timestep_));
         if (round(u_time - timestep_) >= 0 &&
             !isConstrained(u, nullptr, u_time - timestep_, constraints) &&
-            min_rhs > timestep_ + getG(pred_tuple))
+            round(min_rhs) > round(timestep_ + getG(pred_tuple)))
         {
-          min_rhs = timestep_ + getG(pred_tuple);
+          min_rhs = round(timestep_ + getG(pred_tuple));
         }
         setRHS(u_tuple, min_rhs);
       }
       updateVertex(u_tuple, u, goal);
     }
   }
+  // ROS_WARN("NUMBER OF EXPANSIONS: %d", num_expansions_);
   if (open_list_.size() == 0)
     return false;
   return true;
@@ -550,12 +552,12 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
       // ROS_INFO("Constrained: %d", isConstrained(v, pred.second, time - pred.second->getTraversalTime(), constraints));
       if (round(time - pred.second->getTraversalTime()) >= 0 &&
           !isConstrained(v, pred.second, time - pred.second->getTraversalTime(), constraints) &&
-          f > pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime()))))
+          round(f) > round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime())))))
       {
         // ROS_INFO("Pred ID: %d, Time: %f, G: %f, RHS: %f", pred.first->getId(), round(time - pred.second->getTraversalTime()), getG(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime()))), getRHS(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime()))));
         // ROS_INFO("Trav Time: %f", pred.second->getTraversalTime());
         // ROS_INFO("pred time: %f", time - pred.second->getTraversalTime());
-        f = pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime())));
+        f = round(pred.second->getTraversalTime() + getG(std::make_tuple(pred.first->getId(), round(time - pred.second->getTraversalTime()))));
         s = pred.first;
         pred_time = time - pred.second->getTraversalTime();
       }
@@ -565,9 +567,9 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
     // ROS_INFO("Constrained: %d", isConstrained(v, nullptr, time - timestep_, constraints));
     if (round(time - timestep_) >= 0 &&
         !isConstrained(v, nullptr, time - timestep_, constraints) &&
-        f > timestep_ + getG(std::make_tuple(v->getId(), round(time - timestep_))))
+        round(f) > round(timestep_ + getG(std::make_tuple(v->getId(), round(time - timestep_)))))
     {
-      f = timestep_ + getG(std::make_tuple(v->getId(), round(time - timestep_)));
+      f = round(timestep_ + getG(std::make_tuple(v->getId(), round(time - timestep_))));
       s = v;
       pred_time = time - timestep_;
     }
@@ -581,7 +583,7 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
     // if (v->getId() == s->getId())
     //   same = true;
     v = s;
-    time = pred_time;
+    time = round(pred_time);
     prm_path.push_back(v);
   }
   // while (v != start || time != 0)
@@ -594,6 +596,11 @@ std::vector<std::shared_ptr<Vertex>> DStarLiteST::getPRMPath(std::shared_ptr<Ver
   std::reverse(prm_path.begin(), prm_path.end());
   // ROS_INFO("Returning a path from Dstar");
   return prm_path;
+}
+
+unsigned int DStarLiteST::getNumExpansions()
+{
+  return num_expansions_;
 }
 
 double DStarLiteST::computeHeuristics(std::shared_ptr<Vertex> goal)

@@ -41,5 +41,6 @@ class CBSMP
     std::vector<double> runtimes_;
     double total_runtime_;
     std::vector<int> resampled_;
+    std::vector<unsigned int> num_expansions_;
 };
 

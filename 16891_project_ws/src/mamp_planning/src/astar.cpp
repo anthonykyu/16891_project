@@ -27,6 +27,11 @@ bool AStar::computeWaypointPaths(std::vector<std::shared_ptr<Vertex>> waypoints,
   return success;
 }
 
+unsigned int AStar::getNumExpansions()
+{
+  return num_expansions_;
+}
+
 bool AStar::computePRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, 
 std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> &constraints,
 double max_constraint_time, double start_time, bool is_last_waypoint)
@@ -36,6 +41,7 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
   closed_list_.clear();
   // parent_map_.clear();
   g_.clear();
+  num_expansions_ = 0;
 
   double max_time = computeHeuristics(goal) + max_constraint_time;
   // ROS_INFO("h size: %ld", h_.size());
@@ -46,7 +52,7 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
   while (open_list_.size() > 0)
   {
     // ROS_INFO("Inside the while loop");
-
+    ++num_expansions_;
     auto v = open_list_.pop();
     std::tuple<double, unsigned int, double> comparison_v = std::get<0>(v);
     std::tuple<unsigned int, double> id_v = std::get<1>(v); 
@@ -61,6 +67,7 @@ double max_constraint_time, double start_time, bool is_last_waypoint)
     if (vertex_v->getId() == goal->getId() && (current_time > max_constraint_time || !is_last_waypoint))
     {
       // ROS_INFO("Yayyyyyy found the goal");
+      // ROS_WARN("NUMBER OF EXPANSIONS: %d", num_expansions_);
       path_time_ = current_time;
       return true;
     }

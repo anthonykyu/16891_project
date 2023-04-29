@@ -50,10 +50,10 @@ double Edge::getTraversalTime()
 
 void Edge::setDivisions(double divisions)
 {
-  divisions_=divisions;
+  divisions_ = static_cast<unsigned int>(std::round(divisions));
 }
 
-double Edge::getDivisions()
+unsigned int Edge::getDivisions()
 {
   return divisions_;
 }

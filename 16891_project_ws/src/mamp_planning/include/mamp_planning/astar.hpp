@@ -20,6 +20,7 @@ public:
                         double max_constraint_time = 0, double start_time = 0,
                         bool is_last_waypoint = true);
     std::vector<std::shared_ptr<Vertex>> getPRMPath(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal);
+    unsigned int getNumExpansions();
     // AStar(std::shared_ptr<AStar> &astar);
     // AStar(std::shared_ptr<Vertex> start, std::shared_ptr<Vertex> goal, std::shared_ptr<Agent> agent, std::vector<Constraint> constraints);
 // 
@@ -41,6 +42,7 @@ private:
     // std::shared_ptr<PRM> prm_;
     // std::unordered_map<std::tuple<unsigned int, double>, double, hash_tuple::hash<std::tuple<unsigned int, double>>> v_;
     double path_time_;
+    unsigned int num_expansions_;
     double computeHeuristics(std::shared_ptr<Vertex> goal);
     bool isValid(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge);
     bool isConstrained(std::shared_ptr<Vertex> vertex, std::shared_ptr<Edge> edge, double current_time,

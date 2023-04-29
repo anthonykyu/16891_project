@@ -59,7 +59,7 @@ Agent::Agent(const std::string &robot_description, const std::string &robot_desc
                                joint_vel_limit_, upper_joint_limit_, lower_joint_limit_,
                                waypoints_, acm_);
   astar_ = std::make_shared<AStar>(timestep_);
-  dstar_lite_ = std::make_shared<DStarLiteST>(timestep_);
+  dstar_lite_ = std::make_shared<LPAStar>(timestep_);
   dstar_lite_->initialize(waypoints_[0], waypoints_[waypoints_.size()-1]);
 }
 
@@ -83,10 +83,10 @@ Agent::Agent(std::shared_ptr<Agent> &a)
   planning_scene_ = a->getPlanningScene();
   // acm_ = a->getACM();
   astar_ = std::make_shared<AStar>(timestep_);
-  dstar_lite_ = std::make_shared<DStarLiteST>(a->getDStar());
+  dstar_lite_ = std::make_shared<LPAStar>(a->getDStar());
 }
 
-std::shared_ptr<DStarLiteST> &Agent::getDStar()
+std::shared_ptr<LPAStar> &Agent::getDStar()
 {
   return dstar_lite_;
 }

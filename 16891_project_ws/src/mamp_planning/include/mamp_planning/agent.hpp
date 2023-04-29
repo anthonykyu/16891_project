@@ -9,6 +9,7 @@
 
 #include "mamp_planning/dstar_lite.hpp"
 #include "mamp_planning/dstar_lite_st.hpp"
+#include "mamp_planning/lpastar.hpp"
 #include "mamp_planning/astar.hpp"
 #include "mamp_planning/prm.hpp"
 #include <moveit/robot_model_loader/robot_model_loader.h>
@@ -35,7 +36,7 @@ public:
     urdf::Model const &getURDF();
     double const &getTimestep();
     std::shared_ptr<AStar> &getAStar();
-    std::shared_ptr<DStarLiteST> &getDStar();
+    std::shared_ptr<LPAStar> &getDStar();
     bool computeIncrementalSingleAgentPath(std::pair<std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>, 
                                 std::unordered_map<std::shared_ptr<Edge>, std::vector<Constraint>>> constraints =
                                 std::make_pair(std::unordered_map<std::shared_ptr<Vertex>, std::vector<Constraint>>(),
@@ -66,7 +67,8 @@ private:
     std::shared_ptr<PRM> prm_;
     std::shared_ptr<AStar> astar_;
     // std::shared_ptr<DStarLite> dstar_lite_;
-    std::shared_ptr<DStarLiteST> dstar_lite_;
+    // std::shared_ptr<DStarLiteST> dstar_lite_;
+    std::shared_ptr<LPAStar> dstar_lite_;
     double timestep_;
     std::vector<std::shared_ptr<Vertex>> prm_path_;
     std::vector<std::shared_ptr<Vertex>> discretized_path_;

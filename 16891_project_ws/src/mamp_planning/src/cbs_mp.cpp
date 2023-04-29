@@ -254,22 +254,32 @@ void CBSMP::printStats(std::shared_ptr<CTNode> node)
   ROS_INFO("Runtime: %f", total_runtime_);
   std::vector<double> avg_runtimes_;
   double avg = 0;
+  std::vector<double> avg_expansions_;
+  double avg_expansions = 0;
   for (int i = 0; i < runtimes_.size(); i+=2)
   {
     avg += runtimes_[i];
     avg += runtimes_[i+1];
     avg_runtimes_.push_back((runtimes_[i] + runtimes_[i+1]) / 2.0);
+    avg_expansions += num_expansions_[i];
+    avg_expansions += num_expansions_[i+1];
+    avg_expansions_.push_back((num_expansions_[i] + num_expansions_[i+1]) / 2.0);
   }
   avg = avg / runtimes_.size();
+  avg_expansions = avg_expansions / num_expansions_.size();
   ofstream file;
   file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_results.csv");
   // file.open ("cbsmp_results.csv");
   for (int i = 0; i < avg_runtimes_.size(); ++i)
   {
-    file << i << "," << avg_runtimes_[i] << "," << resampled_[i] << std::endl;
+    if (resampled_[i] == 1)
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << "," << resampled_[i] << std::endl;
+    else
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << std::endl;
   }
   file.close();
   ROS_INFO("Average Solve Time: %f", avg);
+  ROS_INFO("Average Number of Expansions: %f", avg_expansions);
   ROS_INFO("Path Cost of Node: %f", node->getCost());
   size_t prm_size = 0;
   for (auto a : agents_)
@@ -290,8 +300,9 @@ bool CBSMP::replanCBS()
   for (auto a : agents_)
   {
     root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
+    // ROS_INFO("Agent: %s, Path Cost: %ld", a.first.c_str(), a.second->getDiscretizedPath().size());
   }
-
+  // printPaths(root);
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
   root->detectCollisions();
   // ROS_INFO("Number of paths: %ld", root->getPaths().size());
@@ -301,13 +312,7 @@ bool CBSMP::replanCBS()
   int iteration=0;
   while (open_list_.size() > 0)
   {
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diff = end - start;
-    if (diff.count() > 120)
-    {
-      ROS_INFO("Failed to find path");
-      return false;
-    }
+    
 
     iteration++;
     ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
@@ -317,10 +322,10 @@ bool CBSMP::replanCBS()
       // TODO: resample routine
       // ROS_INFO("Resampling now!!!");
       auto a = getAgents();
-      #ifdef MP_EN
-        omp_set_num_threads(MP_PROC_NUM);
-        #pragma omp parallel for
-      #endif
+      // #ifdef MP_EN
+      //   omp_set_num_threads(MP_PROC_NUM);
+      //   #pragma omp parallel for
+      // #endif
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
@@ -347,6 +352,19 @@ bool CBSMP::replanCBS()
     }
     std::shared_ptr<CTNode> node = std::get<2>(open_list_.pop());
     ++N;
+
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    if (diff.count() > 120)
+    {
+      ROS_INFO("Failed to find path");
+      end = std::chrono::high_resolution_clock::now();
+      diff = end - start;
+      total_runtime_ = diff.count();
+      printStats(node);
+      return false;
+    }
 
     // ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
     // ROS_INFO("Number of collisions: %ld", node->numCollisions());
@@ -375,11 +393,11 @@ bool CBSMP::replanCBS()
     // printConstraints(constraints);
     std::vector<std::shared_ptr<CTNode>> new_nodes {std::make_shared<CTNode>(++node_id, node), std::make_shared<CTNode>(++node_id, node)};
     std::vector<bool> succ {false, false};
-    #ifdef MP_EN
-        // ROS_INFO("Using OMP");
-        omp_set_num_threads(MP_PROC_NUM);
-        #pragma omp parallel for
-    #endif
+    // #ifdef MP_EN
+    //     // ROS_INFO("Using OMP");
+    //     omp_set_num_threads(MP_PROC_NUM);
+    //     #pragma omp parallel for
+    // #endif
 
     // ROS_WARN("Making children to resolve collision");
     // ROS_INFO("Collision being resolved is:");
@@ -404,6 +422,7 @@ bool CBSMP::replanCBS()
       auto end_solve = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff_solve = end_solve - start_solve;
       runtimes_.push_back(diff_solve.count());
+      num_expansions_.push_back(new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getAStar()->getNumExpansions());
       // ROS_WARN("Will probably fail here");
       if (succ[i])
       {
@@ -422,9 +441,12 @@ bool CBSMP::replanCBS()
         // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         // printCollision(new_nodes[i]->getNextCollision());
         // printConstraints(new_nodes[i]->getConstraints());
-        open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }
+    for (int i = 0; i < new_nodes.size(); ++i)
+      if (succ[i])
+        open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
+
 
     // std::shared_ptr<CTNode> n1 = std::make_shared<CTNode>(++node_id, node);
     // std::shared_ptr<CTNode> n2 = std::make_shared<CTNode>(++node_id, node);

@@ -237,6 +237,46 @@ void CBSMPDStarLiteST::printCollision(Collision c)
   }
 }
 
+void CBSMPDStarLiteST::printStats(std::shared_ptr<CTNode> node)
+{
+  ROS_INFO("Runtime: %f", total_runtime_);
+  std::vector<double> avg_runtimes_;
+  double avg = 0;
+  std::vector<double> avg_expansions_;
+  double avg_expansions = 0;
+  for (int i = 0; i < runtimes_.size(); i+=2)
+  {
+    avg += runtimes_[i];
+    avg += runtimes_[i+1];
+    avg_runtimes_.push_back((runtimes_[i] + runtimes_[i+1]) / 2.0);
+    avg_expansions += num_expansions_[i];
+    avg_expansions += num_expansions_[i+1];
+    avg_expansions_.push_back((num_expansions_[i] + num_expansions_[i+1]) / 2.0);
+  }
+  avg = avg / runtimes_.size();
+  avg_expansions = avg_expansions / num_expansions_.size();
+  ofstream file;
+  file.open(ros::package::getPath("mamp_planning") + "/results/cbsmp_dstarlite_results.csv");
+  // file.open ("cbsmp_results.csv");
+  for (int i = 0; i < avg_runtimes_.size(); ++i)
+  {
+    if (resampled_[i] == 1)
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << "," << resampled_[i] << std::endl;
+    else
+      file << i << "," << avg_runtimes_[i] << "," << avg_expansions_[i] << std::endl;
+  }
+  file.close();
+  ROS_INFO("Average Solve Time: %f", avg);
+  ROS_INFO("Average Number of Expansions: %f", avg_expansions);
+  ROS_INFO("Path Cost of Node: %f", node->getCost());
+  size_t prm_size = 0;
+  for (auto a : agents_)
+  {
+    prm_size += a.second->getPRM()->PRMgraph_.size();
+  }
+  ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
+
+}
 
 bool CBSMPDStarLiteST::replanCBS()
 {
@@ -247,23 +287,16 @@ bool CBSMPDStarLiteST::replanCBS()
   for (auto a : agents_)
   {
     root->getPaths().insert({a.first, a.second->getDiscretizedPath()});
+    // ROS_INFO("Agent: %s, Path Cost: %ld", a.first.c_str(), a.second->getDiscretizedPath().size());
   }
+  // printPaths(root);
 
   root->detectCollisions();
   root->computeCost();
   open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
   int iteration=0;
-  double avg = 0;
-  unsigned int count = 0;
   while (open_list_.size() > 0)
   {
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> diff = end - start;
-    if (diff.count() > 120)
-    {
-      ROS_INFO("Failed to find path");
-      return false;
-    }
 
     iteration++;
     ROS_ERROR("~~~~~~~ CBS Iteration %d ~~~~~~~", iteration);
@@ -280,7 +313,8 @@ bool CBSMPDStarLiteST::replanCBS()
       for (int i = 0; i < a.size(); ++i)
       {
         a[i]->getPRM()->expandPRM();
-        a[i]->computeIncrementalSingleAgentPath();
+        // a[i]->computeIncrementalSingleAgentPath();
+        a[i]->getDStar()->initialize(a[i]->getWaypoints()[0], a[i]->getWaypoints()[a[i]->getWaypoints().size()-1]);
       }
       open_list_.clear();
       // iteration = 0;
@@ -295,10 +329,26 @@ bool CBSMPDStarLiteST::replanCBS()
       root->computeCost();
       open_list_.insert(root->getComparisonTuple(), std::make_tuple(root->getId()), root);
       ++S_;
+      resampled_.push_back(1);
+    }
+    else
+    {
+      resampled_.push_back(0);
     }
     std::shared_ptr<CTNode> node = std::get<2>(open_list_.pop());
     ++N;
 
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> diff = end - start;
+    if (diff.count() > 120)
+    {
+      ROS_INFO("Failed to find path");
+      end = std::chrono::high_resolution_clock::now();
+      diff = end - start;
+      total_runtime_ = diff.count();
+      printStats(node);
+      return false;
+    }
     // ROS_INFO("Number of constraints: %ld", node->getConstraints().size());
     // ROS_INFO("Number of collisions: %ld", node->numCollisions());
     // ROS_INFO("Cost of Node: %f", node->getCost());
@@ -313,16 +363,9 @@ bool CBSMPDStarLiteST::replanCBS()
       // printPaths(node);
       end = std::chrono::high_resolution_clock::now();
       diff = end - start;
-      ROS_INFO("Runtime: %f", diff.count());
-      ROS_INFO("Average Solve Time: %f", avg);
+      total_runtime_ = diff.count();
       agents_ = node->getAgents();
-      ROS_INFO("Path Cost of Node: %f", node->getCost());
-      size_t prm_size = 0;
-      for (auto a : agents_)
-      {
-        prm_size += a.second->getPRM()->PRMgraph_.size();
-      }
-      ROS_INFO("Total Nodes in All PRMs: %ld", prm_size);
+      printStats(node);
 
       return true;
     }
@@ -344,10 +387,36 @@ bool CBSMPDStarLiteST::replanCBS()
       auto start_solve = std::chrono::high_resolution_clock::now();
       succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeIncrementalSingleAgentPath(
       MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime(), std::vector<Constraint> {constraints[i]});
+      // double oldCost = 0;
+      // Collision oldCollision;
+      // if (succ[i])
+      // {
+      //   new_nodes[i]->detectCollisions();
+      //   new_nodes[i]->computeCost();
+      //   // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+      //   // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
+      //   oldCost = new_nodes[i]->getCost();
+      //   oldCollision = new_nodes[i]->getNextCollision();
+      //   // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
+      //   // printCollision(new_nodes[i]->getNextCollision());
+      // }
+      // succ[i] = new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->computeSingleAgentPath(
+      // MAMP_Helper::getConstraintsForAgent(new_nodes[i]->getConstraints(), constraints[i].agent_id), new_nodes[i]->getMaxConstraintTime());
+      // if (succ[i])
+      // {
+      //   new_nodes[i]->detectCollisions();
+      //   new_nodes[i]->computeCost();
+      //   // ROS_INFO("Number of collisions: %ld", new_nodes[i]->numCollisions());
+      //   // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
+      //   if (abs(oldCost - new_nodes[i]->getCost()) > 0.01 || !(oldCollision == new_nodes[i]->getNextCollision()))
+      //     ROS_WARN("COSTS NOT MATCHING");
+      //   // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
+      //   // printCollision(new_nodes[i]->getNextCollision());
+      // }
       auto end_solve = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> diff_solve = end_solve - start_solve;
-      avg = ((avg * count) + diff_solve.count()) / (count + 1);
-      ++count;
+      runtimes_.push_back(diff_solve.count());
+      num_expansions_.push_back(new_nodes[i]->getAgents().find(constraints[i].agent_id)->second->getDStar()->getNumExpansions());
       if (succ[i])
       {
         new_nodes[i]->getPaths().erase(constraints[i].agent_id);
@@ -358,9 +427,11 @@ bool CBSMPDStarLiteST::replanCBS()
         // ROS_INFO("Cost: %f", new_nodes[i]->getCost());
         // ROS_INFO("Node Id: %d", new_nodes[i]->getId());
         // printCollision(new_nodes[i]->getNextCollision());
-        open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
       }
     }
+    for (int i = 0; i < new_nodes.size(); ++i)
+      if (succ[i])
+        open_list_.insert(new_nodes[i]->getComparisonTuple(), std::make_tuple(new_nodes[i]->getId()), new_nodes[i]);
   }
   // No solution!!!
   return false;
